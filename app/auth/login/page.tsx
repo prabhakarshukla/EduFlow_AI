@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-
 export default function LoginPage() {
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
@@ -19,25 +18,46 @@ export default function LoginPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4 py-16"
-      style={{ background: 'var(--bg)' }}
+      style={{ background: '#222022' }}
     >
-      {/* Background glow blobs */}
+      {/* Ambient blobs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full blur-3xl opacity-10"
-          style={{ background: 'var(--primary)' }} />
-        <div className="absolute -bottom-40 -left-40 w-[400px] h-[400px] rounded-full blur-3xl opacity-10"
-          style={{ background: 'var(--secondary)' }} />
+        <div
+          className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.07]"
+          style={{ background: '#6EE7D8' }}
+        />
+        <div
+          className="absolute -bottom-40 -left-40 w-[400px] h-[400px] rounded-full blur-3xl opacity-[0.07]"
+          style={{ background: '#14B8A6' }}
+        />
       </div>
 
       <div className="relative w-full max-w-sm">
+
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <Link href="/" style={{ display:'flex', alignItems:'center' }}>
+          <Link
+            href="/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              transition: 'transform 0.2s, filter 0.2s',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.transform = 'scale(1.05)';
+              (e.currentTarget as HTMLElement).style.filter =
+                'drop-shadow(0 0 12px rgba(110,231,216,0.5))';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
+              (e.currentTarget as HTMLElement).style.filter = 'none';
+            }}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/logo.png"
               alt="EduFlow AI"
-              style={{ height: '90px', width: 'auto', display: 'block' }}
+              style={{ height: '80px', width: 'auto', display: 'block' }}
             />
           </Link>
         </div>
@@ -46,19 +66,21 @@ export default function LoginPage() {
         <div
           className="rounded-2xl p-8"
           style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border)',
-            boxShadow: '0 24px 60px rgba(0,0,0,0.4)',
+            background: '#2a282a',
+            border: '1px solid rgba(110,231,216,0.16)',
+            boxShadow: '0 24px 60px rgba(0,0,0,0.45)',
           }}
         >
           <h1 className="text-2xl font-bold mb-1 gradient-text">Welcome back</h1>
-          <p className="text-sm mb-7" style={{ color: 'var(--text-muted)' }}>
+          <p className="text-sm mb-7" style={{ color: '#7ca8a3' }}>
             Log in to continue your learning journey.
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+            {/* Email */}
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-body)' }}>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
                 Email
               </label>
               <input
@@ -71,10 +93,17 @@ export default function LoginPage() {
               />
             </div>
 
+            {/* Password */}
             <div>
               <div className="flex justify-between items-center mb-1.5">
-                <label className="text-xs font-medium" style={{ color: 'var(--text-body)' }}>Password</label>
-                <Link href="/auth/forgot-password" className="text-xs transition-colors" style={{ color: 'var(--primary)' }}>
+                <label className="text-xs font-medium" style={{ color: '#d1faf5' }}>Password</label>
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-xs transition-colors duration-150"
+                  style={{ color: '#6EE7D8' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#5EEAD4'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#6EE7D8'; }}
+                >
                   Forgot password?
                 </Link>
               </div>
@@ -88,10 +117,12 @@ export default function LoginPage() {
               />
             </div>
 
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
               className="btn-primary justify-center mt-1 py-3"
+              style={{ opacity: loading ? 0.75 : 1 }}
             >
               {loading ? (
                 <>
@@ -105,15 +136,28 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-sm mt-6" style={{ color: 'var(--text-muted)' }}>
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-6">
+            <div className="flex-1 h-px" style={{ background: 'rgba(110,231,216,0.10)' }} />
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>or</span>
+            <div className="flex-1 h-px" style={{ background: 'rgba(110,231,216,0.10)' }} />
+          </div>
+
+          <p className="text-center text-sm" style={{ color: '#7ca8a3' }}>
             Don&apos;t have an account?{' '}
-            <Link href="/auth/signup" className="font-semibold transition-colors" style={{ color: 'var(--primary)' }}>
+            <Link
+              href="/auth/signup"
+              className="font-semibold transition-colors duration-150"
+              style={{ color: '#6EE7D8' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#5EEAD4'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#6EE7D8'; }}
+            >
               Sign up free
             </Link>
           </p>
         </div>
 
-        <p className="text-center text-xs mt-6" style={{ color: 'var(--text-muted)' }}>
+        <p className="text-center text-xs mt-6" style={{ color: 'rgba(255,255,255,0.25)' }}>
           © {new Date().getFullYear()} EduFlow AI — All rights reserved.
         </p>
       </div>

@@ -45,33 +45,66 @@ const sidebarLinks = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const currentPage = sidebarLinks.find(l => l.href === pathname)?.label ?? 'Dashboard';
 
   return (
-    <div className="flex min-h-screen" style={{ background: 'var(--bg)' }}>
+    <div className="flex min-h-screen" style={{ background: '#222022' }}>
+
+      {/* ── Mobile overlay ── */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-20 bg-black/60 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
 
       {/* ── Sidebar ── */}
       <aside
-        className="flex-shrink-0 flex flex-col transition-all duration-300"
+        className={`
+          fixed md:relative z-30 flex flex-col h-full md:h-auto min-h-screen
+          transition-all duration-300 flex-shrink-0
+          ${mobileOpen ? 'left-0' : '-left-64 md:left-0'}
+        `}
         style={{
-          width: collapsed ? '68px' : '240px',
-          background: '#1a181a',
+          width: collapsed ? '68px' : '232px',
+          background: '#1c1a1c',
           borderRight: '1px solid rgba(110,231,216,0.10)',
         }}
       >
-        {/* Logo */}
+        {/* Logo row */}
         <div
-          className="flex items-center px-4 py-5"
-          style={{ borderBottom: '1px solid rgba(110,231,216,0.08)' }}
+          className="flex items-center px-4 py-5 gap-2 flex-shrink-0"
+          style={{ borderBottom: '1px solid rgba(110,231,216,0.08)', minHeight: '72px' }}
         >
-          <Link href="/" className="logo-wrap flex-shrink-0">
+          <Link
+            href="/"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              transition: 'filter 0.2s, transform 0.2s',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.filter =
+                'drop-shadow(0 0 8px rgba(110,231,216,0.45))';
+              (e.currentTarget as HTMLElement).style.transform = 'scale(1.04)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.filter = 'none';
+              (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
+            }}
+          >
             {collapsed ? (
-              /* Collapsed: icon-only fallback */
               <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg,#6EE7D8,#14B8A6)' }}
+                style={{
+                  background: 'linear-gradient(135deg,#6EE7D8,#14B8A6)',
+                  boxShadow: '0 0 12px rgba(110,231,216,0.25)',
+                }}
               >
                 <svg className="w-4 h-4" fill="white" viewBox="0 0 18 18">
-                  <path d="M3 13V5.5C3 4.67 3.67 4 4.5 4H13.5C14.33 4 15 4.67 15 5.5V10.5C15 11.33 14.33 12 13.5 12H7L3 16V13Z"/>
+                  <path d="M3 13V5.5C3 4.67 3.67 4 4.5 4H13.5C14.33 4 15 4.67 15 5.5V10.5C15 11.33 14.33 12 13.5 12H7L3 16V13Z" />
                 </svg>
               </div>
             ) : (
@@ -87,9 +120,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {!collapsed && (
             <button
               onClick={() => setCollapsed(true)}
-              className="ml-auto p-1.5 rounded-lg opacity-40 hover:opacity-100 transition-opacity"
-              style={{ color: 'var(--primary)' }}
+              className="ml-auto p-1.5 rounded-lg transition-all duration-150"
+              style={{ color: 'rgba(110,231,216,0.4)' }}
               aria-label="Collapse sidebar"
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.color = '#6EE7D8';
+                (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.08)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.color = 'rgba(110,231,216,0.4)';
+                (e.currentTarget as HTMLElement).style.background = 'transparent';
+              }}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
@@ -100,19 +141,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {collapsed && (
             <button
               onClick={() => setCollapsed(false)}
-              className="mt-3 p-1.5 rounded-lg opacity-40 hover:opacity-100 transition-opacity self-center"
-              style={{ color: 'var(--primary)', marginLeft: 'auto', marginRight: 'auto' }}
+              className="absolute -right-3 top-6 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150"
+              style={{
+                background: '#1c1a1c',
+                border: '1px solid rgba(110,231,216,0.22)',
+                color: '#6EE7D8',
+              }}
               aria-label="Expand sidebar"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
               </svg>
             </button>
           )}
         </div>
 
+        {/* Section label */}
+        {!collapsed && (
+          <p
+            className="px-5 pt-5 pb-2 text-[10px] font-semibold uppercase tracking-widest"
+            style={{ color: 'rgba(110,231,216,0.35)' }}
+          >
+            Navigation
+          </p>
+        )}
+
         {/* Nav items */}
-        <nav className="flex flex-col gap-1 px-2 py-4 flex-1">
+        <nav className="flex flex-col gap-0.5 px-2 pb-4 flex-1">
           {sidebarLinks.map(({ label, href, icon }) => {
             const active = pathname === href;
             return (
@@ -122,12 +177,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 title={collapsed ? label : undefined}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150"
                 style={{
-                  color:      active ? 'var(--primary)'    : 'var(--text-muted)',
-                  background: active ? 'rgba(110,231,216,0.10)' : 'transparent',
-                  boxShadow:  active ? 'var(--glow-sm)'    : 'none',
+                  color:      active ? '#6EE7D8'                  : 'rgba(255,255,255,0.45)',
+                  background: active ? 'rgba(110,231,216,0.10)'   : 'transparent',
+                  borderLeft: active ? '2px solid #6EE7D8'        : '2px solid transparent',
+                  boxShadow:  active ? '0 0 12px rgba(110,231,216,0.08)' : 'none',
+                }}
+                onMouseEnter={e => {
+                  if (!active) {
+                    (e.currentTarget as HTMLElement).style.color      = '#6EE7D8';
+                    (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.06)';
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!active) {
+                    (e.currentTarget as HTMLElement).style.color      = 'rgba(255,255,255,0.45)';
+                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  }
                 }}
               >
-                <svg className="w-4.5 h-4.5 flex-shrink-0 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 2 : 1.7} d={icon} />
                 </svg>
                 {!collapsed && <span className="truncate">{label}</span>}
@@ -136,13 +204,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           })}
         </nav>
 
-        {/* User/logout */}
-        {!collapsed && (
-          <div
-            className="px-4 py-4"
-            style={{ borderTop: '1px solid rgba(110,231,216,0.08)' }}
-          >
-            <div className="flex items-center gap-3">
+        {/* User row */}
+        <div
+          className="flex-shrink-0 px-3 py-4"
+          style={{ borderTop: '1px solid rgba(110,231,216,0.08)' }}
+        >
+          {collapsed ? (
+            <div
+              className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold mx-auto"
+              style={{ background: 'linear-gradient(135deg,#6EE7D8,#14B8A6)', color: '#111' }}
+            >
+              S
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 px-1">
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                 style={{ background: 'linear-gradient(135deg,#6EE7D8,#14B8A6)', color: '#111' }}
@@ -150,18 +225,90 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 S
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-body)' }}>Student</p>
-                <p className="text-[10px] truncate" style={{ color: 'var(--text-muted)' }}>student@eduflowai.com</p>
+                <p className="text-xs font-semibold truncate" style={{ color: '#d1faf5' }}>Student</p>
+                <p className="text-[10px] truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>student@eduflowai.com</p>
               </div>
+              <Link
+                href="/auth/login"
+                title="Log out"
+                className="p-1.5 rounded-lg transition-all duration-150"
+                style={{ color: 'rgba(255,255,255,0.3)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.3)'; }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </Link>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </aside>
 
-      {/* ── Main content ── */}
-      <main className="flex-1 overflow-auto">
-        {children}
-      </main>
+      {/* ── Main ── */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+        {/* Top header */}
+        <header
+          className="flex-shrink-0 flex items-center gap-4 px-6 py-4"
+          style={{
+            borderBottom: '1px solid rgba(110,231,216,0.10)',
+            background: 'rgba(34,32,34,0.95)',
+            backdropFilter: 'blur(12px)',
+            minHeight: '64px',
+          }}
+        >
+          {/* Mobile hamburger */}
+          <button
+            className="md:hidden p-1.5 rounded-lg transition-colors duration-150"
+            style={{ color: '#6EE7D8' }}
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle menu"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          {/* Page title breadcrumb */}
+          <div className="flex items-center gap-2 text-sm">
+            <span style={{ color: 'rgba(255,255,255,0.35)' }}>EduFlow AI</span>
+            <span style={{ color: 'rgba(110,231,216,0.35)' }}>/</span>
+            <span className="font-semibold" style={{ color: '#d1faf5' }}>{currentPage}</span>
+          </div>
+
+          {/* Right — search + avatar */}
+          <div className="ml-auto flex items-center gap-3">
+            <div
+              className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl text-xs"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(110,231,216,0.12)',
+                color: 'rgba(255,255,255,0.35)',
+              }}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
+              </svg>
+              Search…
+            </div>
+
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+              style={{ background: 'linear-gradient(135deg,#6EE7D8,#14B8A6)', color: '#111' }}
+            >
+              S
+            </div>
+          </div>
+        </header>
+
+        {/* Page content */}
+        <main className="flex-1 overflow-auto" style={{ background: '#222022' }}>
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
