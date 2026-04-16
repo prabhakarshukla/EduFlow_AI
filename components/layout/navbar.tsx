@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import type { User } from '@supabase/supabase-js';
+import { supabase } from '../../lib/supabase';
 
 const navLinks = [
   { label: 'Home',     href: '/#home' },
@@ -13,12 +15,39 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled,    setScrolled]    = useState(false);
   const [mobileOpen,  setMobileOpen]  = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      if (!alive) return;
+      setUser(data.user ?? null);
+      setAuthReady(true);
+    })();
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setAuthReady(true);
+    });
+
+    return () => {
+      alive = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setMobileOpen(false);
+  };
 
   return (
     <header
@@ -34,10 +63,13 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 gap-4">
 
           {/* ── Logo ── */}
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', transition: 'transform 0.2s' }}
+          <Link
+            href="/"
+            className="flex items-center flex-shrink-0"
+            style={{ transition: 'transform 0.2s' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1.04)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
           >
@@ -55,12 +87,12 @@ export default function Navbar() {
           </Link>
 
           {/* ── Desktop Nav ── */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1 flex-1 justify-center min-w-0">
             {navLinks.map(({ label, href }) => (
               <Link
                 key={label}
                 href={href}
-                className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150"
+                className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
                 style={{ color: 'var(--text-muted)' }}
                 onMouseEnter={e => {
                   (e.currentTarget as HTMLElement).style.color      = 'var(--primary)';
@@ -77,17 +109,53 @@ export default function Navbar() {
           </nav>
 
           {/* ── Desktop Actions ── */}
-          <div className="hidden md:flex items-center gap-3">
-            <Link
-              href="/auth/login"
-              className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150"
-              style={{ color: 'var(--primary)' }}
-            >
-              Log in
-            </Link>
-            <Link href="/auth/signup" className="btn-primary text-xs px-5 py-2.5">
-              Get Started
-            </Link>
+          <div className="hidden md:flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
+            {authReady && user ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150"
+                  style={{ color: 'var(--primary)' }}
+                >
+                  Open App
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
+                  style={{
+                    color: 'rgba(255,255,255,0.55)',
+                    border: '1px solid rgba(110,231,216,0.18)',
+                    background: 'transparent',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.color = '#f87171';
+                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(248,113,113,0.35)';
+                    (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.08)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.55)';
+                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.18)';
+                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  }}
+                >
+                  Log out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150"
+                  style={{ color: 'var(--primary)' }}
+                >
+                  Log in
+                </Link>
+                <Link href="/auth/signup" className="btn-primary text-xs px-5 py-2.5 whitespace-nowrap">
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
 
           {/* ── Mobile Hamburger ── */}
@@ -126,16 +194,39 @@ export default function Navbar() {
               ))}
             </nav>
             <div className="flex flex-col gap-2">
-              <Link
-                href="/auth/login"
-                className="px-4 py-2.5 text-center text-sm font-medium rounded-xl border transition-colors"
-                style={{ color: 'var(--primary)', borderColor: 'var(--border)' }}
-              >
-                Log in
-              </Link>
-              <Link href="/auth/signup" className="btn-primary justify-center py-2.5 text-xs">
-                Get Started
-              </Link>
+              {authReady && user ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setMobileOpen(false)}
+                    className="px-4 py-2.5 text-center text-sm font-medium rounded-xl border transition-colors"
+                    style={{ color: 'var(--primary)', borderColor: 'var(--border)' }}
+                  >
+                    Open App
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="px-4 py-2.5 text-center text-sm font-medium rounded-xl border transition-colors"
+                    style={{ color: '#f87171', borderColor: 'rgba(248,113,113,0.30)', background: 'rgba(248,113,113,0.08)' }}
+                  >
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/auth/login"
+                    className="px-4 py-2.5 text-center text-sm font-medium rounded-xl border transition-colors"
+                    style={{ color: 'var(--primary)', borderColor: 'var(--border)' }}
+                  >
+                    Log in
+                  </Link>
+                  <Link href="/auth/signup" className="btn-primary justify-center py-2.5 text-xs">
+                    Get Started
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

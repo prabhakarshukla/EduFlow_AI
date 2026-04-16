@@ -1,19 +1,56 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { supabase } from '../../../lib/supabase';
 
 export default function SignupPage() {
   const [name,     setName]     = useState('');
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [loading,  setLoading]  = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (mounted && data.session) router.replace('/dashboard');
+    })();
+    return () => { mounted = false; };
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1200));
-    setLoading(false);
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: { full_name: name.trim() },
+        },
+      });
+
+      if (signUpError) {
+        setError(signUpError.message);
+        return;
+      }
+
+      if (data.session) {
+        router.replace('/dashboard');
+        return;
+      }
+
+      setSuccess('Account created. Please check your email to confirm your address, then log in.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -95,6 +132,32 @@ export default function SignupPage() {
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            {error && (
+              <div
+                className="rounded-xl px-3 py-2 text-sm"
+                role="alert"
+                style={{
+                  background: 'rgba(248,113,113,0.10)',
+                  border: '1px solid rgba(248,113,113,0.25)',
+                  color: '#fecaca',
+                }}
+              >
+                {error}
+              </div>
+            )}
+            {success && (
+              <div
+                className="rounded-xl px-3 py-2 text-sm"
+                role="status"
+                style={{
+                  background: 'rgba(110,231,216,0.10)',
+                  border: '1px solid rgba(110,231,216,0.22)',
+                  color: '#d1faf5',
+                }}
+              >
+                {success}
+              </div>
+            )}
 
             {/* Full name */}
             <div>

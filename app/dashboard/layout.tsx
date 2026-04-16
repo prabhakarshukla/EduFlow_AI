@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import type { User } from '@supabase/supabase-js';
+import { supabase } from '../../lib/supabase';
 
 const sidebarLinks = [
   {
@@ -44,13 +46,93 @@ const sidebarLinks = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+  const lastProfileSyncUserId = useRef<string | null>(null);
 
   const currentPage = sidebarLinks.find(l => l.href === pathname)?.label ?? 'Dashboard';
+  const nextPathForLogin = useMemo(() => `/auth/login?next=${encodeURIComponent(pathname || '/dashboard')}`, [pathname]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      if (!mounted) return;
+      setUser(data.user ?? null);
+      setAuthReady(true);
+      if (!data.user) router.replace(nextPathForLogin);
+    })();
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setAuthReady(true);
+      if (!session?.user) router.replace(nextPathForLogin);
+    });
+
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, [router, nextPathForLogin]);
+
+  useEffect(() => {
+    if (!authReady || !user) return;
+    if (lastProfileSyncUserId.current === user.id) return;
+    lastProfileSyncUserId.current = user.id;
+
+    const fullName =
+      (user.user_metadata?.full_name as string | undefined) ||
+      (user.user_metadata?.name as string | undefined) ||
+      null;
+    const avatarUrl =
+      (user.user_metadata?.avatar_url as string | undefined) ||
+      (user.user_metadata?.picture as string | undefined) ||
+      null;
+
+    const basePayload = {
+      id: user.id,
+      ...(fullName ? { full_name: fullName } : {}),
+      ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
+    };
+
+    (async () => {
+      try {
+        // Try a richer payload first (in case your profiles table includes these columns).
+        const richPayload = {
+          ...basePayload,
+          user_id: user.id,
+          email: user.email ?? null,
+        } as Record<string, unknown>;
+
+        const { error: richError } = await supabase
+          .from('profiles')
+          .upsert(richPayload, { onConflict: 'id' });
+
+        if (!richError) return;
+
+        // Fallback: minimal columns that match the common profiles schema.
+        await supabase.from('profiles').upsert(basePayload, { onConflict: 'id' });
+      } catch {
+        // Intentionally silent: profile sync should never block dashboard access.
+      }
+    })();
+  }, [authReady, user]);
+
+  const displayEmail = user?.email ?? '';
+  const displayName = (user?.user_metadata?.full_name as string | undefined) ?? 'Student';
+  const avatarLetter = (displayName?.trim()?.[0] ?? displayEmail?.trim()?.[0] ?? 'S').toUpperCase();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.replace('/auth/login');
+  };
 
   return (
-    <div className="flex min-h-screen" style={{ background: '#222022' }}>
+    <div className="flex min-h-screen" style={{ background: '#222022', paddingTop: '64px' }}>
 
       {/* ── Mobile overlay ── */}
       {mobileOpen && (
@@ -68,6 +150,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           ${mobileOpen ? 'left-0' : '-left-64 md:left-0'}
         `}
         style={{
+          top: '64px',
+          height: 'calc(100vh - 64px)',
           width: collapsed ? '68px' : '232px',
           background: '#1c1a1c',
           borderRight: '1px solid rgba(110,231,216,0.10)',
@@ -214,7 +298,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold mx-auto"
               style={{ background: 'linear-gradient(135deg,#6EE7D8,#14B8A6)', color: '#111' }}
             >
-              S
+              {avatarLetter}
             </div>
           ) : (
             <div className="flex items-center gap-3 px-1">
@@ -222,17 +306,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                 style={{ background: 'linear-gradient(135deg,#6EE7D8,#14B8A6)', color: '#111' }}
               >
-                S
+                {avatarLetter}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold truncate" style={{ color: '#d1faf5' }}>Student</p>
-                <p className="text-[10px] truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>student@eduflowai.com</p>
+                <p className="text-xs font-semibold truncate" style={{ color: '#d1faf5' }}>
+                  {displayName}
+                </p>
+                <p className="text-[10px] truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  {displayEmail || ' '}
+                </p>
               </div>
-              <Link
-                href="/auth/login"
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={!authReady}
                 title="Log out"
                 className="p-1.5 rounded-lg transition-all duration-150"
-                style={{ color: 'rgba(255,255,255,0.3)' }}
+                style={{ color: 'rgba(255,255,255,0.3)', opacity: !authReady ? 0.6 : 1 }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.3)'; }}
               >
@@ -240,7 +330,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-              </Link>
+              </button>
             </div>
           )}
         </div>
@@ -306,7 +396,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Page content */}
         <main className="flex-1 overflow-auto" style={{ background: '#222022' }}>
-          {children}
+          {authReady && user ? children : null}
         </main>
       </div>
     </div>

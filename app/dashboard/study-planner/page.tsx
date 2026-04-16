@@ -1,16 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { supabase } from '../../../lib/supabase';
 
 /* ── Types ─────────────────────────────────────────────────────── */
 type Priority = 'high' | 'medium' | 'low';
 type Task = {
-  id: number;
-  label: string;
-  subject: string;
+  id: string;
+  title: string;
+  description: string | null;
+  subject: string | null;
   priority: Priority;
-  done: boolean;
-  due: string;
+  status: 'todo' | 'in_progress' | 'done';
+  due: string | null;
+  created_at?: string;
 };
 
 type WeekDay = { day: string; date: number; tasks: number; active: boolean };
@@ -18,13 +21,7 @@ type Subject = { name: string; color: string; hours: number; pct: number };
 type Deadline = { title: string; subject: string; due: string; urgent: boolean };
 
 /* ── Seed data ──────────────────────────────────────────────────── */
-const initialTasks: Task[] = [
-  { id: 1, label: 'Linear Algebra — Chapter 5 revision',   subject: 'Maths',    priority: 'high',   done: true,  due: 'Today'    },
-  { id: 2, label: 'Physics Problem Set 3 (Q1–Q15)',        subject: 'Physics',  priority: 'high',   done: false, due: 'Today'    },
-  { id: 3, label: 'Write Essay Draft — English Lit.',      subject: 'English',  priority: 'medium', done: false, due: 'Today'    },
-  { id: 4, label: 'Mock Test: Chemistry Chapter 4',        subject: 'Chemistry',priority: 'high',   done: false, due: 'Today'    },
-  { id: 5, label: 'Read History — Cold War chapter',       subject: 'History',  priority: 'low',    done: false, due: 'Today'    },
-];
+const initialTasks: Task[] = [];
 
 const week: WeekDay[] = [
   { day: 'Mon', date: 14, tasks: 4, active: false },
@@ -82,34 +79,199 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 /* ── Page ───────────────────────────────────────────────────────── */
 export default function StudyPlannerPage() {
   const [tasks, setTasks]           = useState<Task[]>(initialTasks);
+  const [loading, setLoading]       = useState(true);
+  const [saving, setSaving]         = useState(false);
+  const [error, setError]           = useState<string | null>(null);
+
   const [newLabel, setNewLabel]     = useState('');
   const [newSubject, setNewSubject] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [newDueDate, setNewDueDate] = useState(''); // YYYY-MM-DD
   const [newPriority, setNewPriority] = useState<Priority>('medium');
   const [focused, setFocused]       = useState<string | null>(null);
 
-  const done    = tasks.filter(t => t.done).length;
+  const done    = tasks.filter(t => t.status === 'done').length;
   const pending = tasks.length - done;
-  const pct     = Math.round((done / tasks.length) * 100);
+  const pct     = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
 
-  const toggle = (id: number) =>
-    setTasks(ts => ts.map(t => (t.id === id ? { ...t, done: !t.done } : t)));
+  const priorityToDb = (p: Priority) => (p === 'high' ? 3 : p === 'medium' ? 2 : 1);
+  const dbToPriority = (v: unknown): Priority => {
+    if (v === 'high' || v === 'medium' || v === 'low') return v;
+    if (typeof v === 'number') return v >= 3 ? 'high' : v === 2 ? 'medium' : 'low';
+    return 'medium';
+  };
 
-  const addTask = () => {
+  const formatDue = (iso: string | null) => {
+    if (!iso) return null;
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  };
+
+  const loadTasks = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      const { data, error: qErr } = await supabase
+        .from('study_tasks')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (qErr) {
+        setError(qErr.message);
+        setTasks([]);
+        return;
+      }
+
+      const mapped: Task[] = (data ?? []).map((row: any) => {
+        const status: Task['status'] =
+          row.status === 'done' || row.status === 'in_progress' || row.status === 'todo'
+            ? row.status
+            : (row.done ? 'done' : 'todo');
+        const dueIso = (row.due_date ?? row.due_at ?? null) as string | null;
+        return {
+          id: String(row.id),
+          title: (row.title ?? row.label ?? '') as string,
+          description: (row.description ?? row.details ?? null) as string | null,
+          subject: (row.subject ?? null) as string | null,
+          priority: dbToPriority(row.priority),
+          status,
+          due: formatDue(dueIso),
+          created_at: row.created_at,
+        };
+      });
+
+      setTasks(mapped);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load tasks.');
+      setTasks([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const { data, error: uErr } = await supabase.auth.getUser();
+      if (!alive) return;
+      if (uErr) setError(uErr.message);
+      if (data.user) await loadTasks();
+      else setLoading(false);
+    })();
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const toggleStatus = async (id: string) => {
+    const current = tasks.find(t => t.id === id);
+    if (!current) return;
+
+    const nextStatus: Task['status'] = current.status === 'done' ? 'todo' : 'done';
+    setTasks(ts => ts.map(t => (t.id === id ? { ...t, status: nextStatus } : t)));
+
+    try {
+      const { error: upErr } = await supabase.from('study_tasks').update({ status: nextStatus }).eq('id', id);
+      if (upErr) {
+        setTasks(ts => ts.map(t => (t.id === id ? { ...t, status: current.status } : t)));
+        setError(upErr.message);
+      }
+    } catch (e) {
+      setTasks(ts => ts.map(t => (t.id === id ? { ...t, status: current.status } : t)));
+      setError(e instanceof Error ? e.message : 'Failed to update task.');
+    }
+  };
+
+  const insertWithFallback = async (payload: Record<string, unknown>) => {
+    // Return inserted row when possible.
+    const { data, error: firstErr } = await supabase
+      .from('study_tasks')
+      .insert(payload)
+      .select('*')
+      .single();
+
+    if (!firstErr) return { data, error: null as any };
+
+    // Fallback to a conservative schema (title/details/due_at/priority/status/user_id).
+    const minimal: Record<string, unknown> = {
+      title: payload.title,
+      details: payload.description,
+      due_at: payload.due_date,
+      priority: payload.priority,
+      status: payload.status,
+      user_id: payload.user_id,
+    };
+
+    const { data: data2, error: secondErr } = await supabase
+      .from('study_tasks')
+      .insert(minimal)
+      .select('*')
+      .single();
+
+    return { data: data2, error: secondErr ?? firstErr };
+  };
+
+  const addTask = async () => {
     if (!newLabel.trim()) return;
-    setTasks(ts => [
-      ...ts,
-      {
-        id:       Date.now(),
-        label:    newLabel.trim(),
-        subject:  newSubject.trim() || 'General',
-        priority: newPriority,
-        done:     false,
-        due:      'Today',
-      },
-    ]);
-    setNewLabel('');
-    setNewSubject('');
-    setNewPriority('medium');
+    setError(null);
+    setSaving(true);
+    try {
+      const { data: u } = await supabase.auth.getUser();
+      const user = u.user;
+      if (!user) {
+        setError('You need to be logged in to add tasks.');
+        return;
+      }
+
+      const dueIso = newDueDate ? new Date(`${newDueDate}T00:00:00.000Z`).toISOString() : null;
+
+      const payload: Record<string, unknown> = {
+        user_id: user.id,
+        title: newLabel.trim(),
+        description: newDescription.trim() || null,
+        subject: newSubject.trim() || null,
+        priority: priorityToDb(newPriority),
+        status: 'todo',
+        due_date: dueIso,
+      };
+
+      const { data, error: insErr } = await insertWithFallback(payload);
+      if (insErr) {
+        setError(insErr.message ?? 'Failed to create task.');
+        return;
+      }
+
+      // Always refresh from DB so the user sees the source of truth.
+      await loadTasks();
+
+      setNewLabel('');
+      setNewSubject('');
+      setNewDescription('');
+      setNewDueDate('');
+      setNewPriority('medium');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to create task.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteTask = async (id: string) => {
+    setError(null);
+    const prev = tasks;
+    setTasks(ts => ts.filter(t => t.id !== id));
+    try {
+      const { error: delErr } = await supabase.from('study_tasks').delete().eq('id', id);
+      if (delErr) {
+        setTasks(prev);
+        setError(delErr.message);
+      }
+    } catch (e) {
+      setTasks(prev);
+      setError(e instanceof Error ? e.message : 'Failed to delete task.');
+    }
   };
 
   /* Input focus ring helper */
@@ -319,35 +481,78 @@ export default function StudyPlannerPage() {
           </div>
 
           <div className="space-y-2.5">
-            {tasks.map((task) => (
+            {loading && (
+              <div
+                className="rounded-xl p-4"
+                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(110,231,216,0.08)' }}
+              >
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>Loading your tasks…</p>
+              </div>
+            )}
+
+            {!loading && error && (
+              <div
+                className="rounded-xl p-4"
+                role="alert"
+                style={{ background: 'rgba(248,113,113,0.10)', border: '1px solid rgba(248,113,113,0.22)' }}
+              >
+                <p className="text-sm" style={{ color: '#fecaca' }}>{error}</p>
+                <button
+                  type="button"
+                  onClick={loadTasks}
+                  className="mt-3 text-xs font-semibold px-3 py-2 rounded-lg"
+                  style={{
+                    background: 'rgba(248,113,113,0.12)',
+                    border: '1px solid rgba(248,113,113,0.25)',
+                    color: '#fecaca',
+                  }}
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+
+            {!loading && !error && tasks.length === 0 && (
+              <div
+                className="rounded-xl p-5"
+                style={{ background: 'rgba(110,231,216,0.05)', border: '1px dashed rgba(110,231,216,0.18)' }}
+              >
+                <p className="text-sm font-semibold" style={{ color: '#d1faf5' }}>No tasks yet.</p>
+                <p className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.40)' }}>
+                  Add your first task on the right — keep it small and specific.
+                </p>
+              </div>
+            )}
+
+            {!loading && tasks.map((task) => (
               <div
                 key={task.id}
                 className="flex items-center gap-3 p-3.5 rounded-xl transition-all duration-150 group"
                 style={{
-                  background: task.done ? 'rgba(110,231,216,0.04)' : 'rgba(255,255,255,0.03)',
+                  background: task.status === 'done' ? 'rgba(110,231,216,0.04)' : 'rgba(255,255,255,0.03)',
                   border:     '1px solid rgba(110,231,216,0.08)',
                 }}
                 onMouseEnter={e => {
                   (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.22)';
-                  (e.currentTarget as HTMLElement).style.background  = task.done
+                  (e.currentTarget as HTMLElement).style.background  = task.status === 'done'
                     ? 'rgba(110,231,216,0.07)' : 'rgba(255,255,255,0.05)';
                 }}
                 onMouseLeave={e => {
                   (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.08)';
-                  (e.currentTarget as HTMLElement).style.background  = task.done
+                  (e.currentTarget as HTMLElement).style.background  = task.status === 'done'
                     ? 'rgba(110,231,216,0.04)' : 'rgba(255,255,255,0.03)';
                 }}
               >
                 {/* Checkbox */}
                 <button
-                  onClick={() => toggle(task.id)}
+                  onClick={() => toggleStatus(task.id)}
                   className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-150"
                   style={{
-                    borderColor: task.done ? '#6EE7D8' : 'rgba(110,231,216,0.30)',
-                    background:  task.done ? '#6EE7D8' : 'transparent',
+                    borderColor: task.status === 'done' ? '#6EE7D8' : 'rgba(110,231,216,0.30)',
+                    background:  task.status === 'done' ? '#6EE7D8' : 'transparent',
                   }}
                 >
-                  {task.done && (
+                  {task.status === 'done' && (
                     <svg className="w-2.5 h-2.5" fill="none" stroke="#111" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
@@ -357,13 +562,13 @@ export default function StudyPlannerPage() {
                 {/* Label */}
                 <div className="flex-1 min-w-0">
                   <p
-                    className={`text-sm truncate ${task.done ? 'line-through' : ''}`}
-                    style={{ color: task.done ? 'rgba(255,255,255,0.30)' : '#d1faf5' }}
+                    className={`text-sm truncate ${task.status === 'done' ? 'line-through' : ''}`}
+                    style={{ color: task.status === 'done' ? 'rgba(255,255,255,0.30)' : '#d1faf5' }}
                   >
-                    {task.label}
+                    {task.title}
                   </p>
                   <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.30)' }}>
-                    {task.subject}
+                    {[task.subject || 'General', task.due ? `Due ${task.due}` : null].filter(Boolean).join(' • ')}
                   </p>
                 </div>
 
@@ -374,6 +579,21 @@ export default function StudyPlannerPage() {
                 >
                   {task.priority}
                 </span>
+
+                {/* Delete */}
+                <button
+                  type="button"
+                  onClick={() => deleteTask(task.id)}
+                  className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 p-1.5 rounded-lg"
+                  title="Delete"
+                  style={{ color: 'rgba(255,255,255,0.30)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.30)'; }}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3m-4 0h14" />
+                  </svg>
+                </button>
               </div>
             ))}
           </div>
@@ -384,6 +604,19 @@ export default function StudyPlannerPage() {
           <SectionLabel>Quick Add Task</SectionLabel>
 
           <div className="flex flex-col gap-3">
+            {!loading && error && (
+              <div
+                className="rounded-xl px-3 py-2 text-sm"
+                role="alert"
+                style={{
+                  background: 'rgba(248,113,113,0.10)',
+                  border: '1px solid rgba(248,113,113,0.22)',
+                  color: '#fecaca',
+                }}
+              >
+                {error}
+              </div>
+            )}
             <div>
               <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
                 Task name
@@ -417,6 +650,34 @@ export default function StudyPlannerPage() {
 
             <div>
               <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
+                Description
+              </label>
+              <textarea
+                placeholder="Optional details (chapters, problems, goals)…"
+                value={newDescription}
+                onChange={e => setNewDescription(e.target.value)}
+                onFocus={() => setFocused('description')}
+                onBlur={() => setFocused(null)}
+                style={{ ...inputStyle('description'), minHeight: '84px', resize: 'none' }}
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
+                Due date
+              </label>
+              <input
+                type="date"
+                value={newDueDate}
+                onChange={e => setNewDueDate(e.target.value)}
+                onFocus={() => setFocused('due')}
+                onBlur={() => setFocused(null)}
+                style={inputStyle('due')}
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
                 Priority
               </label>
               <div className="flex gap-2">
@@ -439,29 +700,42 @@ export default function StudyPlannerPage() {
 
             <button
               onClick={addTask}
-              disabled={!newLabel.trim()}
+              disabled={!newLabel.trim() || saving}
               className="mt-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all duration-200"
               style={{
-                background:  newLabel.trim()
+                background:  newLabel.trim() && !saving
                   ? 'linear-gradient(135deg,#6EE7D8,#14B8A6)'
                   : 'rgba(255,255,255,0.06)',
-                color:       newLabel.trim() ? '#111' : 'rgba(255,255,255,0.25)',
-                boxShadow:   newLabel.trim() ? '0 4px 16px rgba(110,231,216,0.28)' : 'none',
-                cursor:      newLabel.trim() ? 'pointer' : 'not-allowed',
+                color:       newLabel.trim() && !saving ? '#111' : 'rgba(255,255,255,0.25)',
+                boxShadow:   newLabel.trim() && !saving ? '0 4px 16px rgba(110,231,216,0.28)' : 'none',
+                cursor:      newLabel.trim() && !saving ? 'pointer' : 'not-allowed',
+                opacity:     saving ? 0.8 : 1,
               }}
               onMouseEnter={e => {
-                if (newLabel.trim())
+                if (newLabel.trim() && !saving)
                   (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 24px rgba(110,231,216,0.45)';
               }}
               onMouseLeave={e => {
                 (e.currentTarget as HTMLElement).style.boxShadow =
-                  newLabel.trim() ? '0 4px 16px rgba(110,231,216,0.28)' : 'none';
+                  newLabel.trim() && !saving ? '0 4px 16px rgba(110,231,216,0.28)' : 'none';
               }}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 4v16m8-8H4" />
-              </svg>
-              Add Task
+              {saving ? (
+                <>
+                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  Adding…
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Task
+                </>
+              )}
             </button>
           </div>
 

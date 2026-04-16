@@ -1,18 +1,51 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { supabase } from '../../../lib/supabase';
 
 export default function LoginPage() {
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [loading,  setLoading]  = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const nextPath = useMemo(() => {
+    const raw = searchParams.get('next');
+    if (!raw) return '/dashboard';
+    const decoded = raw.startsWith('%2F') ? decodeURIComponent(raw) : raw;
+    return decoded.startsWith('/') ? decoded : '/dashboard';
+  }, [searchParams]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (mounted && data.session) router.replace(nextPath);
+    })();
+    return () => { mounted = false; };
+  }, [router, nextPath]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1200));
-    setLoading(false);
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (signInError) {
+        setError(signInError.message);
+        return;
+      }
+      router.replace(nextPath);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -77,6 +110,19 @@ export default function LoginPage() {
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            {error && (
+              <div
+                className="rounded-xl px-3 py-2 text-sm"
+                role="alert"
+                style={{
+                  background: 'rgba(248,113,113,0.10)',
+                  border: '1px solid rgba(248,113,113,0.25)',
+                  color: '#fecaca',
+                }}
+              >
+                {error}
+              </div>
+            )}
 
             {/* Email */}
             <div>

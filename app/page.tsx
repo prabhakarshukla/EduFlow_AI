@@ -1,7 +1,8 @@
-import type { Metadata } from 'next';
-import Hero from '../components/sections/hero';
-import Features from '../components/sections/features';
-import Cta from '../components/sections/cta';
+import type { Metadata } from "next";
+import Hero from "@/components/sections/hero";
+import Features from "@/components/sections/features";
+import Cta from "@/components/sections/cta";  
+
 
 export const metadata: Metadata = {
   title: 'EduFlow AI — Your AI-Powered Student Assistant',

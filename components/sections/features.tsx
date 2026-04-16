@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 const features = [
   {
     title: 'Study Planner',
@@ -13,6 +15,8 @@ const features = [
     ),
     accent: '#6EE7D8',
     tag: 'Planning',
+    href: '/dashboard/study-planner',
+    available: true,
   },
   {
     title: 'AI Doubt Solver',
@@ -26,6 +30,8 @@ const features = [
     ),
     accent: '#14B8A6',
     tag: 'AI',
+    href: '/dashboard/doubt-solver',
+    available: false,
   },
   {
     title: 'Notes Generator',
@@ -39,6 +45,8 @@ const features = [
     ),
     accent: '#5EEAD4',
     tag: 'Notes',
+    href: '/dashboard/notes',
+    available: false,
   },
   {
     title: 'Productivity Tracker',
@@ -52,6 +60,8 @@ const features = [
     ),
     accent: '#6EE7D8',
     tag: 'Insights',
+    href: '/dashboard/productivity',
+    available: false,
   },
 ];
 
@@ -137,16 +147,21 @@ type FeatureCardProps = {
   icon: React.ReactNode;
   accent: string;
   tag: string;
+  href?: string;
+  available?: boolean;
 };
 
-function FeatureCard({ title, description, icon, accent, tag }: FeatureCardProps) {
-  return (
+function FeatureCard({ title, description, icon, accent, tag, href, available }: FeatureCardProps) {
+  const isClickable = Boolean(href) && Boolean(available);
+
+  const card = (
     <div
       className="group rounded-2xl p-6 flex flex-col gap-4 transition-all duration-250"
       style={{
         background: '#2a282a',
         border: '1px solid rgba(110,231,216,0.13)',
-        cursor: 'default',
+        cursor: isClickable ? 'pointer' : 'default',
+        opacity: available === false ? 0.85 : 1,
       }}
       onMouseEnter={e => {
         const el = e.currentTarget as HTMLElement;
@@ -181,7 +196,7 @@ function FeatureCard({ title, description, icon, accent, tag }: FeatureCardProps
             border: '1px solid rgba(110,231,216,0.15)',
           }}
         >
-          {tag}
+          {available === false ? 'Coming soon' : tag}
         </span>
       </div>
 
@@ -207,5 +222,15 @@ function FeatureCard({ title, description, icon, accent, tag }: FeatureCardProps
         style={{ background: `linear-gradient(90deg, ${accent}40, transparent)` }}
       />
     </div>
+  );
+
+  return (
+    isClickable ? (
+      <Link href={href!} className="block focus:outline-none">
+        {card}
+      </Link>
+    ) : (
+      card
+    )
   );
 }

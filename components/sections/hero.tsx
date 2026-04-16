@@ -347,15 +347,27 @@ export default function Hero() {
             <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full blur-xl opacity-20 pointer-events-none" style={{ background: 'var(--primary)' }} />
             <div className="absolute -bottom-6 -left-6 w-16 h-16 rounded-full blur-xl opacity-20 pointer-events-none" style={{ background: 'var(--secondary)' }} />
 
-            <div className="transform hover:-translate-y-1 transition-transform duration-300">
+            <Link
+              href="/dashboard/study-planner"
+              className="block transform hover:-translate-y-1 transition-transform duration-300 focus:outline-none"
+              aria-label="Open Study Planner"
+            >
               <StudyPlannerCard />
-            </div>
+            </Link>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="transform hover:-translate-y-1 transition-transform duration-300">
+              <div
+                className="transform hover:-translate-y-1 transition-transform duration-300"
+                title="Coming soon"
+                aria-label="AI Doubt Solver (coming soon)"
+              >
                 <AiDoubtSolverCard />
               </div>
-              <div className="transform hover:-translate-y-1 transition-transform duration-300">
+              <div
+                className="transform hover:-translate-y-1 transition-transform duration-300"
+                title="Coming soon"
+                aria-label="Productivity Tracker (coming soon)"
+              >
                 <ProductivityStatsCard />
               </div>
             </div>
