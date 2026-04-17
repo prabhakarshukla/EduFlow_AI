@@ -31,7 +31,7 @@ const features = [
     accent: '#14B8A6',
     tag: 'AI',
     href: '/dashboard/doubt-solver',
-    available: false,
+    available: true,
   },
   {
     title: 'Notes Generator',
@@ -46,7 +46,7 @@ const features = [
     accent: '#5EEAD4',
     tag: 'Notes',
     href: '/dashboard/notes',
-    available: false,
+    available: true,
   },
   {
     title: 'Productivity Tracker',

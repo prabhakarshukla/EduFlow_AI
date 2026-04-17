@@ -356,13 +356,13 @@ export default function Hero() {
             </Link>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div
+              <Link
+                href="/dashboard/doubt-solver"
                 className="transform hover:-translate-y-1 transition-transform duration-300"
-                title="Coming soon"
-                aria-label="AI Doubt Solver (coming soon)"
+                aria-label="Open AI Doubt Solver"
               >
                 <AiDoubtSolverCard />
-              </div>
+              </Link>
               <div
                 className="transform hover:-translate-y-1 transition-transform duration-300"
                 title="Coming soon"

@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
+import { supabase } from '../../lib/supabase';
 
 /* ── Types ── */
 type OverviewCard = {
@@ -20,98 +22,12 @@ type QuickAction = {
   icon: React.ReactNode;
 };
 
-/* ── Data ── */
-const overviewCards: OverviewCard[] = [
-  {
-    title: 'Study Planner',
-    value: '4 / 7',
-    sub: 'tasks done today',
-    delta: '+2 from yesterday',
-    deltaPositive: true,
-    href: '/dashboard/study-planner',
-    accent: '#6EE7D8',
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
-          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-      </svg>
-    ),
-  },
-  {
-    title: 'AI Doubt Solver',
-    value: '12',
-    sub: 'questions solved',
-    delta: 'This week',
-    deltaPositive: true,
-    href: '/dashboard/doubt-solver',
-    accent: '#14B8A6',
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
-          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Notes Generator',
-    value: '8',
-    sub: 'notes created',
-    delta: '3 this week',
-    deltaPositive: true,
-    href: '/dashboard/notes',
-    accent: '#5EEAD4',
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
-          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Productivity',
-    value: '4h 22m',
-    sub: 'focus time today',
-    delta: '+18% vs last week',
-    deltaPositive: true,
-    href: '/dashboard/productivity',
-    accent: '#6EE7D8',
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
-          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Mood Tracker',
-    value: '😊 Good',
-    sub: "today's check-in",
-    delta: '7 day streak 🔥',
-    deltaPositive: true,
-    href: '/dashboard/mood',
-    accent: '#14B8A6',
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
-          d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-  },
-];
+type DbTask = { id: string; title: string | null; label: string | null; status: 'done' | 'in_progress' | 'todo' | string; created_at?: string | null };
+type DbNote = { id: string; title: string | null; updated_at: string | null; created_at?: string | null };
+type DbMood = { id: string; mood: number; note: string | null; occurred_at: string };
 
-const todaysFocus = [
-  { label: 'Linear Algebra Review',     done: true,  priority: 'high'   },
-  { label: 'Physics Problem Set 3',     done: false, priority: 'medium' },
-  { label: 'Write Essay Draft — Lit',   done: false, priority: 'low'    },
-  { label: 'Mock Test: Chemistry Ch. 4',done: false, priority: 'high'   },
-];
-
-const recentActivity = [
-  { text: 'Solved: Newton\'s 3rd Law',       time: '2m ago',  tag: 'AI Solver' },
-  { text: 'Created note: Organic Chemistry', time: '1h ago',  tag: 'Notes'     },
-  { text: 'Completed: Algebra Review',       time: '3h ago',  tag: 'Planner'   },
-  { text: 'Focus session: 45 min',           time: 'Yesterday',tag: 'Tracker'  },
-];
+type FocusItem = { label: string; done: boolean; priority: 'high' | 'medium' | 'low' };
+type ActivityItem = { text: string; time: string; tag: string };
 
 const quickActions: QuickAction[] = [
   {
@@ -168,6 +84,30 @@ const priorityStyle = (p: string) => ({
                      'rgba(255,255,255,0.35)',
 });
 
+const fmtCompact = (n: number) => new Intl.NumberFormat(undefined, { notation: 'compact' }).format(n);
+
+const timeAgo = (iso: string | null | undefined) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  const diffMs = Date.now() - d.getTime();
+  const mins = Math.round(diffMs / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.round(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.round(hrs / 24);
+  return `${days}d ago`;
+};
+
+const moodLabel = (mood: number) => {
+  if (mood >= 5) return '😁 Great';
+  if (mood >= 4) return '😊 Good';
+  if (mood >= 3) return '😐 Okay';
+  if (mood >= 2) return '😕 Low';
+  return '😞 Rough';
+};
+
 /* ── Dashboard page ── */
 export default function DashboardPage() {
   const now     = new Date();
@@ -177,9 +117,220 @@ export default function DashboardPage() {
     hour < 18 ? 'Good afternoon' :
                 'Good evening';
 
-  const progressPct = Math.round(
-    (todaysFocus.filter(t => t.done).length / todaysFocus.length) * 100
-  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [taskTotal, setTaskTotal] = useState<number>(0);
+  const [taskDone, setTaskDone] = useState<number>(0);
+  const [taskPending, setTaskPending] = useState<number>(0);
+  const [focusItems, setFocusItems] = useState<FocusItem[]>([]);
+
+  const [notesTotal, setNotesTotal] = useState<number>(0);
+  const [latestNote, setLatestNote] = useState<DbNote | null>(null);
+
+  const [latestMood, setLatestMood] = useState<DbMood | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      setError(null);
+      setLoading(true);
+      try {
+        const { data: u, error: uErr } = await supabase.auth.getUser();
+        if (!alive) return;
+        if (uErr) {
+          setError(uErr.message);
+          return;
+        }
+        if (!u.user) {
+          setError('You need to be logged in.');
+          return;
+        }
+
+        const [allTasksRes, doneTasksRes, notesCountRes, latestNoteRes, latestMoodRes] = await Promise.all([
+          supabase.from('study_tasks').select('id,title,label,status,created_at').order('created_at', { ascending: false }).limit(4),
+          supabase.from('study_tasks').select('id', { count: 'exact', head: true }).eq('status', 'done'),
+          supabase.from('notes').select('id', { count: 'exact', head: true }),
+          supabase.from('notes').select('id,title,updated_at,created_at').order('updated_at', { ascending: false }).limit(1).maybeSingle(),
+          supabase.from('mood_entries').select('id,mood,note,occurred_at').order('occurred_at', { ascending: false }).limit(1).maybeSingle(),
+        ]);
+
+        if (!alive) return;
+
+        if (allTasksRes.error) throw new Error(allTasksRes.error.message);
+        if (doneTasksRes.error) throw new Error(doneTasksRes.error.message);
+        if (notesCountRes.error) throw new Error(notesCountRes.error.message);
+        if (latestNoteRes.error) throw new Error(latestNoteRes.error.message);
+        if (latestMoodRes.error) throw new Error(latestMoodRes.error.message);
+
+        const tasks = (allTasksRes.data ?? []) as DbTask[];
+        const totalFromList = tasks.length;
+        // total tasks: do a count query only if we have any tasks; keeps it minimal and still accurate enough for overview
+        const totalTasksCountRes = await supabase.from('study_tasks').select('id', { count: 'exact', head: true });
+        if (totalTasksCountRes.error) throw new Error(totalTasksCountRes.error.message);
+
+        const total = totalTasksCountRes.count ?? totalFromList ?? 0;
+        const done = doneTasksRes.count ?? 0;
+        const pending = Math.max(0, total - done);
+
+        setTaskTotal(total);
+        setTaskDone(done);
+        setTaskPending(pending);
+
+        const mappedFocus: FocusItem[] = tasks.map((t) => ({
+          label: String(t.title ?? t.label ?? 'Untitled task'),
+          done: t.status === 'done',
+          priority: 'medium',
+        }));
+        setFocusItems(mappedFocus);
+
+        setNotesTotal(notesCountRes.count ?? 0);
+        setLatestNote((latestNoteRes.data as DbNote | null) ?? null);
+        setLatestMood((latestMoodRes.data as DbMood | null) ?? null);
+      } catch (e) {
+        if (!alive) return;
+        setError(e instanceof Error ? e.message : 'Failed to load dashboard overview.');
+      } finally {
+        if (!alive) return;
+        setLoading(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
+
+  const progressPct = useMemo(() => {
+    if (!focusItems.length) return 0;
+    const done = focusItems.filter(t => t.done).length;
+    return Math.round((done / focusItems.length) * 100);
+  }, [focusItems]);
+
+  const overviewCards: OverviewCard[] = useMemo(() => {
+    const tasksValue = loading ? '…' : `${taskDone} / ${taskTotal}`;
+    const tasksSub = 'tasks completed';
+    const tasksDelta = error ? 'Could not load' : (taskPending ? `${taskPending} pending` : 'All caught up');
+
+    const notesValue = loading ? '…' : fmtCompact(notesTotal);
+    const notesSub = notesTotal === 1 ? 'note' : 'notes';
+    const notesDelta =
+      error ? 'Could not load' :
+      latestNote?.title ? `Latest: ${latestNote.title}` :
+      notesTotal ? 'Recently updated' :
+      'No notes yet';
+
+    const moodValue = loading ? '…' : (latestMood ? moodLabel(latestMood.mood) : '—');
+    const moodSub = latestMood ? "latest check-in" : 'no check-ins yet';
+    const moodDelta =
+      error ? 'Could not load' :
+      latestMood ? timeAgo(latestMood.occurred_at) :
+      'Log your first mood';
+
+    return [
+      {
+        title: 'Study Planner',
+        value: tasksValue,
+        sub: tasksSub,
+        delta: tasksDelta,
+        deltaPositive: !error,
+        href: '/dashboard/study-planner',
+        accent: '#6EE7D8',
+        icon: (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+        ),
+      },
+      {
+        title: 'AI Doubt Solver',
+        value: '—',
+        sub: 'overview coming soon',
+        delta: 'Not connected',
+        deltaPositive: true,
+        href: '/dashboard/doubt-solver',
+        accent: '#14B8A6',
+        icon: (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
+              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+        ),
+      },
+      {
+        title: 'Notes Generator',
+        value: notesValue,
+        sub: notesSub,
+        delta: notesDelta,
+        deltaPositive: !error,
+        href: '/dashboard/notes',
+        accent: '#5EEAD4',
+        icon: (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        ),
+      },
+      {
+        title: 'Productivity',
+        value: '—',
+        sub: 'overview coming soon',
+        delta: 'Not connected',
+        deltaPositive: true,
+        href: '/dashboard/productivity',
+        accent: '#6EE7D8',
+        icon: (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        ),
+      },
+      {
+        title: 'Mood Tracker',
+        value: moodValue,
+        sub: moodSub,
+        delta: moodDelta,
+        deltaPositive: !error,
+        href: '/dashboard/mood',
+        accent: '#14B8A6',
+        icon: (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
+              d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        ),
+      },
+    ];
+  }, [error, latestMood, latestNote, loading, notesTotal, taskDone, taskPending, taskTotal]);
+
+  const recentActivity: ActivityItem[] = useMemo(() => {
+    if (loading) {
+      return [
+        { text: 'Loading your activity…', time: '', tag: 'Overview' },
+      ];
+    }
+    if (error) {
+      return [
+        { text: 'Could not load recent activity.', time: '', tag: 'Overview' },
+      ];
+    }
+    const items: ActivityItem[] = [];
+    if (latestNote?.title) {
+      items.push({ text: `Updated note: ${latestNote.title}`, time: timeAgo(latestNote.updated_at ?? latestNote.created_at), tag: 'Notes' });
+    }
+    if (latestMood) {
+      items.push({ text: `Mood check-in: ${moodLabel(latestMood.mood)}`, time: timeAgo(latestMood.occurred_at), tag: 'Mood' });
+    }
+    if (taskDone > 0) {
+      items.push({ text: `${taskDone} tasks completed`, time: 'Total', tag: 'Planner' });
+    } else if (taskTotal > 0) {
+      items.push({ text: `${taskPending} tasks pending`, time: 'Total', tag: 'Planner' });
+    }
+    if (!items.length) {
+      return [{ text: 'No activity yet — start by adding a task, note, or mood check-in.', time: '', tag: 'Overview' }];
+    }
+    return items.slice(0, 4);
+  }, [error, latestMood, latestNote, loading, taskDone, taskPending, taskTotal]);
 
   return (
     <div className="px-6 py-8 max-w-6xl mx-auto space-y-8">
@@ -194,7 +345,13 @@ export default function DashboardPage() {
             {greeting}, Student 👋
           </h1>
           <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.40)' }}>
-            You have <span style={{ color: '#6EE7D8', fontWeight: 600 }}>3 tasks</span> pending today and your focus streak is going strong.
+            {error ? (
+              <>We couldn&apos;t load your overview right now.</>
+            ) : (
+              <>
+                You have <span style={{ color: '#6EE7D8', fontWeight: 600 }}>{loading ? '…' : taskPending} tasks</span> pending and your momentum is building.
+              </>
+            )}
           </p>
         </div>
 
@@ -303,7 +460,7 @@ export default function DashboardPage() {
             <div>
               <h2 className="text-sm font-semibold" style={{ color: '#d1faf5' }}>Today&apos;s Focus</h2>
               <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                {todaysFocus.filter(t => t.done).length} of {todaysFocus.length} tasks completed
+                {loading ? 'Loading tasks…' : `${focusItems.filter(t => t.done).length} of ${focusItems.length} tasks completed`}
               </p>
             </div>
             <span
@@ -314,7 +471,7 @@ export default function DashboardPage() {
                 border: '1px solid rgba(110,231,216,0.18)',
               }}
             >
-              {progressPct}%
+              {loading ? '…' : `${progressPct}%`}
             </span>
           </div>
 
@@ -332,39 +489,63 @@ export default function DashboardPage() {
 
           {/* Tasks */}
           <div className="space-y-3">
-            {todaysFocus.map((task, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-3 p-3 rounded-xl transition-colors duration-150"
-                style={{ background: task.done ? 'rgba(110,231,216,0.04)' : 'rgba(255,255,255,0.03)' }}
-              >
+            {loading ? (
+              Array.from({ length: 4 }).map((_, i) => (
                 <div
-                  className="w-4.5 h-4.5 w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center border-2 transition-colors"
-                  style={{
-                    borderColor:     task.done ? '#6EE7D8'                   : 'rgba(110,231,216,0.25)',
-                    background:      task.done ? '#6EE7D8'                   : 'transparent',
-                  }}
+                  key={i}
+                  className="flex items-center gap-3 p-3 rounded-xl"
+                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(110,231,216,0.08)' }}
                 >
-                  {task.done && (
-                    <svg className="w-2.5 h-2.5" fill="none" stroke="#111" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
+                  <div className="w-5 h-5 rounded-full flex-shrink-0" style={{ background: 'rgba(110,231,216,0.10)' }} />
+                  <div className="flex-1 min-w-0">
+                    <div className="h-3 rounded w-3/4" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                  </div>
+                  <div className="h-4 rounded w-12" style={{ background: 'rgba(255,255,255,0.06)' }} />
                 </div>
-                <span
-                  className={`text-sm flex-1 ${task.done ? 'line-through' : ''}`}
-                  style={{ color: task.done ? 'rgba(255,255,255,0.30)' : '#d1faf5' }}
-                >
-                  {task.label}
-                </span>
-                <span
-                  className="text-[10px] font-medium px-2 py-0.5 rounded-full flex-shrink-0"
-                  style={priorityStyle(task.priority)}
-                >
-                  {task.priority}
-                </span>
+              ))
+            ) : error ? (
+              <div className="text-xs" style={{ color: 'rgba(255,255,255,0.40)' }}>
+                Couldn&apos;t load tasks right now.
               </div>
-            ))}
+            ) : focusItems.length ? (
+              focusItems.map((task, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 p-3 rounded-xl transition-colors duration-150"
+                  style={{ background: task.done ? 'rgba(110,231,216,0.04)' : 'rgba(255,255,255,0.03)' }}
+                >
+                  <div
+                    className="w-4.5 h-4.5 w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center border-2 transition-colors"
+                    style={{
+                      borderColor:     task.done ? '#6EE7D8'                   : 'rgba(110,231,216,0.25)',
+                      background:      task.done ? '#6EE7D8'                   : 'transparent',
+                    }}
+                  >
+                    {task.done && (
+                      <svg className="w-2.5 h-2.5" fill="none" stroke="#111" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <span
+                    className={`text-sm flex-1 ${task.done ? 'line-through' : ''}`}
+                    style={{ color: task.done ? 'rgba(255,255,255,0.30)' : '#d1faf5' }}
+                  >
+                    {task.label}
+                  </span>
+                  <span
+                    className="text-[10px] font-medium px-2 py-0.5 rounded-full flex-shrink-0"
+                    style={priorityStyle(task.priority)}
+                  >
+                    {task.priority}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="text-xs" style={{ color: 'rgba(255,255,255,0.40)' }}>
+                No tasks yet. Create one to see it here.
+              </div>
+            )}
           </div>
 
           <Link
@@ -450,7 +631,9 @@ export default function DashboardPage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-xs" style={{ color: '#d1faf5' }}>{item.text}</p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.30)' }}>{item.time}</span>
+                      {item.time ? (
+                        <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.30)' }}>{item.time}</span>
+                      ) : null}
                       <span
                         className="text-[9px] font-medium px-1.5 py-0.5 rounded"
                         style={{ background: 'rgba(110,231,216,0.08)', color: '#6EE7D8' }}

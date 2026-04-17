@@ -1,4 +1,4 @@
-\'use client\';
+'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../../lib/supabase';
@@ -56,6 +56,9 @@ export default function NotesPage() {
   const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
   const [pinned, setPinned] = useState(false);
+  const [aiTopic, setAiTopic] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const selected = useMemo(
     () => notes.find(n => n.id === selectedId) ?? null,
@@ -282,6 +285,47 @@ export default function NotesPage() {
     } catch (e) {
       setNotes(prev);
       setError(e instanceof Error ? e.message : 'Failed to update note.');
+    }
+  };
+
+  const generateWithAi = async () => {
+    if (!selectedId) {
+      setAiError('Select or create a note first.');
+      return;
+    }
+    const topic = aiTopic.trim();
+    if (!topic) {
+      setAiError('Enter a topic to generate notes.');
+      return;
+    }
+
+    setAiError(null);
+    setAiLoading(true);
+    try {
+      const res = await fetch('/api/notes-generator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic }),
+      });
+
+      const data = (await res.json()) as { notes?: string; error?: string };
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to generate notes.');
+      }
+
+      const generated = (data.notes ?? '').trim();
+      if (!generated) {
+        throw new Error('AI returned empty notes.');
+      }
+
+      setTitle(`${topic} Notes`);
+      setSubject(topic);
+      setContent(generated);
+      flashSuccess('AI notes generated. Review and save.');
+    } catch (e) {
+      setAiError(e instanceof Error ? e.message : 'Failed to generate notes.');
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -515,6 +559,63 @@ export default function NotesPage() {
             </div>
           ) : (
             <>
+              <div
+                className="rounded-xl p-4 space-y-3"
+                style={{ background: 'rgba(110,231,216,0.04)', border: '1px solid rgba(110,231,216,0.14)' }}
+              >
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(110,231,216,0.50)' }}>
+                    AI Notes Generator
+                  </p>
+                  <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    Auto-fills this editor
+                  </span>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    value={aiTopic}
+                    onChange={e => {
+                      setAiTopic(e.target.value);
+                      if (aiError) setAiError(null);
+                    }}
+                    placeholder="Enter topic (e.g. Electromagnetic Induction)"
+                    className="rounded-xl px-3 py-2.5 text-sm w-full"
+                    style={{
+                      background: '#222022',
+                      border: '1px solid rgba(110,231,216,0.15)',
+                      color: '#d1faf5',
+                      outline: 'none',
+                    }}
+                    disabled={!selectedId || aiLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={generateWithAi}
+                    disabled={!selectedId || aiLoading || !aiTopic.trim()}
+                    className="btn-primary justify-center text-xs px-4 py-2.5 whitespace-nowrap"
+                    style={{
+                      opacity: !selectedId || aiLoading || !aiTopic.trim() ? 0.7 : 1,
+                      cursor: !selectedId || aiLoading || !aiTopic.trim() ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {aiLoading ? 'Generating…' : 'Generate with AI'}
+                  </button>
+                </div>
+                {aiError && (
+                  <div
+                    className="rounded-xl px-3 py-2 text-sm"
+                    role="alert"
+                    style={{
+                      background: 'rgba(248,113,113,0.10)',
+                      border: '1px solid rgba(248,113,113,0.22)',
+                      color: '#fecaca',
+                    }}
+                  >
+                    {aiError}
+                  </div>
+                )}
+              </div>
+
               <div className="grid sm:grid-cols-3 gap-3">
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
