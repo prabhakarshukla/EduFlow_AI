@@ -157,54 +157,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           borderRight: '1px solid rgba(110,231,216,0.10)',
         }}
       >
-        {/* Logo row */}
+        {/* Sidebar controls row */}
         <div
-          className="flex items-center px-4 py-5 gap-2 flex-shrink-0"
-          style={{ borderBottom: '1px solid rgba(110,231,216,0.08)', minHeight: '72px' }}
+          className="flex items-center justify-end px-3 py-3 gap-2 flex-shrink-0"
+          style={{ borderBottom: '1px solid rgba(110,231,216,0.08)', minHeight: '56px' }}
         >
-          <Link
-            href="/"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              transition: 'filter 0.2s, transform 0.2s',
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.filter =
-                'drop-shadow(0 0 8px rgba(110,231,216,0.45))';
-              (e.currentTarget as HTMLElement).style.transform = 'scale(1.04)';
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.filter = 'none';
-              (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
-            }}
-          >
-            {collapsed ? (
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{
-                  background: 'linear-gradient(135deg,#6EE7D8,#14B8A6)',
-                  boxShadow: '0 0 12px rgba(110,231,216,0.25)',
-                }}
-              >
-                <svg className="w-4 h-4" fill="white" viewBox="0 0 18 18">
-                  <path d="M3 13V5.5C3 4.67 3.67 4 4.5 4H13.5C14.33 4 15 4.67 15 5.5V10.5C15 11.33 14.33 12 13.5 12H7L3 16V13Z" />
-                </svg>
-              </div>
-            ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src="/images/logo.png"
-                alt="EduFlow AI"
-                style={{ height: '52px', width: 'auto', display: 'block' }}
-              />
-            )}
-          </Link>
-
           {!collapsed && (
             <button
               onClick={() => setCollapsed(true)}
-              className="ml-auto p-1.5 rounded-lg transition-all duration-150"
+              className="p-1.5 rounded-lg transition-all duration-150"
               style={{ color: 'rgba(110,231,216,0.4)' }}
               aria-label="Collapse sidebar"
               onMouseEnter={e => {
@@ -225,7 +186,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {collapsed && (
             <button
               onClick={() => setCollapsed(false)}
-              className="absolute -right-3 top-6 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150"
+              className="absolute -right-3 top-4 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150"
               style={{
                 background: '#1c1a1c',
                 border: '1px solid rgba(110,231,216,0.22)',
@@ -341,7 +302,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Top header */}
         <header
-          className="flex-shrink-0 flex items-center gap-4 px-6 py-4"
+          className="flex-shrink-0 flex items-center gap-4 px-6 sm:px-8 lg:px-10 py-3"
           style={{
             borderBottom: '1px solid rgba(110,231,216,0.10)',
             background: 'rgba(34,32,34,0.95)',
@@ -362,16 +323,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </button>
 
           {/* Page title breadcrumb */}
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-2.5 text-sm min-w-0">
             <span style={{ color: 'rgba(255,255,255,0.35)' }}>EduFlow AI</span>
             <span style={{ color: 'rgba(110,231,216,0.35)' }}>/</span>
-            <span className="font-semibold" style={{ color: '#d1faf5' }}>{currentPage}</span>
+            <span className="font-semibold truncate" style={{ color: '#d1faf5' }}>{currentPage}</span>
           </div>
 
           {/* Right — search + avatar */}
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-3.5 sm:gap-4">
             <div
-              className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl text-xs"
+              className="hidden sm:flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs"
               style={{
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(110,231,216,0.12)',

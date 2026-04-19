@@ -61,7 +61,22 @@ const features = [
     accent: '#6EE7D8',
     tag: 'Insights',
     href: '/dashboard/productivity',
-    available: false,
+    available: true,
+  },
+  {
+    title: 'Mood Tracker',
+    description:
+      'Track your daily mood, reflect on patterns, and build healthier study habits with simple emotional check-ins and insights.',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
+          d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    accent: '#14B8A6',
+    tag: 'Wellness',
+    href: '/dashboard/mood',
+    available: true,
   },
 ];
 
@@ -84,7 +99,7 @@ export default function Features() {
       <div className="relative max-w-7xl mx-auto px-5 sm:px-8">
 
         {/* ── Section header ── */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-20">
           <div
             className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full mb-5"
             style={{
@@ -121,7 +136,7 @@ export default function Features() {
           </h2>
 
           <p
-            className="text-base sm:text-lg max-w-xl mx-auto leading-relaxed"
+            className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed"
             style={{ color: '#7ca8a3' }}
           >
             Four powerful tools, one seamless workspace. No switching apps.
@@ -130,9 +145,18 @@ export default function Features() {
         </div>
 
         {/* ── Feature cards grid ── */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {features.map((f) => (
-            <FeatureCard key={f.title} {...f} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-6">
+          {features.map((f, idx) => (
+            <div
+              key={f.title}
+              className={
+                idx < 3
+                  ? 'xl:col-span-2'
+                  : 'xl:col-span-3'
+              }
+            >
+              <FeatureCard {...f} />
+            </div>
           ))}
         </div>
       </div>
@@ -156,7 +180,7 @@ function FeatureCard({ title, description, icon, accent, tag, href, available }:
 
   const card = (
     <div
-      className="group rounded-2xl p-6 flex flex-col gap-4 transition-all duration-250"
+      className="group rounded-2xl p-6 flex flex-col gap-4 transition-all duration-250 h-full"
       style={{
         background: '#2a282a',
         border: '1px solid rgba(110,231,216,0.13)',
@@ -166,14 +190,14 @@ function FeatureCard({ title, description, icon, accent, tag, href, available }:
       onMouseEnter={e => {
         const el = e.currentTarget as HTMLElement;
         el.style.borderColor = 'rgba(110,231,216,0.35)';
-        el.style.boxShadow   = '0 0 24px rgba(110,231,216,0.10)';
-        el.style.transform   = 'translateY(-4px) scale(1.01)';
+        el.style.boxShadow   = '0 10px 30px rgba(110,231,216,0.10)';
+        el.style.transform   = 'translateY(-4px)';
       }}
       onMouseLeave={e => {
         const el = e.currentTarget as HTMLElement;
         el.style.borderColor = 'rgba(110,231,216,0.13)';
         el.style.boxShadow   = 'none';
-        el.style.transform   = 'translateY(0) scale(1)';
+        el.style.transform   = 'translateY(0)';
       }}
     >
       {/* Icon + tag row */}
@@ -226,7 +250,7 @@ function FeatureCard({ title, description, icon, accent, tag, href, available }:
 
   return (
     isClickable ? (
-      <Link href={href!} className="block focus:outline-none">
+      <Link href={href!} className="block focus:outline-none h-full">
         {card}
       </Link>
     ) : (

@@ -365,8 +365,7 @@ export default function Hero() {
               </Link>
               <div
                 className="transform hover:-translate-y-1 transition-transform duration-300"
-                title="Coming soon"
-                aria-label="Productivity Tracker (coming soon)"
+                aria-label="Productivity Tracker preview"
               >
                 <ProductivityStatsCard />
               </div>

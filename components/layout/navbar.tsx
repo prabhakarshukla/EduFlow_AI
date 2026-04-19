@@ -62,8 +62,8 @@ export default function Navbar() {
       }}
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
     >
-      <div className="max-w-7xl mx-auto px-5 sm:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+        <div className="flex items-center justify-between h-16 gap-5">
 
           {/* ── Logo ── */}
           <Link
@@ -87,12 +87,12 @@ export default function Navbar() {
           </Link>
 
           {/* ── Desktop Nav ── */}
-          <nav className="hidden md:flex items-center gap-1 flex-1 justify-center min-w-0">
+          <nav className="hidden md:flex items-center gap-2 lg:gap-3 flex-1 justify-center min-w-0 px-4">
             {navLinks.map(({ label, href }) => (
               <Link
                 key={label}
                 href={href}
-                className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
+                className="px-4 lg:px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
                 style={{ color: 'var(--text-muted)' }}
                 onMouseEnter={e => {
                   (e.currentTarget as HTMLElement).style.color      = 'var(--primary)';
@@ -109,20 +109,26 @@ export default function Navbar() {
           </nav>
 
           {/* ── Desktop Actions ── */}
-          <div className="hidden md:flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
+          <div className="hidden md:flex items-center gap-2.5 lg:gap-3 flex-shrink-0 whitespace-nowrap">
             {authReady && user ? (
               <>
                 <Link
                   href="/dashboard"
-                  className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150"
+                  className="px-4 lg:px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-150"
                   style={{ color: 'var(--primary)' }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.08)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  }}
                 >
                   Open App
                 </Link>
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
+                  className="px-4 lg:px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
                   style={{
                     color: 'rgba(255,255,255,0.55)',
                     border: '1px solid rgba(110,231,216,0.18)',
@@ -146,8 +152,14 @@ export default function Navbar() {
               <>
                 <Link
                   href="/auth/login"
-                  className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150"
+                  className="px-4 lg:px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-150"
                   style={{ color: 'var(--primary)' }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.08)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  }}
                 >
                   Log in
                 </Link>

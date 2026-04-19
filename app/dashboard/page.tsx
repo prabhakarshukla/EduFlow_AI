@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '@/lib/supabase';
 
 /* ── Types ── */
 type OverviewCard = {
@@ -25,6 +25,7 @@ type QuickAction = {
 type DbTask = { id: string; title: string | null; label: string | null; status: 'done' | 'in_progress' | 'todo' | string; created_at?: string | null };
 type DbNote = { id: string; title: string | null; updated_at: string | null; created_at?: string | null };
 type DbMood = { id: string; mood: number; note: string | null; occurred_at: string };
+type DbProductivity = { duration_minutes: number; session_date: string };
 
 type FocusItem = { label: string; done: boolean; priority: 'high' | 'medium' | 'low' };
 type ActivityItem = { text: string; time: string; tag: string };
@@ -108,6 +109,13 @@ const moodLabel = (mood: number) => {
   return '😞 Rough';
 };
 
+const formatHoursMinutes = (minutes: number) => {
+  const safe = Number.isFinite(minutes) ? Math.max(0, Math.round(minutes)) : 0;
+  const hours = Math.floor(safe / 60);
+  const mins = safe % 60;
+  return `${hours}h ${mins}m`;
+};
+
 /* ── Dashboard page ── */
 export default function DashboardPage() {
   const now     = new Date();
@@ -129,6 +137,9 @@ export default function DashboardPage() {
   const [latestNote, setLatestNote] = useState<DbNote | null>(null);
 
   const [latestMood, setLatestMood] = useState<DbMood | null>(null);
+  const [productivitySessions, setProductivitySessions] = useState<number>(0);
+  const [productivityTotalMinutes, setProductivityTotalMinutes] = useState<number>(0);
+  const [productivityTodayMinutes, setProductivityTodayMinutes] = useState<number>(0);
 
   useEffect(() => {
     let alive = true;
@@ -147,12 +158,16 @@ export default function DashboardPage() {
           return;
         }
 
-        const [allTasksRes, doneTasksRes, notesCountRes, latestNoteRes, latestMoodRes] = await Promise.all([
+        const [allTasksRes, doneTasksRes, notesCountRes, latestNoteRes, latestMoodRes, productivityRes] = await Promise.all([
           supabase.from('study_tasks').select('id,title,label,status,created_at').order('created_at', { ascending: false }).limit(4),
           supabase.from('study_tasks').select('id', { count: 'exact', head: true }).eq('status', 'done'),
           supabase.from('notes').select('id', { count: 'exact', head: true }),
           supabase.from('notes').select('id,title,updated_at,created_at').order('updated_at', { ascending: false }).limit(1).maybeSingle(),
           supabase.from('mood_entries').select('id,mood,note,occurred_at').order('occurred_at', { ascending: false }).limit(1).maybeSingle(),
+          supabase
+            .from('productivity_sessions')
+            .select('duration_minutes,session_date')
+            .eq('user_id', u.user.id),
         ]);
 
         if (!alive) return;
@@ -162,6 +177,7 @@ export default function DashboardPage() {
         if (notesCountRes.error) throw new Error(notesCountRes.error.message);
         if (latestNoteRes.error) throw new Error(latestNoteRes.error.message);
         if (latestMoodRes.error) throw new Error(latestMoodRes.error.message);
+        if (productivityRes.error) throw new Error(productivityRes.error.message);
 
         const tasks = (allTasksRes.data ?? []) as DbTask[];
         const totalFromList = tasks.length;
@@ -187,6 +203,18 @@ export default function DashboardPage() {
         setNotesTotal(notesCountRes.count ?? 0);
         setLatestNote((latestNoteRes.data as DbNote | null) ?? null);
         setLatestMood((latestMoodRes.data as DbMood | null) ?? null);
+
+        const localToday = new Date();
+        const todayIso = `${localToday.getFullYear()}-${String(localToday.getMonth() + 1).padStart(2, '0')}-${String(localToday.getDate()).padStart(2, '0')}`;
+        const productivity = (productivityRes.data ?? []) as DbProductivity[];
+        const totalMinutes = productivity.reduce((sum, row) => sum + Number(row.duration_minutes ?? 0), 0);
+        const todayMinutes = productivity
+          .filter((row) => row.session_date === todayIso)
+          .reduce((sum, row) => sum + Number(row.duration_minutes ?? 0), 0);
+
+        setProductivitySessions(productivity.length);
+        setProductivityTotalMinutes(totalMinutes);
+        setProductivityTodayMinutes(todayMinutes);
       } catch (e) {
         if (!alive) return;
         setError(e instanceof Error ? e.message : 'Failed to load dashboard overview.');
@@ -272,10 +300,14 @@ export default function DashboardPage() {
       },
       {
         title: 'Productivity',
-        value: '—',
-        sub: 'overview coming soon',
-        delta: 'Not connected',
-        deltaPositive: true,
+        value: loading ? '…' : formatHoursMinutes(productivityTotalMinutes),
+        sub: loading ? 'sessions' : `${productivitySessions} ${productivitySessions === 1 ? 'session' : 'sessions'}`,
+        delta: error
+          ? 'Could not load'
+          : productivitySessions
+            ? `${formatHoursMinutes(productivityTodayMinutes)} today`
+            : '0h 0m today',
+        deltaPositive: !error,
         href: '/dashboard/productivity',
         accent: '#6EE7D8',
         icon: (
@@ -301,7 +333,19 @@ export default function DashboardPage() {
         ),
       },
     ];
-  }, [error, latestMood, latestNote, loading, notesTotal, taskDone, taskPending, taskTotal]);
+  }, [
+    error,
+    latestMood,
+    latestNote,
+    loading,
+    notesTotal,
+    productivitySessions,
+    productivityTodayMinutes,
+    productivityTotalMinutes,
+    taskDone,
+    taskPending,
+    taskTotal,
+  ]);
 
   const recentActivity: ActivityItem[] = useMemo(() => {
     if (loading) {

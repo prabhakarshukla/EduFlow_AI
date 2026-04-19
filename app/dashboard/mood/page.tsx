@@ -1,4 +1,4 @@
-\'use client\';
+"use client";
 
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../../lib/supabase';
@@ -10,11 +10,19 @@ type MoodEntry = {
   occurred_at: string;
 };
 
-function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+function Card({
+  children,
+  className = '',
+  style,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
   return (
     <div
       className={`rounded-2xl p-6 transition-all duration-200 ${className}`}
-      style={{ background: '#2a282a', border: '1px solid rgba(110,231,216,0.12)' }}
+      style={{ background: '#2a282a', border: '1px solid rgba(110,231,216,0.12)', ...style }}
     >
       {children}
     </div>
@@ -39,6 +47,16 @@ const moodMeta: Record<number, { label: string; color: string; bg: string }> = {
   4: { label: 'Good',      color: '#6EE7D8', bg: 'rgba(110,231,216,0.10)' },
   5: { label: 'Great',     color: '#14B8A6', bg: 'rgba(20,184,166,0.12)' },
 };
+
+const moodEmoji: Record<number, string> = {
+  1: '😞',
+  2: '😕',
+  3: '😐',
+  4: '🙂',
+  5: '😁',
+};
+
+const uiTransition = 'all 0.22s ease-in-out';
 
 const formatWhen = (iso: string) => {
   const d = new Date(iso);
@@ -69,6 +87,19 @@ export default function MoodTrackerPage() {
     if (!todays.length) return null;
     const avg = todays.reduce((sum, e) => sum + e.mood, 0) / todays.length;
     return Math.round(avg * 10) / 10;
+  }, [entries]);
+
+  const todayLatestEntry = useMemo(() => {
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = today.getMonth();
+    const d = today.getDate();
+    return (
+      entries.find((e) => {
+        const t = new Date(e.occurred_at);
+        return t.getFullYear() === y && t.getMonth() === m && t.getDate() === d;
+      }) ?? null
+    );
   }, [entries]);
 
   const loadEntries = async () => {
@@ -229,18 +260,55 @@ export default function MoodTrackerPage() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-5">
+      <Card
+        className="p-5 sm:p-6"
+        style={{
+          background: 'linear-gradient(135deg, rgba(42,40,42,1), rgba(33,31,33,1))',
+          border: '1px solid rgba(110,231,216,0.18)',
+          boxShadow: '0 12px 28px rgba(0,0,0,0.20), inset 0 1px 0 rgba(110,231,216,0.08)',
+        } as React.CSSProperties}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(110,231,216,0.45)' }}>
+              Today&apos;s Mood
+            </p>
+            {todayLatestEntry ? (
+              <div className="mt-1.5 flex items-center gap-2">
+                <span className="text-lg">{moodEmoji[todayLatestEntry.mood] ?? '🙂'}</span>
+                <p className="text-sm font-semibold" style={{ color: '#d1faf5' }}>
+                  {moodMeta[todayLatestEntry.mood]?.label ?? 'Logged'} ({todayLatestEntry.mood}/5)
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm mt-1.5" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                No mood saved today yet.
+              </p>
+            )}
+          </div>
+          {todayLatestEntry?.note ? (
+            <p
+              className="text-xs sm:text-sm max-w-xl rounded-xl px-3 py-2.5"
+              style={{ color: 'rgba(255,255,255,0.68)', background: 'rgba(110,231,216,0.07)', border: '1px solid rgba(110,231,216,0.20)' }}
+            >
+              {todayLatestEntry.note}
+            </p>
+          ) : null}
+        </div>
+      </Card>
+
+      <div className="grid lg:grid-cols-3 gap-6">
         {/* Quick check-in */}
-        <Card className="lg:col-span-1 flex flex-col gap-4">
+        <Card className="lg:col-span-1 flex flex-col gap-5">
           <SectionLabel>Quick Check-in</SectionLabel>
 
           {error && (
             <div
-              className="rounded-xl px-3 py-2 text-sm"
+              className="rounded-xl px-3 py-2.5 text-sm"
               role="alert"
               style={{
-                background: 'rgba(248,113,113,0.10)',
-                border: '1px solid rgba(248,113,113,0.22)',
+                background: 'rgba(248,113,113,0.12)',
+                border: '1px solid rgba(248,113,113,0.30)',
                 color: '#fecaca',
               }}
             >
@@ -249,11 +317,11 @@ export default function MoodTrackerPage() {
           )}
           {success && (
             <div
-              className="rounded-xl px-3 py-2 text-sm"
+              className="rounded-xl px-3 py-2.5 text-sm"
               role="status"
               style={{
-                background: 'rgba(110,231,216,0.10)',
-                border: '1px solid rgba(110,231,216,0.22)',
+                background: 'rgba(110,231,216,0.14)',
+                border: '1px solid rgba(110,231,216,0.30)',
                 color: '#d1faf5',
               }}
             >
@@ -261,7 +329,7 @@ export default function MoodTrackerPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-3">
             {[1, 2, 3, 4, 5].map(v => {
               const meta = moodMeta[v];
               const active = mood === v;
@@ -270,16 +338,55 @@ export default function MoodTrackerPage() {
                   key={v}
                   type="button"
                   onClick={() => setMood(v)}
-                  className="py-2.5 rounded-xl text-xs font-semibold transition-all duration-150"
+                  className="rounded-xl px-3 py-3 text-left transition-all duration-200"
                   style={{
-                    background: active ? meta.bg : 'rgba(255,255,255,0.04)',
-                    border: `1px solid ${active ? meta.color + '55' : 'rgba(110,231,216,0.10)'}`,
-                    color: active ? meta.color : 'rgba(255,255,255,0.45)',
-                    boxShadow: active ? `0 0 14px ${meta.color}18` : 'none',
+                    background: active ? `linear-gradient(135deg, ${meta.bg}, rgba(110,231,216,0.08))` : 'rgba(255,255,255,0.03)',
+                    border: `1px solid ${active ? 'rgba(110,231,216,0.45)' : 'rgba(110,231,216,0.14)'}`,
+                    color: active ? '#d1faf5' : 'rgba(255,255,255,0.55)',
+                    boxShadow: active
+                      ? '0 0 0 2px rgba(110,231,216,0.14), 0 10px 20px rgba(110,231,216,0.12)'
+                      : '0 2px 8px rgba(0,0,0,0.10)',
+                    transform: active ? 'translateY(-1px) scale(1.015)' : 'translateY(0) scale(1)',
+                    transition: uiTransition,
                   }}
                   title={meta.label}
+                  aria-pressed={active}
+                  onMouseEnter={e => {
+                    if (!active) {
+                      (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.28)';
+                      (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 16px rgba(110,231,216,0.10)';
+                      (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px) scale(1.01)';
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!active) {
+                      (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.14)';
+                      (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.10)';
+                      (e.currentTarget as HTMLElement).style.transform = 'translateY(0) scale(1)';
+                    }
+                  }}
+                  onMouseDown={e => {
+                    if (!active) (e.currentTarget as HTMLElement).style.transform = 'translateY(0) scale(0.995)';
+                  }}
+                  onMouseUp={e => {
+                    if (!active) (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px) scale(1.01)';
+                  }}
                 >
-                  {v}
+                  <div className="flex items-center justify-between">
+                    <span className="text-base leading-none">{moodEmoji[v]}</span>
+                    <span
+                      className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                      style={{
+                        background: active ? 'rgba(110,231,216,0.18)' : 'rgba(255,255,255,0.06)',
+                        color: active ? '#6EE7D8' : 'rgba(255,255,255,0.45)',
+                      }}
+                    >
+                      {v}/5
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs font-semibold" style={{ color: active ? '#d1faf5' : 'rgba(255,255,255,0.60)' }}>
+                    {meta.label}
+                  </p>
                 </button>
               );
             })}
@@ -341,6 +448,19 @@ export default function MoodTrackerPage() {
               boxShadow: saving ? 'none' : '0 4px 16px rgba(110,231,216,0.28)',
               opacity: saving ? 0.85 : 1,
               cursor: saving ? 'not-allowed' : 'pointer',
+              transition: uiTransition,
+            }}
+            onMouseEnter={e => {
+              if (!saving) (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 20px rgba(110,231,216,0.34)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.boxShadow = saving ? 'none' : '0 4px 16px rgba(110,231,216,0.28)';
+            }}
+            onMouseDown={e => {
+              if (!saving) (e.currentTarget as HTMLElement).style.transform = 'scale(0.99)';
+            }}
+            onMouseUp={e => {
+              if (!saving) (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
             }}
           >
             {saving ? (
@@ -374,14 +494,23 @@ export default function MoodTrackerPage() {
             <button
               type="button"
               onClick={loadEntries}
-              className="px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150"
+              className="px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200"
               style={{
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(110,231,216,0.12)',
                 color: 'rgba(255,255,255,0.55)',
+                transition: uiTransition,
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.28)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.12)'; }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.28)';
+                (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.06)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.12)';
+                (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)';
+              }}
+              onMouseDown={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.99)'; }}
+              onMouseUp={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
             >
               Refresh
             </button>
@@ -389,22 +518,29 @@ export default function MoodTrackerPage() {
 
           <div className="space-y-2.5">
             {loading && (
-              <div
-                className="rounded-xl p-4"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(110,231,216,0.08)' }}
-              >
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>Loading your mood history…</p>
-              </div>
+              <>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl p-4 animate-pulse"
+                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(110,231,216,0.08)' }}
+                  >
+                    <div className="h-3 w-32 rounded mb-2" style={{ background: 'rgba(255,255,255,0.10)' }} />
+                    <div className="h-3 w-full rounded" style={{ background: 'rgba(255,255,255,0.07)' }} />
+                  </div>
+                ))}
+              </>
             )}
 
             {!loading && entries.length === 0 && !error && (
               <div
-                className="rounded-xl p-5"
-                style={{ background: 'rgba(110,231,216,0.05)', border: '1px dashed rgba(110,231,216,0.18)' }}
+                className="rounded-xl p-6 text-center"
+                style={{ background: 'rgba(110,231,216,0.06)', border: '1px dashed rgba(110,231,216,0.22)' }}
               >
-                <p className="text-sm font-semibold" style={{ color: '#d1faf5' }}>No check-ins yet.</p>
-                <p className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.40)' }}>
-                  Add your first mood check-in on the left — it takes 5 seconds.
+                <p className="text-lg mb-2">🧠</p>
+                <p className="text-sm font-semibold" style={{ color: '#d1faf5' }}>No mood check-ins yet</p>
+                <p className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.42)' }}>
+                  Start tracking how you feel each day to build better study habits.
                 </p>
               </div>
             )}
@@ -414,15 +550,22 @@ export default function MoodTrackerPage() {
               return (
                 <div
                   key={e.id}
-                  className="group flex items-start gap-4 p-3.5 rounded-xl transition-all duration-150"
-                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(110,231,216,0.08)' }}
+                  className="group flex items-start gap-4 p-4 rounded-xl transition-all duration-200"
+                  style={{
+                    background: 'rgba(255,255,255,0.035)',
+                    border: '1px solid rgba(110,231,216,0.10)',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.10)',
+                    transition: uiTransition,
+                  }}
                   onMouseEnter={ev => {
-                    (ev.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.22)';
+                    (ev.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.28)';
                     (ev.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)';
+                    (ev.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
                   }}
                   onMouseLeave={ev => {
-                    (ev.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.08)';
-                    (ev.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)';
+                    (ev.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.10)';
+                    (ev.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.035)';
+                    (ev.currentTarget as HTMLElement).style.transform = 'translateY(0)';
                   }}
                 >
                   <div
@@ -439,12 +582,12 @@ export default function MoodTrackerPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-semibold" style={{ color: '#d1faf5' }}>
-                        {meta.label}
+                        {moodEmoji[e.mood] ?? '🙂'} {meta.label}
                       </p>
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full"
-                        style={{ background: 'rgba(110,231,216,0.07)', color: '#6EE7D8', border: '1px solid rgba(110,231,216,0.12)' }}
+                      <span className="text-[10px] font-medium px-2.5 py-1 rounded-full"
+                        style={{ background: 'rgba(110,231,216,0.09)', color: '#6EE7D8', border: '1px solid rgba(110,231,216,0.18)' }}
                       >
                         {formatWhen(e.occurred_at)}
                       </span>
@@ -469,9 +612,9 @@ export default function MoodTrackerPage() {
                   <button
                     type="button"
                     onClick={() => deleteEntry(e.id)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 p-1.5 rounded-lg mt-1"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1.5 rounded-lg mt-1"
                     title="Delete"
-                    style={{ color: 'rgba(255,255,255,0.30)' }}
+                    style={{ color: 'rgba(255,255,255,0.30)', transition: uiTransition }}
                     onMouseEnter={ev => { (ev.currentTarget as HTMLElement).style.color = '#f87171'; }}
                     onMouseLeave={ev => { (ev.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.30)'; }}
                   >
