@@ -20,6 +20,7 @@ type QuickAction = {
   label: string;
   href: string;
   icon: React.ReactNode;
+  description: string;
 };
 
 type DbTask = { id: string; title: string | null; label: string | null; status: 'done' | 'in_progress' | 'todo' | string; created_at?: string | null };
@@ -28,11 +29,12 @@ type DbMood = { id: string; mood: number; note: string | null; occurred_at: stri
 type DbProductivity = { duration_minutes: number; session_date: string };
 
 type FocusItem = { label: string; done: boolean; priority: 'high' | 'medium' | 'low' };
-type ActivityItem = { text: string; time: string; tag: string };
+type ActivityItem = { text: string; time: string; tag: string; tagColor?: string };
 
 const quickActions: QuickAction[] = [
   {
-    label: 'Ask AI a doubt',
+    label: 'Ask AI',
+    description: 'Instant answers',
     href: '/dashboard/doubt-solver',
     icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,17 +44,18 @@ const quickActions: QuickAction[] = [
     ),
   },
   {
-    label: 'Generate notes',
+    label: 'New Note',
+    description: 'AI-generated',
     href: '/dashboard/notes',
     icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-          d="M12 4v16m8-8H4" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
       </svg>
     ),
   },
   {
-    label: 'Add a task',
+    label: 'Add Task',
+    description: 'Study planner',
     href: '/dashboard/study-planner',
     icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,7 +65,8 @@ const quickActions: QuickAction[] = [
     ),
   },
   {
-    label: 'Log mood',
+    label: 'Log Mood',
+    description: 'How are you?',
     href: '/dashboard/mood',
     icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,14 +153,8 @@ export default function DashboardPage() {
       try {
         const { data: u, error: uErr } = await supabase.auth.getUser();
         if (!alive) return;
-        if (uErr) {
-          setError(uErr.message);
-          return;
-        }
-        if (!u.user) {
-          setError('You need to be logged in.');
-          return;
-        }
+        if (uErr) { setError(uErr.message); return; }
+        if (!u.user) { setError('You need to be logged in.'); return; }
 
         const [allTasksRes, doneTasksRes, notesCountRes, latestNoteRes, latestMoodRes, productivityRes] = await Promise.all([
           supabase.from('study_tasks').select('id,title,label,status,created_at').order('created_at', { ascending: false }).limit(4),
@@ -164,10 +162,7 @@ export default function DashboardPage() {
           supabase.from('notes').select('id', { count: 'exact', head: true }),
           supabase.from('notes').select('id,title,updated_at,created_at').order('updated_at', { ascending: false }).limit(1).maybeSingle(),
           supabase.from('mood_entries').select('id,mood,note,occurred_at').order('occurred_at', { ascending: false }).limit(1).maybeSingle(),
-          supabase
-            .from('productivity_sessions')
-            .select('duration_minutes,session_date')
-            .eq('user_id', u.user.id),
+          supabase.from('productivity_sessions').select('duration_minutes,session_date').eq('user_id', u.user.id),
         ]);
 
         if (!alive) return;
@@ -181,7 +176,6 @@ export default function DashboardPage() {
 
         const tasks = (allTasksRes.data ?? []) as DbTask[];
         const totalFromList = tasks.length;
-        // total tasks: do a count query only if we have any tasks; keeps it minimal and still accurate enough for overview
         const totalTasksCountRes = await supabase.from('study_tasks').select('id', { count: 'exact', head: true });
         if (totalTasksCountRes.error) throw new Error(totalTasksCountRes.error.message);
 
@@ -233,20 +227,17 @@ export default function DashboardPage() {
   }, [focusItems]);
 
   const overviewCards: OverviewCard[] = useMemo(() => {
-    const tasksValue = loading ? '…' : `${taskDone} / ${taskTotal}`;
-    const tasksSub = 'tasks completed';
-    const tasksDelta = error ? 'Could not load' : (taskPending ? `${taskPending} pending` : 'All caught up');
+    const tasksValue = loading ? '—' : `${taskDone} / ${taskTotal}`;
+    const tasksDelta = error ? 'Could not load' : (taskPending ? `${taskPending} pending` : 'All caught up ✓');
 
-    const notesValue = loading ? '…' : fmtCompact(notesTotal);
-    const notesSub = notesTotal === 1 ? 'note' : 'notes';
+    const notesValue = loading ? '—' : fmtCompact(notesTotal);
     const notesDelta =
       error ? 'Could not load' :
       latestNote?.title ? `Latest: ${latestNote.title}` :
       notesTotal ? 'Recently updated' :
       'No notes yet';
 
-    const moodValue = loading ? '…' : (latestMood ? moodLabel(latestMood.mood) : '—');
-    const moodSub = latestMood ? "latest check-in" : 'no check-ins yet';
+    const moodValue = loading ? '—' : (latestMood ? moodLabel(latestMood.mood) : '—');
     const moodDelta =
       error ? 'Could not load' :
       latestMood ? timeAgo(latestMood.occurred_at) :
@@ -256,13 +247,13 @@ export default function DashboardPage() {
       {
         title: 'Study Planner',
         value: tasksValue,
-        sub: tasksSub,
+        sub: 'tasks completed',
         delta: tasksDelta,
         deltaPositive: !error,
         href: '/dashboard/study-planner',
         accent: '#6EE7D8',
         icon: (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4.5 h-4.5 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
               d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
           </svg>
@@ -271,8 +262,8 @@ export default function DashboardPage() {
       {
         title: 'AI Doubt Solver',
         value: '—',
-        sub: 'overview coming soon',
-        delta: 'Not connected',
+        sub: 'questions solved',
+        delta: 'Ask a question →',
         deltaPositive: true,
         href: '/dashboard/doubt-solver',
         accent: '#14B8A6',
@@ -284,9 +275,9 @@ export default function DashboardPage() {
         ),
       },
       {
-        title: 'Notes Generator',
+        title: 'Notes',
         value: notesValue,
-        sub: notesSub,
+        sub: notesTotal === 1 ? 'note saved' : 'notes saved',
         delta: notesDelta,
         deltaPositive: !error,
         href: '/dashboard/notes',
@@ -300,7 +291,7 @@ export default function DashboardPage() {
       },
       {
         title: 'Productivity',
-        value: loading ? '…' : formatHoursMinutes(productivityTotalMinutes),
+        value: loading ? '—' : formatHoursMinutes(productivityTotalMinutes),
         sub: loading ? 'sessions' : `${productivitySessions} ${productivitySessions === 1 ? 'session' : 'sessions'}`,
         delta: error
           ? 'Could not load'
@@ -318,9 +309,9 @@ export default function DashboardPage() {
         ),
       },
       {
-        title: 'Mood Tracker',
+        title: 'Mood',
         value: moodValue,
-        sub: moodSub,
+        sub: latestMood ? 'latest check-in' : 'no check-ins yet',
         delta: moodDelta,
         deltaPositive: !error,
         href: '/dashboard/mood',
@@ -334,41 +325,25 @@ export default function DashboardPage() {
       },
     ];
   }, [
-    error,
-    latestMood,
-    latestNote,
-    loading,
-    notesTotal,
-    productivitySessions,
-    productivityTodayMinutes,
-    productivityTotalMinutes,
-    taskDone,
-    taskPending,
-    taskTotal,
+    error, latestMood, latestNote, loading, notesTotal,
+    productivitySessions, productivityTodayMinutes, productivityTotalMinutes,
+    taskDone, taskPending, taskTotal,
   ]);
 
   const recentActivity: ActivityItem[] = useMemo(() => {
-    if (loading) {
-      return [
-        { text: 'Loading your activity…', time: '', tag: 'Overview' },
-      ];
-    }
-    if (error) {
-      return [
-        { text: 'Could not load recent activity.', time: '', tag: 'Overview' },
-      ];
-    }
+    if (loading) return [{ text: 'Loading your activity…', time: '', tag: 'Overview' }];
+    if (error)   return [{ text: 'Could not load recent activity.', time: '', tag: 'Overview' }];
     const items: ActivityItem[] = [];
     if (latestNote?.title) {
-      items.push({ text: `Updated note: ${latestNote.title}`, time: timeAgo(latestNote.updated_at ?? latestNote.created_at), tag: 'Notes' });
+      items.push({ text: `Updated note: ${latestNote.title}`, time: timeAgo(latestNote.updated_at ?? latestNote.created_at), tag: 'Notes', tagColor: '#5EEAD4' });
     }
     if (latestMood) {
-      items.push({ text: `Mood check-in: ${moodLabel(latestMood.mood)}`, time: timeAgo(latestMood.occurred_at), tag: 'Mood' });
+      items.push({ text: `Mood check-in: ${moodLabel(latestMood.mood)}`, time: timeAgo(latestMood.occurred_at), tag: 'Mood', tagColor: '#14B8A6' });
     }
     if (taskDone > 0) {
-      items.push({ text: `${taskDone} tasks completed`, time: 'Total', tag: 'Planner' });
+      items.push({ text: `${taskDone} tasks completed`, time: 'Total', tag: 'Planner', tagColor: '#6EE7D8' });
     } else if (taskTotal > 0) {
-      items.push({ text: `${taskPending} tasks pending`, time: 'Total', tag: 'Planner' });
+      items.push({ text: `${taskPending} tasks pending`, time: 'Total', tag: 'Planner', tagColor: '#6EE7D8' });
     }
     if (!items.length) {
       return [{ text: 'No activity yet — start by adding a task, note, or mood check-in.', time: '', tag: 'Overview' }];
@@ -377,23 +352,27 @@ export default function DashboardPage() {
   }, [error, latestMood, latestNote, loading, taskDone, taskPending, taskTotal]);
 
   return (
-    <div className="px-6 py-8 max-w-6xl mx-auto space-y-8">
+    <div className="px-6 sm:px-8 py-8 max-w-[1280px] mx-auto space-y-8">
 
       {/* ── Welcome header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <p className="text-sm mb-1" style={{ color: 'rgba(110,231,216,0.6)' }}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <p className="text-xs font-medium tracking-wide uppercase" style={{ color: 'rgba(110,231,216,0.50)' }}>
             {now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
-          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#6EE7D8' }}>
+          <h1 className="text-2xl sm:text-[28px] font-bold tracking-tight" style={{ color: '#e2fdf9' }}>
             {greeting}, Student 👋
           </h1>
-          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.40)' }}>
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.38)' }}>
             {error ? (
               <>We couldn&apos;t load your overview right now.</>
             ) : (
               <>
-                You have <span style={{ color: '#6EE7D8', fontWeight: 600 }}>{loading ? '…' : taskPending} tasks</span> pending and your momentum is building.
+                You have{' '}
+                <span style={{ color: '#6EE7D8', fontWeight: 600 }}>
+                  {loading ? '…' : taskPending} tasks
+                </span>{' '}
+                pending — keep the momentum going.
               </>
             )}
           </p>
@@ -404,82 +383,92 @@ export default function DashboardPage() {
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 self-start sm:self-auto flex-shrink-0"
           style={{
             background: 'linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)',
-            color: '#111',
-            boxShadow: '0 4px 16px rgba(110,231,216,0.28)',
+            color: '#0d2420',
+            boxShadow: '0 3px 14px rgba(110,231,216,0.28)',
           }}
           onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 24px rgba(110,231,216,0.45)';
-            (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
+            (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 22px rgba(110,231,216,0.44)';
+            (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
           }}
           onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 16px rgba(110,231,216,0.28)';
+            (e.currentTarget as HTMLElement).style.boxShadow = '0 3px 14px rgba(110,231,216,0.28)';
             (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
           }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 4v16m8-8H4" />
           </svg>
           New Task
         </Link>
       </div>
 
       {/* ── Overview cards ── */}
-      <div>
-        <h2 className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'rgba(110,231,216,0.45)' }}>
-          Overview
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+      <section>
+        <div className="flex items-center gap-2 mb-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.10em]" style={{ color: 'rgba(110,231,216,0.40)' }}>
+            Overview
+          </p>
+          <div className="flex-1 h-px" style={{ background: 'rgba(110,231,216,0.07)' }} />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
           {overviewCards.map((card) => (
             <Link
               key={card.title}
               href={card.href}
-              className="flex flex-col gap-4 p-5 rounded-2xl transition-all duration-200 group"
+              className="group flex flex-col gap-3.5 p-4 rounded-2xl transition-all duration-200"
               style={{
                 background: '#2a282a',
-                border: '1px solid rgba(110,231,216,0.12)',
+                border: '1px solid rgba(110,231,216,0.11)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.14)',
               }}
               onMouseEnter={e => {
                 const el = e.currentTarget as HTMLElement;
-                el.style.borderColor = 'rgba(110,231,216,0.32)';
-                el.style.boxShadow   = '0 0 20px rgba(110,231,216,0.09)';
+                el.style.borderColor = `${card.accent}40`;
+                el.style.boxShadow   = `0 6px 22px rgba(0,0,0,0.32), 0 0 18px ${card.accent}12`;
                 el.style.transform   = 'translateY(-3px)';
               }}
               onMouseLeave={e => {
                 const el = e.currentTarget as HTMLElement;
-                el.style.borderColor = 'rgba(110,231,216,0.12)';
-                el.style.boxShadow   = 'none';
+                el.style.borderColor = 'rgba(110,231,216,0.11)';
+                el.style.boxShadow   = '0 1px 3px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.14)';
                 el.style.transform   = 'translateY(0)';
               }}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between">
                 <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center"
+                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                   style={{
-                    background: `${card.accent}18`,
+                    background: `${card.accent}14`,
                     color: card.accent,
-                    border: `1px solid ${card.accent}28`,
+                    border: `1px solid ${card.accent}22`,
                   }}
                 >
                   {card.icon}
                 </div>
                 <svg
-                  className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                  style={{ color: 'rgba(110,231,216,0.5)' }}
+                  className="w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity duration-200 mt-0.5"
+                  style={{ color: card.accent }}
                   fill="none" stroke="currentColor" viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M9 5l7 7-7 7" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M7 17L17 7M17 7H7M17 7v10" />
                 </svg>
               </div>
 
-              <div>
-                <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.40)' }}>{card.title}</p>
-                <p className="text-xl font-bold leading-none mb-1" style={{ color: '#d1faf5' }}>{card.value}</p>
-                <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{card.sub}</p>
+              <div className="space-y-0.5">
+                <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  {card.title}
+                </p>
+                <p className="text-xl font-bold leading-tight" style={{ color: '#e2fdf9' }}>
+                  {card.value}
+                </p>
+                <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.32)' }}>
+                  {card.sub}
+                </p>
               </div>
 
               <p
-                className="text-[10px] font-medium"
+                className="text-[10px] font-medium truncate"
                 style={{ color: card.deltaPositive ? card.accent : '#f87171' }}
               >
                 {card.delta}
@@ -487,68 +476,69 @@ export default function DashboardPage() {
             </Link>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* ── Two-col: Today's Focus + Quick Actions / Recent ── */}
-      <div className="grid lg:grid-cols-5 gap-6">
+      {/* ── Two-col: Today's Focus + Right column ── */}
+      <div className="grid lg:grid-cols-5 gap-5">
 
-        {/* Today's focus — wider */}
+        {/* Today's Focus */}
         <div
-          className="lg:col-span-3 rounded-2xl p-6"
+          className="lg:col-span-3 rounded-2xl p-5"
           style={{
             background: '#2a282a',
-            border: '1px solid rgba(110,231,216,0.12)',
+            border: '1px solid rgba(110,231,216,0.11)',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.14)',
           }}
         >
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-sm font-semibold" style={{ color: '#d1faf5' }}>Today&apos;s Focus</h2>
-              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <h2 className="text-sm font-semibold" style={{ color: '#e2fdf9', letterSpacing: '-0.01em' }}>
+                Today&apos;s Focus
+              </h2>
+              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.30)' }}>
                 {loading ? 'Loading tasks…' : `${focusItems.filter(t => t.done).length} of ${focusItems.length} tasks completed`}
               </p>
             </div>
             <span
-              className="text-xs font-semibold px-2.5 py-1 rounded-full"
+              className="text-xs font-bold px-2.5 py-1 rounded-full"
               style={{
-                background: 'rgba(110,231,216,0.08)',
+                background: progressPct === 100 ? 'rgba(110,231,216,0.14)' : 'rgba(110,231,216,0.07)',
                 color: '#6EE7D8',
-                border: '1px solid rgba(110,231,216,0.18)',
+                border: '1px solid rgba(110,231,216,0.16)',
               }}
             >
-              {loading ? '…' : `${progressPct}%`}
+              {loading ? '—' : `${progressPct}%`}
             </span>
           </div>
 
           {/* Progress bar */}
-          <div className="w-full h-1.5 rounded-full mb-5" style={{ background: 'rgba(255,255,255,0.06)' }}>
+          <div className="w-full h-1.5 rounded-full mb-4" style={{ background: 'rgba(255,255,255,0.05)' }}>
             <div
-              className="h-1.5 rounded-full transition-all duration-500"
+              className="h-1.5 rounded-full transition-all duration-700"
               style={{
                 width: `${progressPct}%`,
                 background: 'linear-gradient(90deg, #6EE7D8, #14B8A6)',
-                boxShadow: '0 0 8px rgba(110,231,216,0.35)',
+                boxShadow: progressPct > 0 ? '0 0 10px rgba(110,231,216,0.30)' : 'none',
               }}
             />
           </div>
 
-          {/* Tasks */}
-          <div className="space-y-3">
+          {/* Tasks list */}
+          <div className="space-y-2">
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 p-3 rounded-xl"
-                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(110,231,216,0.08)' }}
+                  className="flex items-center gap-3 p-3 rounded-xl animate-pulse"
+                  style={{ background: 'rgba(255,255,255,0.03)' }}
                 >
-                  <div className="w-5 h-5 rounded-full flex-shrink-0" style={{ background: 'rgba(110,231,216,0.10)' }} />
-                  <div className="flex-1 min-w-0">
-                    <div className="h-3 rounded w-3/4" style={{ background: 'rgba(255,255,255,0.06)' }} />
-                  </div>
-                  <div className="h-4 rounded w-12" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                  <div className="w-4 h-4 rounded-full flex-shrink-0" style={{ background: 'rgba(110,231,216,0.08)' }} />
+                  <div className="flex-1 h-3 rounded" style={{ background: 'rgba(255,255,255,0.05)' }} />
+                  <div className="h-4 w-12 rounded" style={{ background: 'rgba(255,255,255,0.05)' }} />
                 </div>
               ))
             ) : error ? (
-              <div className="text-xs" style={{ color: 'rgba(255,255,255,0.40)' }}>
+              <div className="text-xs py-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
                 Couldn&apos;t load tasks right now.
               </div>
             ) : focusItems.length ? (
@@ -556,29 +546,29 @@ export default function DashboardPage() {
                 <div
                   key={i}
                   className="flex items-center gap-3 p-3 rounded-xl transition-colors duration-150"
-                  style={{ background: task.done ? 'rgba(110,231,216,0.04)' : 'rgba(255,255,255,0.03)' }}
+                  style={{ background: task.done ? 'rgba(110,231,216,0.04)' : 'rgba(255,255,255,0.02)' }}
                 >
                   <div
-                    className="w-4.5 h-4.5 w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center border-2 transition-colors"
+                    className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center border-2 transition-colors"
                     style={{
-                      borderColor:     task.done ? '#6EE7D8'                   : 'rgba(110,231,216,0.25)',
-                      background:      task.done ? '#6EE7D8'                   : 'transparent',
+                      borderColor: task.done ? '#6EE7D8' : 'rgba(110,231,216,0.22)',
+                      background:  task.done ? '#6EE7D8' : 'transparent',
                     }}
                   >
                     {task.done && (
-                      <svg className="w-2.5 h-2.5" fill="none" stroke="#111" viewBox="0 0 24 24">
+                      <svg className="w-2.5 h-2.5" fill="none" stroke="#0d2420" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                       </svg>
                     )}
                   </div>
                   <span
-                    className={`text-sm flex-1 ${task.done ? 'line-through' : ''}`}
-                    style={{ color: task.done ? 'rgba(255,255,255,0.30)' : '#d1faf5' }}
+                    className={`text-sm flex-1 truncate ${task.done ? 'line-through' : ''}`}
+                    style={{ color: task.done ? 'rgba(255,255,255,0.28)' : '#d1faf5' }}
                   >
                     {task.label}
                   </span>
                   <span
-                    className="text-[10px] font-medium px-2 py-0.5 rounded-full flex-shrink-0"
+                    className="text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
                     style={priorityStyle(task.priority)}
                   >
                     {task.priority}
@@ -586,18 +576,18 @@ export default function DashboardPage() {
                 </div>
               ))
             ) : (
-              <div className="text-xs" style={{ color: 'rgba(255,255,255,0.40)' }}>
-                No tasks yet. Create one to see it here.
+              <div className="text-xs py-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                No tasks yet — create one to see it here.
               </div>
             )}
           </div>
 
           <Link
             href="/dashboard/study-planner"
-            className="mt-5 flex items-center gap-1.5 text-xs font-medium transition-colors duration-150"
-            style={{ color: 'rgba(110,231,216,0.5)' }}
+            className="mt-4 flex items-center gap-1.5 text-xs font-medium transition-colors duration-150"
+            style={{ color: 'rgba(110,231,216,0.45)' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#6EE7D8'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(110,231,216,0.5)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(110,231,216,0.45)'; }}
           >
             View all tasks
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -606,81 +596,98 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        {/* Right column: Quick actions + Recent activity */}
-        <div className="lg:col-span-2 flex flex-col gap-5">
+        {/* Right col */}
+        <div className="lg:col-span-2 flex flex-col gap-4">
 
-          {/* Quick actions */}
+          {/* Quick Actions */}
           <div
             className="rounded-2xl p-5"
             style={{
               background: '#2a282a',
-              border: '1px solid rgba(110,231,216,0.12)',
+              border: '1px solid rgba(110,231,216,0.11)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.14)',
             }}
           >
-            <h2 className="text-sm font-semibold mb-4" style={{ color: '#d1faf5' }}>Quick Actions</h2>
-            <div className="grid grid-cols-2 gap-2.5">
+            <h2 className="text-sm font-semibold mb-3.5" style={{ color: '#e2fdf9', letterSpacing: '-0.01em' }}>
+              Quick Actions
+            </h2>
+            <div className="grid grid-cols-2 gap-2">
               {quickActions.map((action) => (
                 <Link
                   key={action.label}
                   href={action.href}
-                  className="flex flex-col items-center gap-2 p-3 rounded-xl text-center text-xs font-medium transition-all duration-150"
+                  className="flex items-center gap-2.5 p-3 rounded-xl text-xs font-medium transition-all duration-150"
                   style={{
                     background: 'rgba(110,231,216,0.04)',
-                    border: '1px solid rgba(110,231,216,0.10)',
-                    color: 'rgba(255,255,255,0.55)',
+                    border: '1px solid rgba(110,231,216,0.09)',
+                    color: 'rgba(255,255,255,0.50)',
                   }}
                   onMouseEnter={e => {
                     const el = e.currentTarget as HTMLElement;
-                    el.style.borderColor = 'rgba(110,231,216,0.30)';
+                    el.style.borderColor = 'rgba(110,231,216,0.28)';
                     el.style.background  = 'rgba(110,231,216,0.08)';
-                    el.style.color       = '#6EE7D8';
-                    el.style.transform   = 'translateY(-2px)';
+                    el.style.color       = '#d1faf5';
+                    el.style.transform   = 'translateY(-1px)';
                   }}
                   onMouseLeave={e => {
                     const el = e.currentTarget as HTMLElement;
-                    el.style.borderColor = 'rgba(110,231,216,0.10)';
+                    el.style.borderColor = 'rgba(110,231,216,0.09)';
                     el.style.background  = 'rgba(110,231,216,0.04)';
-                    el.style.color       = 'rgba(255,255,255,0.55)';
+                    el.style.color       = 'rgba(255,255,255,0.50)';
                     el.style.transform   = 'translateY(0)';
                   }}
                 >
                   <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center"
+                    className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
                     style={{ background: 'rgba(110,231,216,0.10)', color: '#6EE7D8' }}
                   >
                     {action.icon}
                   </div>
-                  {action.label}
+                  <div className="min-w-0">
+                    <p className="font-semibold truncate leading-tight">{action.label}</p>
+                    <p className="text-[10px] leading-tight mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                      {action.description}
+                    </p>
+                  </div>
                 </Link>
               ))}
             </div>
           </div>
 
-          {/* Recent activity */}
+          {/* Recent Activity */}
           <div
             className="rounded-2xl p-5 flex-1"
             style={{
               background: '#2a282a',
-              border: '1px solid rgba(110,231,216,0.12)',
+              border: '1px solid rgba(110,231,216,0.11)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.14)',
             }}
           >
-            <h2 className="text-sm font-semibold mb-4" style={{ color: '#d1faf5' }}>Recent Activity</h2>
-            <div className="space-y-3">
+            <h2 className="text-sm font-semibold mb-4" style={{ color: '#e2fdf9', letterSpacing: '-0.01em' }}>
+              Recent Activity
+            </h2>
+            <div className="space-y-3.5">
               {recentActivity.map((item, i) => (
                 <div key={i} className="flex items-start gap-3">
                   <div
                     className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
-                    style={{ background: '#6EE7D8', boxShadow: '0 0 4px rgba(110,231,216,0.5)' }}
+                    style={{
+                      background: item.tagColor ?? '#6EE7D8',
+                      boxShadow: `0 0 6px ${item.tagColor ?? '#6EE7D8'}60`,
+                    }}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs" style={{ color: '#d1faf5' }}>{item.text}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      {item.time ? (
-                        <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.30)' }}>{item.time}</span>
-                      ) : null}
+                    <p className="text-xs leading-snug" style={{ color: '#d1faf5' }}>{item.text}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      {item.time && (
+                        <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.28)' }}>{item.time}</span>
+                      )}
                       <span
-                        className="text-[9px] font-medium px-1.5 py-0.5 rounded"
-                        style={{ background: 'rgba(110,231,216,0.08)', color: '#6EE7D8' }}
+                        className="text-[9px] font-semibold px-1.5 py-0.5 rounded"
+                        style={{
+                          background: `${item.tagColor ?? '#6EE7D8'}12`,
+                          color: item.tagColor ?? '#6EE7D8',
+                        }}
                       >
                         {item.tag}
                       </span>

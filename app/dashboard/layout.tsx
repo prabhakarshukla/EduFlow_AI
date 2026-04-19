@@ -8,41 +8,59 @@ import { supabase } from '../../lib/supabase';
 
 const sidebarLinks = [
   {
-    label: 'Dashboard',
-    href: '/dashboard',
-    icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+    group: 'Overview',
+    items: [
+      {
+        label: 'Dashboard',
+        href: '/dashboard',
+        icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+      },
+    ],
   },
   {
-    label: 'Study Planner',
-    href: '/dashboard/study-planner',
-    icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+    group: 'Tools',
+    items: [
+      {
+        label: 'Study Planner',
+        href: '/dashboard/study-planner',
+        icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+      },
+      {
+        label: 'AI Doubt Solver',
+        href: '/dashboard/doubt-solver',
+        icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
+      },
+      {
+        label: 'Notes',
+        href: '/dashboard/notes',
+        icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z',
+      },
+      {
+        label: 'Productivity',
+        href: '/dashboard/productivity',
+        icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+      },
+      {
+        label: 'Mood Tracker',
+        href: '/dashboard/mood',
+        icon: 'M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+      },
+    ],
   },
   {
-    label: 'AI Doubt Solver',
-    href: '/dashboard/doubt-solver',
-    icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
-  },
-  {
-    label: 'Notes',
-    href: '/dashboard/notes',
-    icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z',
-  },
-  {
-    label: 'Productivity',
-    href: '/dashboard/productivity',
-    icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
-  },
-  {
-    label: 'Mood Tracker',
-    href: '/dashboard/mood',
-    icon: 'M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-  },
-  {
-    label: 'Settings',
-    href: '/dashboard/settings',
-    icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
+    group: 'Account',
+    items: [
+      {
+        label: 'Settings',
+        href: '/dashboard/settings',
+        icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
+      },
+    ],
   },
 ];
+
+// Flat list for current page lookup
+const allLinks = sidebarLinks.flatMap(g => g.items);
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -53,7 +71,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [authReady, setAuthReady] = useState(false);
   const lastProfileSyncUserId = useRef<string | null>(null);
 
-  const currentPage = sidebarLinks.find(l => l.href === pathname)?.label ?? 'Dashboard';
+  const currentPage = allLinks.find(l => l.href === pathname)?.label ?? 'Dashboard';
   const nextPathForLogin = useMemo(() => `/auth/login?next=${encodeURIComponent(pathname || '/dashboard')}`, [pathname]);
 
   useEffect(() => {
@@ -101,7 +119,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     (async () => {
       try {
-        // Try a richer payload first (in case your profiles table includes these columns).
         const richPayload = {
           ...basePayload,
           user_id: user.id,
@@ -114,7 +131,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         if (!richError) return;
 
-        // Fallback: minimal columns that match the common profiles schema.
         await supabase.from('profiles').upsert(basePayload, { onConflict: 'id' });
       } catch {
         // Intentionally silent: profile sync should never block dashboard access.
@@ -137,43 +153,43 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* ── Mobile overlay ── */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-20 bg-black/60 md:hidden"
+          className="fixed inset-0 z-20 bg-black/60 backdrop-blur-sm md:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
-      {/* ── Sidebar ── */}
+      {/* ─────────────────────── SIDEBAR ─────────────────────────── */}
       <aside
         className={`
-          fixed md:relative z-30 flex flex-col h-full md:h-auto min-h-screen
-          transition-all duration-300 flex-shrink-0
+          fixed md:relative z-30 flex flex-col min-h-screen flex-shrink-0
+          transition-all duration-300 ease-in-out
           ${mobileOpen ? 'left-0' : '-left-64 md:left-0'}
         `}
         style={{
           top: '64px',
           height: 'calc(100vh - 64px)',
-          width: collapsed ? '68px' : '232px',
-          background: '#1c1a1c',
-          borderRight: '1px solid rgba(110,231,216,0.10)',
+          width: collapsed ? '64px' : '224px',
+          background: '#1e1c1e',
+          borderRight: '1px solid rgba(110,231,216,0.09)',
         }}
       >
-        {/* Sidebar controls row */}
+        {/* Collapse toggle row */}
         <div
-          className="flex items-center justify-end px-3 py-3 gap-2 flex-shrink-0"
-          style={{ borderBottom: '1px solid rgba(110,231,216,0.08)', minHeight: '56px' }}
+          className="flex items-center justify-end px-3 py-3 flex-shrink-0"
+          style={{ borderBottom: '1px solid rgba(110,231,216,0.07)', minHeight: '52px' }}
         >
-          {!collapsed && (
+          {!collapsed ? (
             <button
               onClick={() => setCollapsed(true)}
               className="p-1.5 rounded-lg transition-all duration-150"
-              style={{ color: 'rgba(110,231,216,0.4)' }}
+              style={{ color: 'rgba(110,231,216,0.35)' }}
               aria-label="Collapse sidebar"
               onMouseEnter={e => {
                 (e.currentTarget as HTMLElement).style.color = '#6EE7D8';
                 (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.08)';
               }}
               onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.color = 'rgba(110,231,216,0.4)';
+                (e.currentTarget as HTMLElement).style.color = 'rgba(110,231,216,0.35)';
                 (e.currentTarget as HTMLElement).style.background = 'transparent';
               }}
             >
@@ -181,14 +197,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
               </svg>
             </button>
-          )}
-
-          {collapsed && (
+          ) : (
             <button
               onClick={() => setCollapsed(false)}
-              className="absolute -right-3 top-4 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150"
+              className="absolute -right-3 top-3 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150"
               style={{
-                background: '#1c1a1c',
+                background: '#1e1c1e',
                 border: '1px solid rgba(110,231,216,0.22)',
                 color: '#6EE7D8',
               }}
@@ -201,52 +215,71 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           )}
         </div>
 
-        {/* Section label */}
-        {!collapsed && (
-          <p
-            className="px-5 pt-5 pb-2 text-[10px] font-semibold uppercase tracking-widest"
-            style={{ color: 'rgba(110,231,216,0.35)' }}
-          >
-            Navigation
-          </p>
-        )}
+        {/* Nav groups */}
+        <nav className="flex flex-col flex-1 px-2 py-4 gap-5 overflow-y-auto overflow-x-hidden">
+          {sidebarLinks.map(({ group, items }) => (
+            <div key={group} className="flex flex-col gap-0.5">
+              {/* Group label */}
+              {!collapsed && (
+                <p
+                  className="px-3 pb-1.5 text-[9px] font-bold uppercase tracking-[0.12em]"
+                  style={{ color: 'rgba(110,231,216,0.30)' }}
+                >
+                  {group}
+                </p>
+              )}
 
-        {/* Nav items */}
-        <nav className="flex flex-col gap-0.5 px-2 pb-4 flex-1">
-          {sidebarLinks.map(({ label, href, icon }) => {
-            const active = pathname === href;
-            return (
-              <Link
-                key={href}
-                href={href}
-                title={collapsed ? label : undefined}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150"
-                style={{
-                  color:      active ? '#6EE7D8'                  : 'rgba(255,255,255,0.45)',
-                  background: active ? 'rgba(110,231,216,0.10)'   : 'transparent',
-                  borderLeft: active ? '2px solid #6EE7D8'        : '2px solid transparent',
-                  boxShadow:  active ? '0 0 12px rgba(110,231,216,0.08)' : 'none',
-                }}
-                onMouseEnter={e => {
-                  if (!active) {
-                    (e.currentTarget as HTMLElement).style.color      = '#6EE7D8';
-                    (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.06)';
-                  }
-                }}
-                onMouseLeave={e => {
-                  if (!active) {
-                    (e.currentTarget as HTMLElement).style.color      = 'rgba(255,255,255,0.45)';
-                    (e.currentTarget as HTMLElement).style.background = 'transparent';
-                  }
-                }}
-              >
-                <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 2 : 1.7} d={icon} />
-                </svg>
-                {!collapsed && <span className="truncate">{label}</span>}
-              </Link>
-            );
-          })}
+              {items.map(({ label, href, icon }) => {
+                const active = pathname === href;
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    title={collapsed ? label : undefined}
+                    className="relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150"
+                    style={{
+                      color:      active ? '#6EE7D8'                : 'rgba(255,255,255,0.40)',
+                      background: active ? 'rgba(110,231,216,0.09)' : 'transparent',
+                    }}
+                    onMouseEnter={e => {
+                      if (!active) {
+                        (e.currentTarget as HTMLElement).style.color      = 'rgba(255,255,255,0.75)';
+                        (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)';
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (!active) {
+                        (e.currentTarget as HTMLElement).style.color      = 'rgba(255,255,255,0.40)';
+                        (e.currentTarget as HTMLElement).style.background = 'transparent';
+                      }
+                    }}
+                  >
+                    {/* Active indicator pip */}
+                    {active && (
+                      <span
+                        className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-r-full"
+                        style={{ background: 'linear-gradient(180deg, #6EE7D8, #14B8A6)' }}
+                      />
+                    )}
+                    <svg
+                      className="w-[18px] h-[18px] flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={active ? 2.1 : 1.65}
+                        d={icon}
+                      />
+                    </svg>
+                    {!collapsed && <span className="truncate leading-none">{label}</span>}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         {/* User row */}
@@ -256,24 +289,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         >
           {collapsed ? (
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold mx-auto"
-              style={{ background: 'linear-gradient(135deg,#6EE7D8,#14B8A6)', color: '#111' }}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold mx-auto"
+              style={{ background: 'linear-gradient(135deg,#6EE7D8,#14B8A6)', color: '#0d2420' }}
             >
               {avatarLetter}
             </div>
           ) : (
-            <div className="flex items-center gap-3 px-1">
+            <div className="flex items-center gap-2.5 px-1">
               <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg,#6EE7D8,#14B8A6)', color: '#111' }}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg,#6EE7D8,#14B8A6)', color: '#0d2420' }}
               >
                 {avatarLetter}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold truncate" style={{ color: '#d1faf5' }}>
+                <p className="text-xs font-semibold truncate leading-tight" style={{ color: '#d1faf5' }}>
                   {displayName}
                 </p>
-                <p className="text-[10px] truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                <p className="text-[10px] truncate leading-tight mt-0.5" style={{ color: 'rgba(255,255,255,0.30)' }}>
                   {displayEmail || ' '}
                 </p>
               </div>
@@ -282,10 +315,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 onClick={handleLogout}
                 disabled={!authReady}
                 title="Log out"
-                className="p-1.5 rounded-lg transition-all duration-150"
-                style={{ color: 'rgba(255,255,255,0.3)', opacity: !authReady ? 0.6 : 1 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.3)'; }}
+                className="p-1.5 rounded-lg transition-all duration-150 flex-shrink-0"
+                style={{ color: 'rgba(255,255,255,0.28)', opacity: !authReady ? 0.5 : 1 }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.08)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.28)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
@@ -297,17 +330,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      {/* ── Main ── */}
+      {/* ─────────────────────── MAIN AREA ───────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
-        {/* Top header */}
+        {/* ── Top header ── */}
         <header
-          className="flex-shrink-0 flex items-center gap-4 px-6 sm:px-8 lg:px-10 py-3"
+          className="flex-shrink-0 flex items-center gap-4 px-5 sm:px-7"
           style={{
-            borderBottom: '1px solid rgba(110,231,216,0.10)',
-            background: 'rgba(34,32,34,0.95)',
-            backdropFilter: 'blur(12px)',
-            minHeight: '64px',
+            borderBottom: '1px solid rgba(110,231,216,0.09)',
+            background: 'rgba(34,32,34,0.96)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            minHeight: '56px',
           }}
         >
           {/* Mobile hamburger */}
@@ -322,40 +356,66 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </svg>
           </button>
 
-          {/* Page title breadcrumb */}
-          <div className="flex items-center gap-2.5 text-sm min-w-0">
-            <span style={{ color: 'rgba(255,255,255,0.35)' }}>EduFlow AI</span>
-            <span style={{ color: 'rgba(110,231,216,0.35)' }}>/</span>
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-xs min-w-0">
+            <span style={{ color: 'rgba(255,255,255,0.28)', fontWeight: 500 }}>EduFlow</span>
+            <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'rgba(110,231,216,0.28)' }}>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
             <span className="font-semibold truncate" style={{ color: '#d1faf5' }}>{currentPage}</span>
           </div>
 
-          {/* Right — search + avatar */}
-          <div className="ml-auto flex items-center gap-3.5 sm:gap-4">
+          {/* Right region */}
+          <div className="ml-auto flex items-center gap-3">
+            {/* Search pill */}
             <div
-              className="hidden sm:flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs"
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs cursor-text transition-colors duration-150"
               style={{
                 background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(110,231,216,0.12)',
-                color: 'rgba(255,255,255,0.35)',
+                border: '1px solid rgba(110,231,216,0.10)',
+                color: 'rgba(255,255,255,0.28)',
+                minWidth: '160px',
               }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.22)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.10)'; }}
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
+              <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
               </svg>
-              Search…
+              <span>Search…</span>
+              <span
+                className="ml-auto text-[10px] px-1.5 py-0.5 rounded font-mono"
+                style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.22)' }}
+              >
+                ⌘K
+              </span>
             </div>
 
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg,#6EE7D8,#14B8A6)', color: '#111' }}
+            {/* Notification bell */}
+            <button
+              className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center transition-all duration-150"
+              style={{ color: 'rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(110,231,216,0.08)' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#6EE7D8'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.22)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.35)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.08)'; }}
+              aria-label="Notifications"
             >
-              S
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </button>
+
+            {/* Avatar */}
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 cursor-pointer"
+              style={{ background: 'linear-gradient(135deg,#6EE7D8,#14B8A6)', color: '#0d2420' }}
+              title={displayName}
+            >
+              {avatarLetter}
             </div>
           </div>
         </header>
 
-        {/* Page content */}
+        {/* ── Page content ── */}
         <main className="flex-1 overflow-auto" style={{ background: '#222022' }}>
           {authReady && user ? children : null}
         </main>

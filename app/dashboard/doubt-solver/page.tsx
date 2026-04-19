@@ -10,6 +10,13 @@ type SolverResult = {
   source?: string;
 };
 
+const exampleQuestions = [
+  "Explain Newton's 3rd Law with examples",
+  "What is the difference between mitosis and meiosis?",
+  "How does a capacitor charge and discharge?",
+  "Explain the concept of limits in calculus",
+];
+
 export default function DoubtSolverPage() {
   const [question, setQuestion] = useState('');
   const [status, setStatus] = useState<SolverStatus>('idle');
@@ -26,7 +33,6 @@ export default function DoubtSolverPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
     const q = question.trim();
     if (!q) return;
 
@@ -43,18 +49,10 @@ export default function DoubtSolverPage() {
 
       const data = (await res.json()) as { answer?: string; source?: string; error?: string };
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to generate answer.');
-      }
+      if (!res.ok) throw new Error(data.error || 'Failed to generate answer.');
+      if (!data.answer || !data.answer.trim()) throw new Error('AI returned an empty answer.');
 
-      if (!data.answer || !data.answer.trim()) {
-        throw new Error('AI returned an empty answer.');
-      }
-
-      setResult({
-        answer: data.answer.trim(),
-        source: data.source || 'ai',
-      });
+      setResult({ answer: data.answer.trim(), source: data.source || 'ai' });
       setStatus('success');
     } catch (err) {
       setStatus('error');
@@ -63,36 +61,35 @@ export default function DoubtSolverPage() {
   };
 
   return (
-    <div className="px-6 py-8 max-w-5xl mx-auto space-y-6">
-      {/* Header */}
-      <div
-        className="rounded-2xl p-6"
-        style={{
-          background: '#2a282a',
-          border: '1px solid rgba(110,231,216,0.12)',
-        }}
-      >
-        <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: 'rgba(110,231,216,0.45)' }}>
+    <div className="px-6 sm:px-8 py-8 max-w-4xl mx-auto space-y-6">
+
+      {/* ── Page header ── */}
+      <div>
+        <div
+          className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full mb-3"
+          style={{ background: 'rgba(110,231,216,0.08)', color: '#6EE7D8', border: '1px solid rgba(110,231,216,0.18)' }}
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
           AI Doubt Solver
-        </p>
-        <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#6EE7D8' }}>
-          Ask any academic doubt
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#e2fdf9' }}>
+          Ask any academic doubt.
         </h1>
-        <p className="text-sm mt-2" style={{ color: 'rgba(255,255,255,0.45)' }}>
-          Type your question clearly and get an AI-generated explanation.
+        <p className="text-sm mt-1.5" style={{ color: 'rgba(255,255,255,0.38)' }}>
+          Type your question clearly and get an instant AI-generated explanation with examples.
         </p>
       </div>
 
-      {/* Input + submit */}
+      {/* ── Question form ── */}
       <form
         onSubmit={handleSubmit}
         className="rounded-2xl p-5 space-y-4"
-        style={{
-          background: '#2a282a',
-          border: '1px solid rgba(110,231,216,0.12)',
-        }}
+        style={{ background: '#2a282a', border: '1px solid rgba(110,231,216,0.12)' }}
       >
-        <label htmlFor="question" className="text-sm font-semibold" style={{ color: '#d1faf5' }}>
+        <label htmlFor="question" className="text-xs font-semibold" style={{ color: 'rgba(209,250,245,0.75)' }}>
           Your question
         </label>
         <textarea
@@ -104,97 +101,172 @@ export default function DoubtSolverPage() {
           }}
           placeholder="e.g. Explain Kirchhoff's Voltage Law with a simple circuit example."
           rows={5}
-          className="w-full rounded-xl px-4 py-3 text-sm resize-y outline-none"
+          className="w-full rounded-xl px-4 py-3 text-sm resize-y outline-none transition-all duration-200"
           style={{
-            background: 'rgba(255,255,255,0.03)',
+            background: '#222022',
             border: '1px solid rgba(110,231,216,0.15)',
             color: '#d1faf5',
+            lineHeight: 1.7,
           }}
+          onFocus={e => { e.currentTarget.style.borderColor = 'rgba(110,231,216,0.40)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(110,231,216,0.07)'; }}
+          onBlur={e => { e.currentTarget.style.borderColor = 'rgba(110,231,216,0.15)'; e.currentTarget.style.boxShadow = 'none'; }}
         />
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button
             type="submit"
             disabled={!canSubmit}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
             style={{
-              background: canSubmit
-                ? 'linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)'
-                : 'rgba(255,255,255,0.10)',
-              color: canSubmit ? '#111' : 'rgba(255,255,255,0.45)',
+              background: canSubmit ? 'linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)' : 'rgba(255,255,255,0.06)',
+              color: canSubmit ? '#0d2420' : 'rgba(255,255,255,0.30)',
               boxShadow: canSubmit ? '0 4px 16px rgba(110,231,216,0.28)' : 'none',
               cursor: canSubmit ? 'pointer' : 'not-allowed',
             }}
+            onMouseEnter={e => {
+              if (canSubmit) {
+                (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 22px rgba(110,231,216,0.44)';
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
+              }
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.boxShadow = canSubmit ? '0 4px 16px rgba(110,231,216,0.28)' : 'none';
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+            }}
           >
-            {status === 'loading' ? 'Solving...' : 'Get answer'}
+            {status === 'loading' ? (
+              <>
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
+                Solving…
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Get answer
+              </>
+            )}
           </button>
 
           <button
             type="button"
-            onClick={() => {
-              setQuestion('');
-              resetState();
-            }}
-            className="px-4 py-2 text-xs font-medium rounded-lg transition-colors"
-            style={{
-              background: 'rgba(110,231,216,0.06)',
-              border: '1px solid rgba(110,231,216,0.16)',
-              color: 'rgba(110,231,216,0.9)',
-            }}
+            onClick={() => { setQuestion(''); resetState(); }}
+            className="px-4 py-2.5 text-xs font-medium rounded-xl transition-colors duration-150"
+            style={{ background: 'rgba(110,231,216,0.05)', border: '1px solid rgba(110,231,216,0.14)', color: 'rgba(110,231,216,0.80)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.30)'; (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.09)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.14)'; (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.05)'; }}
           >
             Clear
           </button>
         </div>
+
+        {/* Example questions */}
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wider mb-2.5" style={{ color: 'rgba(110,231,216,0.35)' }}>
+            Try an example
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {exampleQuestions.map((q) => (
+              <button
+                key={q}
+                type="button"
+                onClick={() => { setQuestion(q); if (status !== 'idle') resetState(); }}
+                className="text-xs px-3 py-1.5 rounded-lg transition-all duration-150"
+                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(110,231,216,0.10)', color: 'rgba(255,255,255,0.45)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.24)'; (e.currentTarget as HTMLElement).style.color = '#d1faf5'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.10)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.45)'; }}
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        </div>
       </form>
 
-      {/* Answer panel */}
+      {/* ── Answer panel ── */}
       <div
-        className="rounded-2xl p-5 min-h-[180px]"
+        className="rounded-2xl p-5 min-h-[200px] transition-all duration-300"
         style={{
           background: '#2a282a',
-          border: '1px solid rgba(110,231,216,0.12)',
+          border: `1px solid ${status === 'success' ? 'rgba(110,231,216,0.22)' : status === 'error' ? 'rgba(248,113,113,0.22)' : 'rgba(110,231,216,0.12)'}`,
         }}
       >
-        <h2 className="text-sm font-semibold mb-3" style={{ color: '#d1faf5' }}>
-          Answer
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-semibold" style={{ color: '#d1faf5' }}>Answer</h2>
+          {status === 'success' && (
+            <span
+              className="flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full"
+              style={{ background: 'rgba(110,231,216,0.08)', color: '#6EE7D8', border: '1px solid rgba(110,231,216,0.18)' }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#6EE7D8' }} />
+              AI Response
+            </span>
+          )}
+        </div>
 
         {status === 'idle' && (
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>
-            No answer yet. Submit a question to get started.
-          </p>
-        )}
-
-        {status === 'loading' && (
-          <div className="space-y-2">
-            <div className="h-3 rounded w-5/6" style={{ background: 'rgba(255,255,255,0.07)' }} />
-            <div className="h-3 rounded w-4/6" style={{ background: 'rgba(255,255,255,0.07)' }} />
-            <div className="h-3 rounded w-3/6" style={{ background: 'rgba(255,255,255,0.07)' }} />
-            <p className="text-xs mt-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
-              Thinking...
+          <div className="flex flex-col items-center justify-center py-12 gap-3">
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center"
+              style={{ background: 'rgba(110,231,216,0.08)', border: '1px solid rgba(110,231,216,0.14)' }}
+            >
+              <svg className="w-6 h-6" style={{ color: 'rgba(110,231,216,0.40)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+            </div>
+            <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.30)' }}>
+              Ask a question to get your AI-powered answer
             </p>
           </div>
         )}
 
+        {status === 'loading' && (
+          <div className="space-y-3">
+            {[6, 5, 4, 3].map((w, i) => (
+              <div key={i} className={`h-3 rounded-lg w-${w}/6 animate-pulse`} style={{ background: 'rgba(255,255,255,0.06)' }} />
+            ))}
+            <div className="flex items-center gap-2 mt-4">
+              <div className="w-4 h-4 rounded-full animate-pulse" style={{ background: 'rgba(110,231,216,0.20)' }} />
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.30)' }}>EduFlow AI is thinking…</p>
+            </div>
+          </div>
+        )}
+
         {status === 'error' && (
-          <p className="text-sm" style={{ color: '#f87171' }}>
-            {error ?? 'Failed to solve your doubt.'}
-          </p>
+          <div
+            className="flex items-start gap-3 rounded-xl p-4"
+            style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.20)' }}
+          >
+            <svg className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#f87171' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-sm" style={{ color: '#fca5a5' }}>{error ?? 'Failed to solve your doubt.'}</p>
+          </div>
         )}
 
         {status === 'success' && result && (
-          <div className="space-y-3">
-            <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: '#d1faf5' }}>
+          <div className="space-y-4">
+            {/* Mint top accent line */}
+            <div className="h-px w-full mb-4" style={{ background: 'linear-gradient(90deg, #6EE7D8, transparent)' }} />
+            <p className="text-sm leading-[1.85] whitespace-pre-wrap" style={{ color: '#d1faf5' }}>
               {result.answer}
             </p>
-            {result.source ? (
+            {result.source && (
               <span
-                className="inline-flex text-[10px] font-medium px-2 py-1 rounded"
-                style={{ background: 'rgba(110,231,216,0.08)', color: '#6EE7D8' }}
+                className="inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full"
+                style={{ background: 'rgba(110,231,216,0.07)', color: '#6EE7D8', border: '1px solid rgba(110,231,216,0.16)' }}
               >
+                <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
                 Source: {result.source}
               </span>
-            ) : null}
+            )}
           </div>
         )}
       </div>

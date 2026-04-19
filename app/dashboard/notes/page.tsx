@@ -348,7 +348,7 @@ export default function NotesPage() {
             </svg>
             Notes
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#6EE7D8' }}>
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#e2fdf9' }}>
             Write once. Review fast.
           </h1>
           <p className="text-sm mt-1.5" style={{ color: 'rgba(255,255,255,0.40)' }}>

@@ -13,10 +13,10 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const [scrolled,    setScrolled]    = useState(false);
-  const [mobileOpen,  setMobileOpen]  = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [authReady, setAuthReady] = useState(false);
+  const [scrolled,   setScrolled]   = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [user,       setUser]       = useState<User | null>(null);
+  const [authReady,  setAuthReady]  = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -51,25 +51,21 @@ export default function Navbar() {
 
   return (
     <header
-      style={{
-        background: scrolled
-          ? 'rgba(34, 32, 34, 0.90)'
-          : 'transparent',
-        borderBottom: scrolled
-          ? '1px solid rgba(110, 231, 216, 0.12)'
-          : '1px solid transparent',
-        backdropFilter: scrolled ? 'blur(14px)' : 'none',
-      }}
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      style={{
+        background: scrolled ? 'rgba(34,32,34,0.92)' : 'transparent',
+        borderBottom: scrolled ? '1px solid rgba(110,231,216,0.10)' : '1px solid transparent',
+        backdropFilter: scrolled ? 'blur(16px) saturate(1.4)' : 'none',
+        WebkitBackdropFilter: scrolled ? 'blur(16px) saturate(1.4)' : 'none',
+      }}
     >
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
-        <div className="flex items-center justify-between h-16 gap-5">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
+        <div className="flex items-center justify-between h-[60px] gap-6">
 
           {/* ── Logo ── */}
           <Link
             href="/"
-            className="flex items-center flex-shrink-0"
-            style={{ transition: 'transform 0.2s' }}
+            className="flex items-center flex-shrink-0 transition-all duration-200"
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1.04)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
           >
@@ -77,29 +73,24 @@ export default function Navbar() {
             <img
               src="/images/logo.png"
               alt="EduFlow AI"
-              style={{
-                height: '52px',
-                width: 'auto',
-                display: 'block',
-                
-              }}
+              style={{ height: '48px', width: 'auto', display: 'block' }}
             />
           </Link>
 
           {/* ── Desktop Nav ── */}
-          <nav className="hidden md:flex items-center gap-2 lg:gap-3 flex-1 justify-center min-w-0 px-4">
+          <nav className="hidden md:flex items-center gap-1 flex-1 justify-center px-4">
             {navLinks.map(({ label, href }) => (
               <Link
                 key={label}
                 href={href}
-                className="px-4 lg:px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
-                style={{ color: 'var(--text-muted)' }}
+                className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
+                style={{ color: 'rgba(255,255,255,0.52)' }}
                 onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.color      = 'var(--primary)';
-                  (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.07)';
+                  (e.currentTarget as HTMLElement).style.color      = '#d1faf5';
+                  (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)';
                 }}
                 onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.color      = 'var(--text-muted)';
+                  (e.currentTarget as HTMLElement).style.color      = 'rgba(255,255,255,0.52)';
                   (e.currentTarget as HTMLElement).style.background = 'transparent';
                 }}
               >
@@ -109,13 +100,13 @@ export default function Navbar() {
           </nav>
 
           {/* ── Desktop Actions ── */}
-          <div className="hidden md:flex items-center gap-2.5 lg:gap-3 flex-shrink-0 whitespace-nowrap">
+          <div className="hidden md:flex items-center gap-2.5 flex-shrink-0">
             {authReady && user ? (
               <>
                 <Link
                   href="/dashboard"
-                  className="px-4 lg:px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-150"
-                  style={{ color: 'var(--primary)' }}
+                  className="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-150"
+                  style={{ color: '#6EE7D8' }}
                   onMouseEnter={e => {
                     (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.08)';
                   }}
@@ -128,21 +119,21 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="px-4 lg:px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
+                  className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
                   style={{
-                    color: 'rgba(255,255,255,0.55)',
-                    border: '1px solid rgba(110,231,216,0.18)',
+                    color: 'rgba(255,255,255,0.45)',
+                    border: '1px solid rgba(110,231,216,0.16)',
                     background: 'transparent',
                   }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.color = '#f87171';
-                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(248,113,113,0.35)';
-                    (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.08)';
+                    (e.currentTarget as HTMLElement).style.color       = '#f87171';
+                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(248,113,113,0.32)';
+                    (e.currentTarget as HTMLElement).style.background  = 'rgba(248,113,113,0.07)';
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.55)';
-                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.18)';
-                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                    (e.currentTarget as HTMLElement).style.color       = 'rgba(255,255,255,0.45)';
+                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.16)';
+                    (e.currentTarget as HTMLElement).style.background  = 'transparent';
                   }}
                 >
                   Log out
@@ -152,19 +143,40 @@ export default function Navbar() {
               <>
                 <Link
                   href="/auth/login"
-                  className="px-4 lg:px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-150"
-                  style={{ color: 'var(--primary)' }}
+                  className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
+                  style={{ color: 'rgba(255,255,255,0.55)' }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.08)';
+                    (e.currentTarget as HTMLElement).style.color = '#d1faf5';
+                    (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)';
                   }}
                   onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.55)';
                     (e.currentTarget as HTMLElement).style.background = 'transparent';
                   }}
                 >
                   Log in
                 </Link>
-                <Link href="/auth/signup" className="btn-primary text-xs px-5 py-2.5 whitespace-nowrap">
+                <Link
+                  href="/auth/signup"
+                  className="inline-flex items-center gap-1.5 px-5 py-2 text-sm font-semibold rounded-xl whitespace-nowrap transition-all duration-200"
+                  style={{
+                    background: 'linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)',
+                    color: '#0d2420',
+                    boxShadow: '0 3px 12px rgba(110,231,216,0.28)',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 5px 18px rgba(110,231,216,0.44)';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 3px 12px rgba(110,231,216,0.28)';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                  }}
+                >
                   Get Started
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M5 12h14m-7-7l7 7-7 7" />
+                  </svg>
                 </Link>
               </>
             )}
@@ -174,7 +186,7 @@ export default function Navbar() {
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="md:hidden p-2 rounded-lg transition-colors duration-150"
-            style={{ color: 'var(--primary)' }}
+            style={{ color: '#6EE7D8', background: 'rgba(110,231,216,0.06)' }}
             aria-label="Toggle menu"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,7 +202,7 @@ export default function Navbar() {
         {mobileOpen && (
           <div
             className="md:hidden pb-5 pt-3"
-            style={{ borderTop: '1px solid var(--border)' }}
+            style={{ borderTop: '1px solid rgba(110,231,216,0.10)' }}
           >
             <nav className="flex flex-col gap-1 mb-4">
               {navLinks.map(({ label, href }) => (
@@ -199,7 +211,7 @@ export default function Navbar() {
                   href={href}
                   onClick={() => setMobileOpen(false)}
                   className="px-4 py-2.5 text-sm font-medium rounded-lg transition-colors duration-150"
-                  style={{ color: 'var(--text-muted)' }}
+                  style={{ color: 'rgba(255,255,255,0.55)' }}
                 >
                   {label}
                 </Link>
@@ -211,8 +223,8 @@ export default function Navbar() {
                   <Link
                     href="/dashboard"
                     onClick={() => setMobileOpen(false)}
-                    className="px-4 py-2.5 text-center text-sm font-medium rounded-xl border transition-colors"
-                    style={{ color: 'var(--primary)', borderColor: 'var(--border)' }}
+                    className="px-4 py-2.5 text-center text-sm font-semibold rounded-xl border transition-colors"
+                    style={{ color: '#6EE7D8', borderColor: 'rgba(110,231,216,0.20)' }}
                   >
                     Open App
                   </Link>
@@ -220,7 +232,7 @@ export default function Navbar() {
                     type="button"
                     onClick={handleLogout}
                     className="px-4 py-2.5 text-center text-sm font-medium rounded-xl border transition-colors"
-                    style={{ color: '#f87171', borderColor: 'rgba(248,113,113,0.30)', background: 'rgba(248,113,113,0.08)' }}
+                    style={{ color: '#f87171', borderColor: 'rgba(248,113,113,0.28)', background: 'rgba(248,113,113,0.07)' }}
                   >
                     Log out
                   </button>
@@ -230,11 +242,19 @@ export default function Navbar() {
                   <Link
                     href="/auth/login"
                     className="px-4 py-2.5 text-center text-sm font-medium rounded-xl border transition-colors"
-                    style={{ color: 'var(--primary)', borderColor: 'var(--border)' }}
+                    style={{ color: 'rgba(255,255,255,0.55)', borderColor: 'rgba(110,231,216,0.16)' }}
                   >
                     Log in
                   </Link>
-                  <Link href="/auth/signup" className="btn-primary justify-center py-2.5 text-xs">
+                  <Link
+                    href="/auth/signup"
+                    className="px-4 py-2.5 text-center text-sm font-semibold rounded-xl transition-all duration-200"
+                    style={{
+                      background: 'linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)',
+                      color: '#0d2420',
+                      boxShadow: '0 3px 12px rgba(110,231,216,0.28)',
+                    }}
+                  >
                     Get Started
                   </Link>
                 </>

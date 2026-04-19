@@ -14,9 +14,9 @@ const features = [
       </svg>
     ),
     accent: '#6EE7D8',
+    accentBg: 'rgba(110,231,216,0.10)',
     tag: 'Planning',
     href: '/dashboard/study-planner',
-    available: true,
   },
   {
     title: 'AI Doubt Solver',
@@ -29,14 +29,14 @@ const features = [
       </svg>
     ),
     accent: '#14B8A6',
-    tag: 'AI',
+    accentBg: 'rgba(20,184,166,0.10)',
+    tag: 'AI-Powered',
     href: '/dashboard/doubt-solver',
-    available: true,
   },
   {
     title: 'Notes Generator',
     description:
-      'Paste any lecture, textbook excerpt, or topic — and get structured, revision-ready notes in seconds. Clean formatting. Zero effort.',
+      'Paste any lecture or topic and get structured, revision-ready notes in seconds. Clean formatting. Zero effort.',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
@@ -44,14 +44,14 @@ const features = [
       </svg>
     ),
     accent: '#5EEAD4',
+    accentBg: 'rgba(94,234,212,0.10)',
     tag: 'Notes',
     href: '/dashboard/notes',
-    available: true,
   },
   {
     title: 'Productivity Tracker',
     description:
-      'Visualise your focus time, streaks, and completion rates. Stay consistent with gentle nudges and weekly insights from your AI coach.',
+      'Visualise your focus time, streaks, and completion rates. Stay consistent with gentle nudges and weekly insights.',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
@@ -59,14 +59,14 @@ const features = [
       </svg>
     ),
     accent: '#6EE7D8',
+    accentBg: 'rgba(110,231,216,0.08)',
     tag: 'Insights',
     href: '/dashboard/productivity',
-    available: true,
   },
   {
     title: 'Mood Tracker',
     description:
-      'Track your daily mood, reflect on patterns, and build healthier study habits with simple emotional check-ins and insights.',
+      'Track your daily mood, reflect on patterns, and build healthier study habits with simple emotional check-ins.',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
@@ -74,9 +74,9 @@ const features = [
       </svg>
     ),
     accent: '#14B8A6',
+    accentBg: 'rgba(20,184,166,0.08)',
     tag: 'Wellness',
     href: '/dashboard/mood',
-    available: true,
   },
 ];
 
@@ -84,45 +84,59 @@ export default function Features() {
   return (
     <section
       id="features"
+      className="relative py-32 overflow-hidden"
       style={{ background: '#222022' }}
-      className="py-24 relative overflow-hidden"
     >
-      {/* Subtle background gradient hint */}
+      {/* Background accent */}
       <div
         className="absolute inset-0 pointer-events-none"
+        aria-hidden="true"
         style={{
-          background:
-            'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(110,231,216,0.04) 0%, transparent 70%)',
+          backgroundImage: 'radial-gradient(circle, rgba(110,231,216,0.035) 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }}
+      />
+      <div
+        className="absolute top-0 left-0 right-0 h-px"
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(110,231,216,0.18), transparent)' }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        aria-hidden="true"
+        style={{
+          background: 'radial-gradient(ellipse 70% 40% at 50% 0%, rgba(110,231,216,0.05) 0%, transparent 65%)',
         }}
       />
 
       <div className="relative max-w-7xl mx-auto px-5 sm:px-8">
 
-        {/* ── Section header ── */}
+        {/* Section header */}
         <div className="text-center mb-20">
           <div
-            className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full mb-5"
+            className="inline-flex items-center gap-2 text-xs font-semibold px-3.5 py-1.5 rounded-full mb-5"
             style={{
-              background: 'rgba(110,231,216,0.08)',
+              background: 'rgba(110,231,216,0.07)',
               color: '#6EE7D8',
-              border: '1px solid rgba(110,231,216,0.20)',
+              border: '1px solid rgba(110,231,216,0.18)',
             }}
           >
-            <span
-              className="w-1.5 h-1.5 rounded-full"
-              style={{
-                background: '#6EE7D8',
-                boxShadow: '0 0 6px rgba(110,231,216,0.7)',
-              }}
-            />
-            Everything you need to excel
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#6EE7D8', boxShadow: '0 0 6px rgba(110,231,216,0.7)' }} />
+            Five tools. One workspace.
           </div>
 
           <h2
-            className="text-3xl sm:text-4xl xl:text-5xl font-bold tracking-tight mb-4"
-            style={{ color: '#6EE7D8' }}
+            className="font-bold tracking-tight mb-4"
+            style={{
+              fontSize: 'clamp(2rem, 4.5vw, 3rem)',
+              color: '#e2fdf9',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+            }}
           >
-            Built for the modern{' '}
+            Everything a student needs{' '}
+            <br className="hidden sm:block" />
+            to{' '}
             <span
               style={{
                 background: 'linear-gradient(135deg, #6EE7D8, #14B8A6)',
@@ -131,130 +145,132 @@ export default function Features() {
                 backgroundClip: 'text',
               }}
             >
-              student
+              actually excel
             </span>
           </h2>
 
           <p
-            className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed"
-            style={{ color: '#7ca8a3' }}
+            className="max-w-xl mx-auto leading-relaxed"
+            style={{ fontSize: '1.0625rem', color: 'rgba(255,255,255,0.42)' }}
           >
-            Four powerful tools, one seamless workspace. No switching apps.
-            No friction. Just focused, AI-assisted learning.
+            No switching apps. No friction. Just one beautifully designed space that
+            keeps you organised, focused, and one step ahead.
           </p>
         </div>
 
-        {/* ── Feature cards grid ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-6">
-          {features.map((f, idx) => (
-            <div
-              key={f.title}
-              className={
-                idx < 3
-                  ? 'xl:col-span-2'
-                  : 'xl:col-span-3'
-              }
-            >
-              <FeatureCard {...f} />
-            </div>
-          ))}
+        {/* Card grid — 3 top, 2 bottom (spanning wider) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 mb-5">
+          {features.slice(0, 3).map(f => <FeatureCard key={f.title} {...f} />)}
         </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {features.slice(3).map(f => <FeatureCard key={f.title} {...f} wide />)}
+        </div>
+
       </div>
+
+      {/* Bottom divider */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-px"
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(110,231,216,0.12), transparent)' }}
+        aria-hidden="true"
+      />
     </section>
   );
 }
 
-/* ── Individual card ── */
-type FeatureCardProps = {
+type CardProps = {
   title: string;
   description: string;
   icon: React.ReactNode;
   accent: string;
+  accentBg: string;
   tag: string;
-  href?: string;
-  available?: boolean;
+  href: string;
+  wide?: boolean;
 };
 
-function FeatureCard({ title, description, icon, accent, tag, href, available }: FeatureCardProps) {
-  const isClickable = Boolean(href) && Boolean(available);
-
-  const card = (
-    <div
-      className="group rounded-2xl p-6 flex flex-col gap-4 transition-all duration-250 h-full"
-      style={{
-        background: '#2a282a',
-        border: '1px solid rgba(110,231,216,0.13)',
-        cursor: isClickable ? 'pointer' : 'default',
-        opacity: available === false ? 0.85 : 1,
-      }}
-      onMouseEnter={e => {
-        const el = e.currentTarget as HTMLElement;
-        el.style.borderColor = 'rgba(110,231,216,0.35)';
-        el.style.boxShadow   = '0 10px 30px rgba(110,231,216,0.10)';
-        el.style.transform   = 'translateY(-4px)';
-      }}
-      onMouseLeave={e => {
-        const el = e.currentTarget as HTMLElement;
-        el.style.borderColor = 'rgba(110,231,216,0.13)';
-        el.style.boxShadow   = 'none';
-        el.style.transform   = 'translateY(0)';
-      }}
-    >
-      {/* Icon + tag row */}
-      <div className="flex items-center justify-between">
-        <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{
-            background: `${accent}18`,
-            color: accent,
-            border: `1px solid ${accent}28`,
-          }}
-        >
-          {icon}
-        </div>
-        <span
-          className="text-[10px] font-semibold px-2.5 py-1 rounded-full"
-          style={{
-            background: 'rgba(110,231,216,0.07)',
-            color: '#6EE7D8',
-            border: '1px solid rgba(110,231,216,0.15)',
-          }}
-        >
-          {available === false ? 'Coming soon' : tag}
-        </span>
-      </div>
-
-      {/* Text */}
-      <div className="flex flex-col gap-2">
-        <h3
-          className="text-base font-semibold leading-snug"
-          style={{ color: '#d1faf5' }}
-        >
-          {title}
-        </h3>
-        <p
-          className="text-sm leading-relaxed"
-          style={{ color: '#7ca8a3' }}
-        >
-          {description}
-        </p>
-      </div>
-
-      {/* Bottom accent line */}
-      <div
-        className="mt-auto h-px w-full rounded-full transition-all duration-250 opacity-0 group-hover:opacity-100"
-        style={{ background: `linear-gradient(90deg, ${accent}40, transparent)` }}
-      />
-    </div>
-  );
-
+function FeatureCard({ title, description, icon, accent, accentBg, tag, href }: CardProps) {
   return (
-    isClickable ? (
-      <Link href={href!} className="block focus:outline-none h-full">
-        {card}
-      </Link>
-    ) : (
-      card
-    )
+    <Link href={href} className="block focus:outline-none group">
+      <div
+        className="relative rounded-2xl p-6 h-full flex flex-col gap-4 transition-all duration-250 overflow-hidden"
+        style={{
+          background: '#272427',
+          border: '1px solid rgba(110,231,216,0.10)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.24)',
+        }}
+        onMouseEnter={e => {
+          const el = e.currentTarget as HTMLElement;
+          el.style.borderColor = `${accent}44`;
+          el.style.boxShadow = `0 16px 40px rgba(0,0,0,0.35), 0 0 24px ${accent}0e`;
+          el.style.transform = 'translateY(-6px)';
+          el.style.background = '#2c2a2c';
+        }}
+        onMouseLeave={e => {
+          const el = e.currentTarget as HTMLElement;
+          el.style.borderColor = 'rgba(110,231,216,0.10)';
+          el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.24)';
+          el.style.transform = 'translateY(0)';
+          el.style.background = '#272427';
+        }}
+      >
+        {/* Subtle corner glow on hover (pseudo via box-shadow on inner div) */}
+        <div
+          className="absolute -top-16 -right-16 w-32 h-32 rounded-full blur-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          style={{ background: `${accent}18` }}
+          aria-hidden="true"
+        />
+
+        {/* Icon + tag row */}
+        <div className="flex items-start justify-between">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: accentBg, color: accent, border: `1px solid ${accent}22` }}
+          >
+            {icon}
+          </div>
+          <span
+            className="text-[10px] font-semibold px-2.5 py-1 rounded-full"
+            style={{
+              background: 'rgba(110,231,216,0.06)',
+              color: accent,
+              border: `1px solid ${accent}20`,
+            }}
+          >
+            {tag}
+          </span>
+        </div>
+
+        {/* Text */}
+        <div className="flex-1 flex flex-col gap-2">
+          <h3
+            className="text-[15px] font-semibold leading-snug"
+            style={{ color: '#d1faf5' }}
+          >
+            {title}
+          </h3>
+          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.42)' }}>
+            {description}
+          </p>
+        </div>
+
+        {/* Bottom CTA strip */}
+        <div className="flex items-center gap-1.5 mt-auto">
+          <div
+            className="h-px flex-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-250"
+            style={{ background: `linear-gradient(90deg, ${accent}55, transparent)` }}
+          />
+          <span
+            className="text-[10px] font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1"
+            style={{ color: accent }}
+          >
+            Open tool
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12h14m-7-7l7 7-7 7" />
+            </svg>
+          </span>
+        </div>
+      </div>
+    </Link>
   );
 }

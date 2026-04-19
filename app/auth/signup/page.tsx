@@ -10,8 +10,8 @@ export default function SignupPage() {
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [loading,  setLoading]  = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [error,    setError]    = useState<string | null>(null);
+  const [success,  setSuccess]  = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -55,36 +55,40 @@ export default function SignupPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4 py-16"
+      className="min-h-screen flex items-center justify-center px-4 py-16 relative overflow-hidden"
       style={{ background: '#222022' }}
     >
       {/* Ambient blobs */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
         <div
-          className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.07]"
-          style={{ background: '#6EE7D8' }}
+          className="absolute -top-48 -right-48 w-[520px] h-[520px] rounded-full blur-3xl"
+          style={{ background: '#6EE7D8', opacity: 0.055 }}
         />
         <div
-          className="absolute -bottom-40 -left-40 w-[400px] h-[400px] rounded-full blur-3xl opacity-[0.07]"
-          style={{ background: '#14B8A6' }}
+          className="absolute -bottom-48 -left-48 w-[440px] h-[440px] rounded-full blur-3xl"
+          style={{ background: '#14B8A6', opacity: 0.055 }}
+        />
+        {/* Subtle dot grid */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(110,231,216,0.07) 1px, transparent 1px)',
+            backgroundSize: '32px 32px',
+            opacity: 0.5,
+          }}
         />
       </div>
 
-      <div className="relative w-full max-w-sm">
+      <div className="relative w-full max-w-[400px]">
 
         {/* Logo */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-7">
           <Link
             href="/"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              transition: 'transform 0.2s, filter 0.2s',
-            }}
+            className="inline-flex transition-all duration-200"
             onMouseEnter={e => {
               (e.currentTarget as HTMLElement).style.transform = 'scale(1.05)';
-              (e.currentTarget as HTMLElement).style.filter =
-                'drop-shadow(0 0 12px rgba(110,231,216,0.5))';
+              (e.currentTarget as HTMLElement).style.filter = 'drop-shadow(0 0 16px rgba(110,231,216,0.45))';
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
@@ -92,24 +96,20 @@ export default function SignupPage() {
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/logo.png"
-              alt="EduFlow AI"
-              style={{ height: '80px', width: 'auto', display: 'block' }}
-            />
+            <img src="/images/logo.png" alt="EduFlow AI" style={{ height: '64px', width: 'auto', display: 'block' }} />
           </Link>
         </div>
 
-        {/* Feature highlights strip */}
-        <div className="flex justify-center gap-4 mb-6">
-          {['Study Planner', 'AI Solver', 'Notes'].map((f) => (
+        {/* Feature pills */}
+        <div className="flex justify-center gap-2 flex-wrap mb-6">
+          {['Study Planner', 'AI Solver', 'Smart Notes', 'Mood Tracker'].map((f) => (
             <span
               key={f}
-              className="text-[10px] font-medium px-2.5 py-1 rounded-full"
+              className="text-[10px] font-semibold px-2.5 py-1 rounded-full"
               style={{
                 background: 'rgba(110,231,216,0.07)',
-                color: '#6EE7D8',
-                border: '1px solid rgba(110,231,216,0.18)',
+                color: 'rgba(110,231,216,0.75)',
+                border: '1px solid rgba(110,231,216,0.15)',
               }}
             >
               {f}
@@ -119,140 +119,189 @@ export default function SignupPage() {
 
         {/* Card */}
         <div
-          className="rounded-2xl p-8"
+          className="rounded-2xl overflow-hidden"
           style={{
             background: '#2a282a',
-            border: '1px solid rgba(110,231,216,0.16)',
-            boxShadow: '0 24px 60px rgba(0,0,0,0.45)',
+            border: '1px solid rgba(110,231,216,0.15)',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.40), 0 32px 64px rgba(0,0,0,0.28)',
           }}
         >
-          <h1 className="text-2xl font-bold mb-1 gradient-text">Create account</h1>
-          <p className="text-sm mb-7" style={{ color: '#7ca8a3' }}>
-            Start your AI-powered study journey today — free forever.
-          </p>
+          {/* Mint accent top line */}
+          <div
+            className="h-[2px] w-full"
+            style={{ background: 'linear-gradient(90deg, #6EE7D8, #14B8A6, transparent)' }}
+          />
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {error && (
-              <div
-                className="rounded-xl px-3 py-2 text-sm"
-                role="alert"
-                style={{
-                  background: 'rgba(248,113,113,0.10)',
-                  border: '1px solid rgba(248,113,113,0.25)',
-                  color: '#fecaca',
-                }}
-              >
-                {error}
-              </div>
-            )}
-            {success && (
-              <div
-                className="rounded-xl px-3 py-2 text-sm"
-                role="status"
-                style={{
-                  background: 'rgba(110,231,216,0.10)',
-                  border: '1px solid rgba(110,231,216,0.22)',
-                  color: '#d1faf5',
-                }}
-              >
-                {success}
-              </div>
-            )}
-
-            {/* Full name */}
-            <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
-                Full name
-              </label>
-              <input
-                type="text"
-                placeholder="Priya Sharma"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                required
-                className="input"
-              />
+          <div className="px-8 py-8">
+            <div className="mb-6">
+              <h1 className="text-[22px] font-bold tracking-tight mb-1.5" style={{ color: '#e2fdf9' }}>
+                Create your account
+              </h1>
+              <p className="text-sm" style={{ color: '#7ca8a3' }}>
+                Start your AI-powered study journey — free forever.
+              </p>
             </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
-                Email
-              </label>
-              <input
-                type="email"
-                placeholder="you@university.edu"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                className="input"
-              />
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
-                Password
-              </label>
-              <input
-                type="password"
-                placeholder="Create a strong password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                className="input"
-              />
-            </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary justify-center mt-1 py-3"
-              style={{ opacity: loading ? 0.75 : 1 }}
-            >
-              {loading ? (
-                <>
-                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              {error && (
+                <div
+                  className="flex items-start gap-2.5 rounded-xl px-3.5 py-3 text-sm"
+                  role="alert"
+                  style={{
+                    background: 'rgba(248,113,113,0.08)',
+                    border: '1px solid rgba(248,113,113,0.22)',
+                    color: '#fca5a5',
+                  }}
+                >
+                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  Creating account…
-                </>
-              ) : 'Get started free'}
-            </button>
-          </form>
+                  {error}
+                </div>
+              )}
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px" style={{ background: 'rgba(110,231,216,0.10)' }} />
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>or</span>
-            <div className="flex-1 h-px" style={{ background: 'rgba(110,231,216,0.10)' }} />
+              {success && (
+                <div
+                  className="flex items-start gap-2.5 rounded-xl px-3.5 py-3 text-sm"
+                  role="status"
+                  style={{
+                    background: 'rgba(110,231,216,0.08)',
+                    border: '1px solid rgba(110,231,216,0.22)',
+                    color: '#d1faf5',
+                  }}
+                >
+                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {success}
+                </div>
+              )}
+
+              {/* Full name */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold" style={{ color: 'rgba(209,250,245,0.75)' }}>
+                  Full name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Priya Sharma"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  required
+                  className="input"
+                  autoComplete="name"
+                />
+              </div>
+
+              {/* Email */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold" style={{ color: 'rgba(209,250,245,0.75)' }}>
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  placeholder="you@university.edu"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                  className="input"
+                  autoComplete="email"
+                />
+              </div>
+
+              {/* Password */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold" style={{ color: 'rgba(209,250,245,0.75)' }}>
+                  Password
+                </label>
+                <input
+                  type="password"
+                  placeholder="Create a strong password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  className="input"
+                  autoComplete="new-password"
+                />
+                <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                  Use at least 8 characters with letters and numbers.
+                </p>
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 mt-1 py-3 rounded-xl text-sm font-bold transition-all duration-200"
+                style={{
+                  background: loading
+                    ? 'rgba(110,231,216,0.35)'
+                    : 'linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)',
+                  color: '#0d2420',
+                  boxShadow: loading ? 'none' : '0 4px 16px rgba(110,231,216,0.30)',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                }}
+                onMouseEnter={e => {
+                  if (!loading) {
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 22px rgba(110,231,216,0.46)';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
+                  }
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 16px rgba(110,231,216,0.30)';
+                  (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                }}
+              >
+                {loading ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
+                    Creating account…
+                  </>
+                ) : (
+                  <>
+                    Get started free
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M5 12h14m-7-7l7 7-7 7" />
+                    </svg>
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 my-5">
+              <div className="flex-1 h-px" style={{ background: 'rgba(110,231,216,0.09)' }} />
+              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.22)' }}>or</span>
+              <div className="flex-1 h-px" style={{ background: 'rgba(110,231,216,0.09)' }} />
+            </div>
+
+            <p className="text-center text-sm" style={{ color: '#7ca8a3' }}>
+              Already have an account?{' '}
+              <Link
+                href="/auth/login"
+                className="font-semibold transition-colors duration-150"
+                style={{ color: '#6EE7D8' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#5EEAD4'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#6EE7D8'; }}
+              >
+                Log in →
+              </Link>
+            </p>
           </div>
-
-          <p className="text-center text-sm" style={{ color: '#7ca8a3' }}>
-            Already have an account?{' '}
-            <Link
-              href="/auth/login"
-              className="font-semibold transition-colors duration-150"
-              style={{ color: '#6EE7D8' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#5EEAD4'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#6EE7D8'; }}
-            >
-              Log in
-            </Link>
-          </p>
         </div>
 
-        {/* Legal fine print */}
-        <p className="text-center text-xs mt-5" style={{ color: 'rgba(255,255,255,0.25)' }}>
+        {/* Legal */}
+        <p className="text-center text-[11px] mt-5" style={{ color: 'rgba(255,255,255,0.20)' }}>
           By signing up, you agree to our{' '}
           <Link
             href="/terms"
             className="transition-colors duration-150"
-            style={{ color: 'rgba(110,231,216,0.55)' }}
+            style={{ color: 'rgba(110,231,216,0.45)' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#6EE7D8'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(110,231,216,0.55)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(110,231,216,0.45)'; }}
           >
             Terms
           </Link>
@@ -260,9 +309,9 @@ export default function SignupPage() {
           <Link
             href="/privacy"
             className="transition-colors duration-150"
-            style={{ color: 'rgba(110,231,216,0.55)' }}
+            style={{ color: 'rgba(110,231,216,0.45)' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#6EE7D8'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(110,231,216,0.55)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(110,231,216,0.45)'; }}
           >
             Privacy Policy
           </Link>
