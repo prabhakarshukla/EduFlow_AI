@@ -16,7 +16,7 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
   return (
     <div
       className={`rounded-2xl p-6 transition-all duration-200 ${className}`}
-      style={{ background: '#2a282a', border: '1px solid rgba(110,231,216,0.12)' }}
+      style={{ background: '#ffffff', border: '1px solid #e5e7eb' }}
     >
       {children}
     </div>
@@ -189,10 +189,10 @@ export default function ProductivityPage() {
             </svg>
             Productivity Tracker
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#e2fdf9' }}>
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#1f2937' }}>
             Track sessions. Improve consistency.
           </h1>
-          <p className="text-sm mt-1.5" style={{ color: 'rgba(255,255,255,0.40)' }}>
+          <p className="text-sm mt-1.5" style={{ color: '#6b7280' }}>
             Log focused study sessions and monitor your progress every day.
           </p>
         </div>
@@ -206,8 +206,8 @@ export default function ProductivityPage() {
           { label: "Today's Study Time", value: `${stats.todayMinutes} min` },
         ].map((card) => (
           <Card key={card.label} className="p-5">
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.40)' }}>{card.label}</p>
-            <p className="text-2xl font-bold mt-1" style={{ color: '#d1faf5' }}>{card.value}</p>
+            <p className="text-xs" style={{ color: '#6b7280' }}>{card.label}</p>
+            <p className="text-2xl font-bold mt-1" style={{ color: '#1f2937' }}>{card.value}</p>
           </Card>
         ))}
       </div>
@@ -231,7 +231,7 @@ export default function ProductivityPage() {
 
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
                 Subject
               </label>
               <input
@@ -240,12 +240,12 @@ export default function ProductivityPage() {
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="e.g. Mathematics"
                 className="rounded-xl px-3 py-2.5 text-sm w-full"
-                style={{ background: '#222022', border: '1px solid rgba(110,231,216,0.15)', color: '#d1faf5', outline: 'none' }}
+                style={{ background: '#ffffff', border: '1px solid rgba(110,231,216,0.15)', color: '#1f2937', outline: 'none' }}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
                 Duration (minutes)
               </label>
               <input
@@ -255,12 +255,12 @@ export default function ProductivityPage() {
                 onChange={(e) => setDurationMinutes(e.target.value)}
                 placeholder="e.g. 50"
                 className="rounded-xl px-3 py-2.5 text-sm w-full"
-                style={{ background: '#222022', border: '1px solid rgba(110,231,216,0.15)', color: '#d1faf5', outline: 'none' }}
+                style={{ background: '#ffffff', border: '1px solid rgba(110,231,216,0.15)', color: '#1f2937', outline: 'none' }}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
                 Session Date
               </label>
               <input
@@ -268,12 +268,12 @@ export default function ProductivityPage() {
                 value={sessionDate}
                 onChange={(e) => setSessionDate(e.target.value)}
                 className="rounded-xl px-3 py-2.5 text-sm w-full"
-                style={{ background: '#222022', border: '1px solid rgba(110,231,216,0.15)', color: '#d1faf5', outline: 'none' }}
+                style={{ background: '#ffffff', border: '1px solid rgba(110,231,216,0.15)', color: '#1f2937', outline: 'none' }}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
                 Notes (optional)
               </label>
               <textarea
@@ -282,9 +282,9 @@ export default function ProductivityPage() {
                 placeholder="What did you study in this session?"
                 className="rounded-xl px-3 py-2.5 text-sm w-full"
                 style={{
-                  background: '#222022',
+                  background: '#ffffff',
                   border: '1px solid rgba(110,231,216,0.15)',
-                  color: '#d1faf5',
+                  color: '#1f2937',
                   outline: 'none',
                   minHeight: '88px',
                   resize: 'none',
@@ -324,9 +324,9 @@ export default function ProductivityPage() {
               onClick={loadSessions}
               className="px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150"
               style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(110,231,216,0.12)',
-                color: 'rgba(255,255,255,0.55)',
+                background: '#f5f7f4',
+                border: '1px solid #e5e7eb',
+                color: '#374151',
               }}
             >
               Refresh
@@ -335,15 +335,15 @@ export default function ProductivityPage() {
 
           <div className="space-y-2.5">
             {loading && (
-              <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(110,231,216,0.08)' }}>
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>Loading your sessions…</p>
+              <div className="rounded-xl p-4" style={{ background: '#f5f7f4', border: '1px solid #e5e7eb' }}>
+                <p className="text-sm" style={{ color: '#6b7280' }}>Loading your sessions…</p>
               </div>
             )}
 
             {!loading && sessions.length === 0 && !error && (
               <div className="rounded-xl p-5" style={{ background: 'rgba(110,231,216,0.05)', border: '1px dashed rgba(110,231,216,0.18)' }}>
-                <p className="text-sm font-semibold" style={{ color: '#d1faf5' }}>No sessions yet.</p>
-                <p className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.40)' }}>
+                <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>No sessions yet.</p>
+                <p className="text-[11px] mt-1" style={{ color: '#6b7280' }}>
                   Add your first session to start tracking productivity.
                 </p>
               </div>
@@ -354,18 +354,18 @@ export default function ProductivityPage() {
                 <div
                   key={session.id}
                   className="group rounded-xl p-4 transition-all duration-150"
-                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(110,231,216,0.08)' }}
+                  style={{ background: '#f5f7f4', border: '1px solid #e5e7eb' }}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold" style={{ color: '#d1faf5' }}>
+                      <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>
                         {session.subject}
                       </p>
-                      <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                      <p className="text-[11px] mt-0.5" style={{ color: '#6b7280' }}>
                         {session.duration_minutes} min • {formatDate(session.session_date)}
                       </p>
                       {session.notes ? (
-                        <p className="text-xs mt-2 whitespace-pre-wrap" style={{ color: 'rgba(255,255,255,0.50)' }}>
+                        <p className="text-xs mt-2 whitespace-pre-wrap" style={{ color: '#374151' }}>
                           {session.notes}
                         </p>
                       ) : null}
@@ -375,7 +375,7 @@ export default function ProductivityPage() {
                       type="button"
                       onClick={() => deleteSession(session.id)}
                       className="p-1.5 rounded-lg transition-colors duration-150"
-                      style={{ color: 'rgba(255,255,255,0.30)' }}
+                      style={{ color: '#6b7280' }}
                       title="Delete session"
                       onMouseEnter={(e) => {
                         (e.currentTarget as HTMLElement).style.color = '#f87171';

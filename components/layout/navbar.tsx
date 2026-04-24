@@ -59,7 +59,7 @@ export default function Navbar() {
         WebkitBackdropFilter: scrolled ? 'blur(16px) saturate(1.4)' : 'none',
       }}
     >
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[60px] gap-6">
 
           {/* ── Logo ── */}
@@ -73,7 +73,12 @@ export default function Navbar() {
             <img
               src="/images/logo.png"
               alt="EduFlow AI"
-              style={{ height: '48px', width: 'auto', display: 'block' }}
+              style={{
+                height: '48px',
+                width: 'auto',
+                display: 'block',
+                filter: 'drop-shadow(0 1px 2px rgba(31,41,55,0.14)) contrast(1.06)',
+              }}
             />
           </Link>
 
@@ -84,13 +89,13 @@ export default function Navbar() {
                 key={label}
                 href={href}
                 className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
-                style={{ color: 'rgba(255,255,255,0.52)' }}
+                style={{ color: '#374151' }}
                 onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.color      = '#d1faf5';
-                  (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)';
+                  (e.currentTarget as HTMLElement).style.color      = '#14b8a6';
+                  (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.14)';
                 }}
                 onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.color      = 'rgba(255,255,255,0.52)';
+                  (e.currentTarget as HTMLElement).style.color      = '#374151';
                   (e.currentTarget as HTMLElement).style.background = 'transparent';
                 }}
               >
@@ -106,12 +111,18 @@ export default function Navbar() {
                 <Link
                   href="/dashboard"
                   className="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-150"
-                  style={{ color: '#6EE7D8' }}
+                  style={{
+                    background: 'linear-gradient(135deg, #14b8a6 0%, #6ee7d8 100%)',
+                    color: '#ffffff',
+                    boxShadow: '0 6px 16px rgba(20,184,166,0.24)',
+                  }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.08)';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 10px 22px rgba(20,184,166,0.32)';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 16px rgba(20,184,166,0.24)';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
                   }}
                 >
                   Open App
@@ -121,19 +132,15 @@ export default function Navbar() {
                   onClick={handleLogout}
                   className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
                   style={{
-                    color: 'rgba(255,255,255,0.45)',
-                    border: '1px solid rgba(110,231,216,0.16)',
-                    background: 'transparent',
+                    color: '#1f2937',
+                    border: '1px solid #e5e7eb',
+                    background: '#ffffff',
                   }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.color       = '#f87171';
-                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(248,113,113,0.32)';
-                    (e.currentTarget as HTMLElement).style.background  = 'rgba(248,113,113,0.07)';
+                    (e.currentTarget as HTMLElement).style.background  = '#f5f7f4';
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.color       = 'rgba(255,255,255,0.45)';
-                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.16)';
-                    (e.currentTarget as HTMLElement).style.background  = 'transparent';
+                    (e.currentTarget as HTMLElement).style.background  = '#ffffff';
                   }}
                 >
                   Log out
@@ -211,7 +218,7 @@ export default function Navbar() {
                   href={href}
                   onClick={() => setMobileOpen(false)}
                   className="px-4 py-2.5 text-sm font-medium rounded-lg transition-colors duration-150"
-                  style={{ color: 'rgba(255,255,255,0.55)' }}
+                  style={{ color: '#374151' }}
                 >
                   {label}
                 </Link>

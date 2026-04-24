@@ -85,27 +85,27 @@ export default function Features() {
     <section
       id="features"
       className="relative py-32 overflow-hidden"
-      style={{ background: '#222022' }}
+      style={{ background: '#f5f7f4' }}
     >
-      {/* Background accent */}
       <div
         className="absolute inset-0 pointer-events-none"
         aria-hidden="true"
         style={{
-          backgroundImage: 'radial-gradient(circle, rgba(110,231,216,0.035) 1px, transparent 1px)',
-          backgroundSize: '32px 32px',
+          backgroundImage: 'radial-gradient(circle, rgba(20,184,166,0.06) 1px, transparent 1px)',
+          backgroundSize: '36px 36px',
+          opacity: 0.35,
         }}
       />
       <div
         className="absolute top-0 left-0 right-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(110,231,216,0.18), transparent)' }}
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(20,184,166,0.2), transparent)' }}
         aria-hidden="true"
       />
       <div
         className="absolute inset-0 pointer-events-none"
         aria-hidden="true"
         style={{
-          background: 'radial-gradient(ellipse 70% 40% at 50% 0%, rgba(110,231,216,0.05) 0%, transparent 65%)',
+          background: 'radial-gradient(ellipse 65% 45% at 50% 0%, rgba(196,181,253,0.18) 0%, transparent 70%)',
         }}
       />
 
@@ -116,12 +116,12 @@ export default function Features() {
           <div
             className="inline-flex items-center gap-2 text-xs font-semibold px-3.5 py-1.5 rounded-full mb-5"
             style={{
-              background: 'rgba(110,231,216,0.07)',
-              color: '#6EE7D8',
-              border: '1px solid rgba(110,231,216,0.18)',
+              background: '#fcfcf9',
+              color: '#14b8a6',
+              border: '1px solid #e5e7eb',
             }}
           >
-            <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#6EE7D8', boxShadow: '0 0 6px rgba(110,231,216,0.7)' }} />
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#6ee7d8' }} />
             Five tools. One workspace.
           </div>
 
@@ -129,7 +129,7 @@ export default function Features() {
             className="font-bold tracking-tight mb-4"
             style={{
               fontSize: 'clamp(2rem, 4.5vw, 3rem)',
-              color: '#e2fdf9',
+              color: '#1f2937',
               letterSpacing: '-0.02em',
               lineHeight: 1.1,
             }}
@@ -139,7 +139,7 @@ export default function Features() {
             to{' '}
             <span
               style={{
-                background: 'linear-gradient(135deg, #6EE7D8, #14B8A6)',
+                background: 'linear-gradient(135deg, #14b8a6, #6ee7d8)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -151,7 +151,7 @@ export default function Features() {
 
           <p
             className="max-w-xl mx-auto leading-relaxed"
-            style={{ fontSize: '1.0625rem', color: 'rgba(255,255,255,0.42)' }}
+            style={{ fontSize: '1.0625rem', color: '#6b7280' }}
           >
             No switching apps. No friction. Just one beautifully designed space that
             keeps you organised, focused, and one step ahead.
@@ -171,7 +171,7 @@ export default function Features() {
       {/* Bottom divider */}
       <div
         className="absolute bottom-0 left-0 right-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(110,231,216,0.12), transparent)' }}
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(20,184,166,0.15), transparent)' }}
         aria-hidden="true"
       />
     </section>
@@ -195,29 +195,26 @@ function FeatureCard({ title, description, icon, accent, accentBg, tag, href }: 
       <div
         className="relative rounded-2xl p-6 h-full flex flex-col gap-4 transition-all duration-250 overflow-hidden"
         style={{
-          background: '#272427',
-          border: '1px solid rgba(110,231,216,0.10)',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.24)',
+          background: '#fcfcf9',
+          border: '1px solid #e5e7eb',
+          boxShadow: '0 10px 25px rgba(31,41,55,0.05)',
         }}
         onMouseEnter={e => {
           const el = e.currentTarget as HTMLElement;
-          el.style.borderColor = `${accent}44`;
-          el.style.boxShadow = `0 16px 40px rgba(0,0,0,0.35), 0 0 24px ${accent}0e`;
-          el.style.transform = 'translateY(-6px)';
-          el.style.background = '#2c2a2c';
+          el.style.borderColor = `${accent}55`;
+          el.style.boxShadow = `0 16px 30px rgba(31,41,55,0.11), 0 0 0 1px ${accent}20`;
+          el.style.transform = 'translateY(-4px)';
         }}
         onMouseLeave={e => {
           const el = e.currentTarget as HTMLElement;
-          el.style.borderColor = 'rgba(110,231,216,0.10)';
-          el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.24)';
+          el.style.borderColor = '#e5e7eb';
+          el.style.boxShadow = '0 10px 25px rgba(31,41,55,0.05)';
           el.style.transform = 'translateY(0)';
-          el.style.background = '#272427';
         }}
       >
-        {/* Subtle corner glow on hover (pseudo via box-shadow on inner div) */}
         <div
           className="absolute -top-16 -right-16 w-32 h-32 rounded-full blur-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          style={{ background: `${accent}18` }}
+          style={{ background: `${accent}24` }}
           aria-hidden="true"
         />
 
@@ -225,16 +222,16 @@ function FeatureCard({ title, description, icon, accent, accentBg, tag, href }: 
         <div className="flex items-start justify-between">
           <div
             className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: accentBg, color: accent, border: `1px solid ${accent}22` }}
+            style={{ background: accentBg, color: accent, border: `1px solid ${accent}2f` }}
           >
             {icon}
           </div>
           <span
             className="text-[10px] font-semibold px-2.5 py-1 rounded-full"
             style={{
-              background: 'rgba(110,231,216,0.06)',
+              background: '#f5f7f4',
               color: accent,
-              border: `1px solid ${accent}20`,
+              border: `1px solid ${accent}36`,
             }}
           >
             {tag}
@@ -245,11 +242,11 @@ function FeatureCard({ title, description, icon, accent, accentBg, tag, href }: 
         <div className="flex-1 flex flex-col gap-2">
           <h3
             className="text-[15px] font-semibold leading-snug"
-            style={{ color: '#d1faf5' }}
+            style={{ color: '#1f2937' }}
           >
             {title}
           </h3>
-          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.42)' }}>
+          <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
             {description}
           </p>
         </div>

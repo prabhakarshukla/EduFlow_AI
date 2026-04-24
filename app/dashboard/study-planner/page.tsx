@@ -59,7 +59,7 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
   return (
     <div
       className={`rounded-2xl p-6 transition-all duration-200 ${className}`}
-      style={{ background: '#2a282a', border: '1px solid rgba(110,231,216,0.12)' }}
+      style={{ background: '#ffffff', border: '1px solid #e5e7eb' }}
     >
       {children}
     </div>
@@ -276,10 +276,10 @@ export default function StudyPlannerPage() {
 
   /* Input focus ring helper */
   const inputStyle = (field: string): React.CSSProperties => ({
-    background:  '#222022',
+    background:  '#ffffff',
     border:      `1px solid ${focused === field ? 'rgba(110,231,216,0.45)' : 'rgba(110,231,216,0.15)'}`,
     boxShadow:   focused === field ? '0 0 0 3px rgba(110,231,216,0.07)' : 'none',
-    color:       '#d1faf5',
+    color:       '#1f2937',
     outline:     'none',
     borderRadius: '0.75rem',
     padding:     '0.625rem 0.875rem',
@@ -308,10 +308,10 @@ export default function StudyPlannerPage() {
             </svg>
             Study Planner
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#e2fdf9' }}>
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#1f2937' }}>
             Plan smarter, study better.
           </h1>
-          <p className="text-sm mt-1.5" style={{ color: 'rgba(255,255,255,0.40)' }}>
+          <p className="text-sm mt-1.5" style={{ color: '#6b7280' }}>
             Organise your tasks, track priority subjects, and never miss a deadline.
           </p>
         </div>
@@ -319,13 +319,13 @@ export default function StudyPlannerPage() {
         {/* Progress pill */}
         <div
           className="flex items-center gap-3 px-4 py-2.5 rounded-xl flex-shrink-0"
-          style={{ background: '#2a282a', border: '1px solid rgba(110,231,216,0.15)' }}
+          style={{ background: '#ffffff', border: '1px solid rgba(110,231,216,0.15)' }}
         >
           <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#6EE7D8' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span className="text-sm font-semibold" style={{ color: '#d1faf5' }}>
+          <span className="text-sm font-semibold" style={{ color: '#1f2937' }}>
             {pct}% done today
           </span>
         </div>
@@ -364,10 +364,10 @@ export default function StudyPlannerPage() {
               {[
                 { label: 'Completed', value: done,    color: '#6EE7D8' },
                 { label: 'Pending',   value: pending, color: '#fbbf24' },
-                { label: 'Total',     value: tasks.length, color: 'rgba(255,255,255,0.45)' },
+                { label: 'Total',     value: tasks.length, color: '#6b7280' },
               ].map(s => (
                 <div key={s.label} className="flex items-center justify-between text-xs">
-                  <span style={{ color: 'rgba(255,255,255,0.40)' }}>{s.label}</span>
+                  <span style={{ color: '#6b7280' }}>{s.label}</span>
                   <span className="font-semibold" style={{ color: s.color }}>{s.value}</span>
                 </div>
               ))}
@@ -377,12 +377,12 @@ export default function StudyPlannerPage() {
           {/* Streak */}
           <div
             className="flex items-center gap-3 rounded-xl px-4 py-3"
-            style={{ background: 'rgba(110,231,216,0.05)', border: '1px solid rgba(110,231,216,0.10)' }}
+            style={{ background: 'rgba(110,231,216,0.05)', border: '1px solid #e5e7eb' }}
           >
             <span className="text-xl">🔥</span>
             <div>
-              <p className="text-sm font-semibold" style={{ color: '#d1faf5' }}>7-day streak</p>
-              <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Keep going — you&apos;re on fire!</p>
+              <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>7-day streak</p>
+              <p className="text-[11px]" style={{ color: '#6b7280' }}>Keep going — you&apos;re on fire!</p>
             </div>
           </div>
         </Card>
@@ -418,7 +418,7 @@ export default function StudyPlannerPage() {
                   {d.day}
                 </span>
                 <span className="text-sm font-bold"
-                  style={{ color: d.active ? '#6EE7D8' : '#d1faf5' }}>
+                  style={{ color: d.active ? '#6EE7D8' : '#1f2937' }}>
                   {d.date}
                 </span>
                 <span
@@ -436,7 +436,7 @@ export default function StudyPlannerPage() {
 
           {/* Horizontal task load bar */}
           <div className="mt-5">
-            <p className="text-[10px] mb-2" style={{ color: 'rgba(255,255,255,0.30)' }}>Weekly task load</p>
+            <p className="text-[10px] mb-2" style={{ color: '#6b7280' }}>Weekly task load</p>
             <div className="flex items-end gap-1 h-8">
               {week.map((d) => (
                 <div key={d.day} className="flex-1 rounded-t" style={{
@@ -460,13 +460,13 @@ export default function StudyPlannerPage() {
           <div className="flex items-center justify-between mb-5">
             <div>
               <SectionLabel>Today&apos;s Study Tasks</SectionLabel>
-              <p className="text-sm font-semibold -mt-2" style={{ color: '#d1faf5' }}>
+              <p className="text-sm font-semibold -mt-2" style={{ color: '#1f2937' }}>
                 {done} of {tasks.length} completed
               </p>
             </div>
             {/* Progress bar */}
             <div className="w-24">
-              <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
+              <div className="w-full h-1.5 rounded-full" style={{ background: '#f5f7f4' }}>
                 <div
                   className="h-1.5 rounded-full transition-all duration-500"
                   style={{
@@ -476,7 +476,7 @@ export default function StudyPlannerPage() {
                   }}
                 />
               </div>
-              <p className="text-[10px] text-right mt-1" style={{ color: 'rgba(255,255,255,0.30)' }}>{pct}%</p>
+              <p className="text-[10px] text-right mt-1" style={{ color: '#6b7280' }}>{pct}%</p>
             </div>
           </div>
 
@@ -484,9 +484,9 @@ export default function StudyPlannerPage() {
             {loading && (
               <div
                 className="rounded-xl p-4"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(110,231,216,0.08)' }}
+                style={{ background: '#f5f7f4', border: '1px solid #e5e7eb' }}
               >
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>Loading your tasks…</p>
+                <p className="text-sm" style={{ color: '#6b7280' }}>Loading your tasks…</p>
               </div>
             )}
 
@@ -517,8 +517,8 @@ export default function StudyPlannerPage() {
                 className="rounded-xl p-5"
                 style={{ background: 'rgba(110,231,216,0.05)', border: '1px dashed rgba(110,231,216,0.18)' }}
               >
-                <p className="text-sm font-semibold" style={{ color: '#d1faf5' }}>No tasks yet.</p>
-                <p className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.40)' }}>
+                <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>No tasks yet.</p>
+                <p className="text-[11px] mt-1" style={{ color: '#6b7280' }}>
                   Add your first task on the right — keep it small and specific.
                 </p>
               </div>
@@ -563,11 +563,11 @@ export default function StudyPlannerPage() {
                 <div className="flex-1 min-w-0">
                   <p
                     className={`text-sm truncate ${task.status === 'done' ? 'line-through' : ''}`}
-                    style={{ color: task.status === 'done' ? 'rgba(255,255,255,0.30)' : '#d1faf5' }}
+                    style={{ color: task.status === 'done' ? '#9ca3af' : '#1f2937' }}
                   >
                     {task.title}
                   </p>
-                  <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.30)' }}>
+                  <p className="text-[11px] mt-0.5" style={{ color: '#6b7280' }}>
                     {[task.subject || 'General', task.due ? `Due ${task.due}` : null].filter(Boolean).join(' • ')}
                   </p>
                 </div>
@@ -586,7 +586,7 @@ export default function StudyPlannerPage() {
                   onClick={() => deleteTask(task.id)}
                   className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 p-1.5 rounded-lg"
                   title="Delete"
-                  style={{ color: 'rgba(255,255,255,0.30)' }}
+                  style={{ color: '#6b7280' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.30)'; }}
                 >
@@ -618,7 +618,7 @@ export default function StudyPlannerPage() {
               </div>
             )}
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
                 Task name
               </label>
               <input
@@ -634,7 +634,7 @@ export default function StudyPlannerPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
                 Subject
               </label>
               <input
@@ -649,7 +649,7 @@ export default function StudyPlannerPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
                 Description
               </label>
               <textarea
@@ -663,7 +663,7 @@ export default function StudyPlannerPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
                 Due date
               </label>
               <input
@@ -677,7 +677,7 @@ export default function StudyPlannerPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
                 Priority
               </label>
               <div className="flex gap-2">
@@ -742,16 +742,16 @@ export default function StudyPlannerPage() {
           {/* Tip */}
           <div
             className="flex items-start gap-2.5 rounded-xl p-3 mt-auto"
-            style={{ background: 'rgba(110,231,216,0.05)', border: '1px solid rgba(110,231,216,0.10)' }}
+            style={{ background: 'rgba(110,231,216,0.05)', border: '1px solid #e5e7eb' }}
           >
             <svg className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: '#6EE7D8' }}
               fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.40)' }}>
+            <p className="text-[11px] leading-relaxed" style={{ color: '#6b7280' }}>
               Press <kbd className="px-1 py-0.5 rounded text-[10px]"
-                style={{ background: 'rgba(255,255,255,0.08)', color: '#d1faf5' }}>Enter</kbd> to quickly add.
+                style={{ background: 'rgba(255,255,255,0.08)', color: '#1f2937' }}>Enter</kbd> to quickly add.
             </p>
           </div>
         </Card>
@@ -772,13 +772,13 @@ export default function StudyPlannerPage() {
                       className="w-2 h-2 rounded-full flex-shrink-0"
                       style={{ background: s.color, boxShadow: `0 0 6px ${s.color}70` }}
                     />
-                    <span style={{ color: '#d1faf5' }}>{s.name}</span>
+                    <span style={{ color: '#1f2937' }}>{s.name}</span>
                   </div>
-                  <span style={{ color: 'rgba(255,255,255,0.40)' }}>
+                  <span style={{ color: '#6b7280' }}>
                     {s.hours}h this week
                   </span>
                 </div>
-                <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                <div className="w-full h-1.5 rounded-full" style={{ background: '#f5f7f4' }}>
                   <div
                     className="h-1.5 rounded-full transition-all duration-500"
                     style={{
@@ -831,8 +831,8 @@ export default function StudyPlannerPage() {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ color: '#d1faf5' }}>{d.title}</p>
-                  <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{d.subject}</p>
+                  <p className="text-sm font-medium truncate" style={{ color: '#1f2937' }}>{d.title}</p>
+                  <p className="text-[11px]" style={{ color: '#6b7280' }}>{d.subject}</p>
                 </div>
 
                 <div className="flex flex-col items-end gap-1 flex-shrink-0">

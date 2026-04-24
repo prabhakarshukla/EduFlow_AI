@@ -360,10 +360,10 @@ export default function DashboardPage() {
           <p className="text-xs font-medium tracking-wide uppercase" style={{ color: 'rgba(110,231,216,0.50)' }}>
             {now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
-          <h1 className="text-2xl sm:text-[28px] font-bold tracking-tight" style={{ color: '#e2fdf9' }}>
+          <h1 className="text-2xl sm:text-[28px] font-bold tracking-tight" style={{ color: '#1f2937' }}>
             {greeting}, Student 👋
           </h1>
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.38)' }}>
+          <p className="text-sm" style={{ color: '#6b7280' }}>
             {error ? (
               <>We couldn&apos;t load your overview right now.</>
             ) : (
@@ -418,8 +418,8 @@ export default function DashboardPage() {
               href={card.href}
               className="group flex flex-col gap-3.5 p-4 rounded-2xl transition-all duration-200"
               style={{
-                background: '#2a282a',
-                border: '1px solid rgba(110,231,216,0.11)',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.14)',
               }}
               onMouseEnter={e => {
@@ -456,13 +456,13 @@ export default function DashboardPage() {
               </div>
 
               <div className="space-y-0.5">
-                <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: '#6b7280' }}>
                   {card.title}
                 </p>
-                <p className="text-xl font-bold leading-tight" style={{ color: '#e2fdf9' }}>
+                <p className="text-xl font-bold leading-tight" style={{ color: '#1f2937' }}>
                   {card.value}
                 </p>
-                <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.32)' }}>
+                <p className="text-[11px]" style={{ color: '#6b7280' }}>
                   {card.sub}
                 </p>
               </div>
@@ -485,17 +485,17 @@ export default function DashboardPage() {
         <div
           className="lg:col-span-3 rounded-2xl p-5"
           style={{
-            background: '#2a282a',
-            border: '1px solid rgba(110,231,216,0.11)',
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
             boxShadow: '0 1px 3px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.14)',
           }}
         >
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-sm font-semibold" style={{ color: '#e2fdf9', letterSpacing: '-0.01em' }}>
+              <h2 className="text-sm font-semibold" style={{ color: '#1f2937', letterSpacing: '-0.01em' }}>
                 Today&apos;s Focus
               </h2>
-              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.30)' }}>
+              <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
                 {loading ? 'Loading tasks…' : `${focusItems.filter(t => t.done).length} of ${focusItems.length} tasks completed`}
               </p>
             </div>
@@ -512,7 +512,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Progress bar */}
-          <div className="w-full h-1.5 rounded-full mb-4" style={{ background: 'rgba(255,255,255,0.05)' }}>
+          <div className="w-full h-1.5 rounded-full mb-4" style={{ background: '#f5f7f4' }}>
             <div
               className="h-1.5 rounded-full transition-all duration-700"
               style={{
@@ -530,15 +530,15 @@ export default function DashboardPage() {
                 <div
                   key={i}
                   className="flex items-center gap-3 p-3 rounded-xl animate-pulse"
-                  style={{ background: 'rgba(255,255,255,0.03)' }}
+                  style={{ background: '#f5f7f4' }}
                 >
                   <div className="w-4 h-4 rounded-full flex-shrink-0" style={{ background: 'rgba(110,231,216,0.08)' }} />
-                  <div className="flex-1 h-3 rounded" style={{ background: 'rgba(255,255,255,0.05)' }} />
-                  <div className="h-4 w-12 rounded" style={{ background: 'rgba(255,255,255,0.05)' }} />
+                  <div className="flex-1 h-3 rounded" style={{ background: '#f5f7f4' }} />
+                  <div className="h-4 w-12 rounded" style={{ background: '#f5f7f4' }} />
                 </div>
               ))
             ) : error ? (
-              <div className="text-xs py-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <div className="text-xs py-2" style={{ color: '#6b7280' }}>
                 Couldn&apos;t load tasks right now.
               </div>
             ) : focusItems.length ? (
@@ -563,7 +563,7 @@ export default function DashboardPage() {
                   </div>
                   <span
                     className={`text-sm flex-1 truncate ${task.done ? 'line-through' : ''}`}
-                    style={{ color: task.done ? 'rgba(255,255,255,0.28)' : '#d1faf5' }}
+                    style={{ color: task.done ? '#9ca3af' : '#1f2937' }}
                   >
                     {task.label}
                   </span>
@@ -576,7 +576,7 @@ export default function DashboardPage() {
                 </div>
               ))
             ) : (
-              <div className="text-xs py-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <div className="text-xs py-2" style={{ color: '#6b7280' }}>
                 No tasks yet — create one to see it here.
               </div>
             )}
@@ -603,12 +603,12 @@ export default function DashboardPage() {
           <div
             className="rounded-2xl p-5"
             style={{
-              background: '#2a282a',
-              border: '1px solid rgba(110,231,216,0.11)',
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
               boxShadow: '0 1px 3px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.14)',
             }}
           >
-            <h2 className="text-sm font-semibold mb-3.5" style={{ color: '#e2fdf9', letterSpacing: '-0.01em' }}>
+            <h2 className="text-sm font-semibold mb-3.5" style={{ color: '#1f2937', letterSpacing: '-0.01em' }}>
               Quick Actions
             </h2>
             <div className="grid grid-cols-2 gap-2">
@@ -619,14 +619,14 @@ export default function DashboardPage() {
                   className="flex items-center gap-2.5 p-3 rounded-xl text-xs font-medium transition-all duration-150"
                   style={{
                     background: 'rgba(110,231,216,0.04)',
-                    border: '1px solid rgba(110,231,216,0.09)',
-                    color: 'rgba(255,255,255,0.50)',
+                    border: '1px solid #e5e7eb',
+                    color: '#374151',
                   }}
                   onMouseEnter={e => {
                     const el = e.currentTarget as HTMLElement;
                     el.style.borderColor = 'rgba(110,231,216,0.28)';
                     el.style.background  = 'rgba(110,231,216,0.08)';
-                    el.style.color       = '#d1faf5';
+                    el.style.color       = '#1f2937';
                     el.style.transform   = 'translateY(-1px)';
                   }}
                   onMouseLeave={e => {
@@ -645,7 +645,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="min-w-0">
                     <p className="font-semibold truncate leading-tight">{action.label}</p>
-                    <p className="text-[10px] leading-tight mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                    <p className="text-[10px] leading-tight mt-0.5 truncate" style={{ color: '#6b7280' }}>
                       {action.description}
                     </p>
                   </div>
@@ -658,12 +658,12 @@ export default function DashboardPage() {
           <div
             className="rounded-2xl p-5 flex-1"
             style={{
-              background: '#2a282a',
-              border: '1px solid rgba(110,231,216,0.11)',
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
               boxShadow: '0 1px 3px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.14)',
             }}
           >
-            <h2 className="text-sm font-semibold mb-4" style={{ color: '#e2fdf9', letterSpacing: '-0.01em' }}>
+            <h2 className="text-sm font-semibold mb-4" style={{ color: '#1f2937', letterSpacing: '-0.01em' }}>
               Recent Activity
             </h2>
             <div className="space-y-3.5">
@@ -677,10 +677,10 @@ export default function DashboardPage() {
                     }}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs leading-snug" style={{ color: '#d1faf5' }}>{item.text}</p>
+                    <p className="text-xs leading-snug" style={{ color: '#1f2937' }}>{item.text}</p>
                     <div className="flex items-center gap-2 mt-1">
                       {item.time && (
-                        <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.28)' }}>{item.time}</span>
+                        <span className="text-[10px]" style={{ color: '#6b7280' }}>{item.time}</span>
                       )}
                       <span
                         className="text-[9px] font-semibold px-1.5 py-0.5 rounded"

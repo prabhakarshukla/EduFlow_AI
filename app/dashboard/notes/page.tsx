@@ -17,7 +17,7 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
   return (
     <div
       className={`rounded-2xl p-6 transition-all duration-200 ${className}`}
-      style={{ background: '#2a282a', border: '1px solid rgba(110,231,216,0.12)' }}
+      style={{ background: '#ffffff', border: '1px solid #e5e7eb' }}
     >
       {children}
     </div>
@@ -348,10 +348,10 @@ export default function NotesPage() {
             </svg>
             Notes
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#e2fdf9' }}>
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#1f2937' }}>
             Write once. Review fast.
           </h1>
-          <p className="text-sm mt-1.5" style={{ color: 'rgba(255,255,255,0.40)' }}>
+          <p className="text-sm mt-1.5" style={{ color: '#6b7280' }}>
             Keep clean, revision-ready notes — organised by subject.
           </p>
         </div>
@@ -373,7 +373,7 @@ export default function NotesPage() {
             className="px-4 py-2.5 text-xs font-semibold rounded-xl transition-all duration-150"
             style={{
               background: selectedId ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(110,231,216,0.12)',
+              border: '1px solid #e5e7eb',
               color: selectedId ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.25)',
               cursor: selectedId ? 'pointer' : 'not-allowed',
             }}
@@ -408,9 +408,9 @@ export default function NotesPage() {
               onClick={loadNotes}
               className="px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150"
               style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(110,231,216,0.12)',
-                color: 'rgba(255,255,255,0.55)',
+                background: '#f5f7f4',
+                border: '1px solid #e5e7eb',
+                color: '#374151',
               }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.28)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.12)'; }}
@@ -441,7 +441,7 @@ export default function NotesPage() {
                   style={{
                     background: 'rgba(110,231,216,0.10)',
                     border: '1px solid rgba(110,231,216,0.22)',
-                    color: '#d1faf5',
+                    color: '#1f2937',
                   }}
                 >
                   {success}
@@ -456,9 +456,9 @@ export default function NotesPage() {
             placeholder="Search notes…"
             className="rounded-xl px-3 py-2.5 text-sm w-full mb-4"
             style={{
-              background: '#222022',
+              background: '#ffffff',
               border: '1px solid rgba(110,231,216,0.15)',
-              color: '#d1faf5',
+              color: '#1f2937',
               outline: 'none',
             }}
           />
@@ -467,9 +467,9 @@ export default function NotesPage() {
             {loading && (
               <div
                 className="rounded-xl p-4"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(110,231,216,0.08)' }}
+                style={{ background: '#f5f7f4', border: '1px solid #e5e7eb' }}
               >
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>Loading your notes…</p>
+                <p className="text-sm" style={{ color: '#6b7280' }}>Loading your notes…</p>
               </div>
             )}
 
@@ -478,8 +478,8 @@ export default function NotesPage() {
                 className="rounded-xl p-5"
                 style={{ background: 'rgba(110,231,216,0.05)', border: '1px dashed rgba(110,231,216,0.18)' }}
               >
-                <p className="text-sm font-semibold" style={{ color: '#d1faf5' }}>No notes yet.</p>
-                <p className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.40)' }}>
+                <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>No notes yet.</p>
+                <p className="text-[11px] mt-1" style={{ color: '#6b7280' }}>
                   Create your first note — keep it structured and concise.
                 </p>
               </div>
@@ -529,10 +529,10 @@ export default function NotesPage() {
                       </svg>
                     </button>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate" style={{ color: '#d1faf5' }}>
+                      <p className="text-sm font-semibold truncate" style={{ color: '#1f2937' }}>
                         {n.title || 'Untitled note'}
                       </p>
-                      <p className="text-[11px] mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                      <p className="text-[11px] mt-0.5 truncate" style={{ color: '#6b7280' }}>
                         {(n.subject ?? 'General')}{' '}• updated {fmt(n.updated_at)}
                       </p>
                     </div>
@@ -552,8 +552,8 @@ export default function NotesPage() {
               className="rounded-xl p-5"
               style={{ background: 'rgba(110,231,216,0.05)', border: '1px dashed rgba(110,231,216,0.18)' }}
             >
-              <p className="text-sm font-semibold" style={{ color: '#d1faf5' }}>Select a note to edit.</p>
-              <p className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.40)' }}>
+              <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>Select a note to edit.</p>
+              <p className="text-[11px] mt-1" style={{ color: '#6b7280' }}>
                 Or create a new note to start writing.
               </p>
             </div>
@@ -567,7 +567,7 @@ export default function NotesPage() {
                   <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(110,231,216,0.50)' }}>
                     AI Notes Generator
                   </p>
-                  <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  <span className="text-[11px]" style={{ color: '#6b7280' }}>
                     Auto-fills this editor
                   </span>
                 </div>
@@ -581,9 +581,9 @@ export default function NotesPage() {
                     placeholder="Enter topic (e.g. Electromagnetic Induction)"
                     className="rounded-xl px-3 py-2.5 text-sm w-full"
                     style={{
-                      background: '#222022',
+                      background: '#ffffff',
                       border: '1px solid rgba(110,231,216,0.15)',
-                      color: '#d1faf5',
+                      color: '#1f2937',
                       outline: 'none',
                     }}
                     disabled={!selectedId || aiLoading}
@@ -618,7 +618,7 @@ export default function NotesPage() {
 
               <div className="grid sm:grid-cols-3 gap-3">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
                     Title
                   </label>
                   <input
@@ -627,16 +627,16 @@ export default function NotesPage() {
                     placeholder="e.g. Chapter 4 — Thermodynamics"
                     className="rounded-xl px-3 py-2.5 text-sm w-full"
                     style={{
-                      background: '#222022',
+                      background: '#ffffff',
                       border: '1px solid rgba(110,231,216,0.15)',
-                      color: '#d1faf5',
+                      color: '#1f2937',
                       outline: 'none',
                     }}
                     disabled={!selectedId}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
                     Subject
                   </label>
                   <input
@@ -645,9 +645,9 @@ export default function NotesPage() {
                     placeholder="e.g. Physics"
                     className="rounded-xl px-3 py-2.5 text-sm w-full"
                     style={{
-                      background: '#222022',
+                      background: '#ffffff',
                       border: '1px solid rgba(110,231,216,0.15)',
-                      color: '#d1faf5',
+                      color: '#1f2937',
                       outline: 'none',
                     }}
                     disabled={!selectedId}
@@ -670,13 +670,13 @@ export default function NotesPage() {
                 >
                   {pinned ? 'Pinned' : 'Pin'}
                 </button>
-                <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.30)' }}>
+                <span className="text-[11px]" style={{ color: '#6b7280' }}>
                   {selected ? `Last updated ${fmt(selected.updated_at)}` : ' '}
                 </span>
               </div>
 
               <div className="flex-1 flex flex-col">
-                <label className="block text-xs font-medium mb-1.5" style={{ color: '#d1faf5' }}>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
                   Content
                 </label>
                 <textarea
@@ -687,9 +687,9 @@ export default function NotesPage() {
                   style={{
                     minHeight: '360px',
                     resize: 'none',
-                    background: '#222022',
+                    background: '#ffffff',
                     border: '1px solid rgba(110,231,216,0.15)',
-                    color: '#d1faf5',
+                    color: '#1f2937',
                     outline: 'none',
                     lineHeight: 1.6,
                   }}

@@ -148,7 +148,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className="flex min-h-screen" style={{ background: '#222022', paddingTop: '64px' }}>
+    <div className="flex min-h-screen" style={{ background: '#fcfcf9', paddingTop: '64px' }}>
 
       {/* ── Mobile overlay ── */}
       {mobileOpen && (
@@ -169,27 +169,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           top: '64px',
           height: 'calc(100vh - 64px)',
           width: collapsed ? '64px' : '224px',
-          background: '#1e1c1e',
-          borderRight: '1px solid rgba(110,231,216,0.09)',
+          background: '#ffffff',
+          borderRight: '1px solid #e5e7eb',
         }}
       >
         {/* Collapse toggle row */}
         <div
           className="flex items-center justify-end px-3 py-3 flex-shrink-0"
-          style={{ borderBottom: '1px solid rgba(110,231,216,0.07)', minHeight: '52px' }}
+          style={{ borderBottom: '1px solid #e5e7eb', minHeight: '52px' }}
         >
           {!collapsed ? (
             <button
               onClick={() => setCollapsed(true)}
               className="p-1.5 rounded-lg transition-all duration-150"
-              style={{ color: 'rgba(110,231,216,0.35)' }}
+              style={{ color: '#6b7280' }}
               aria-label="Collapse sidebar"
               onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.color = '#6EE7D8';
-                (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.08)';
+                (e.currentTarget as HTMLElement).style.color = '#14b8a6';
+                (e.currentTarget as HTMLElement).style.background = '#f5f7f4';
               }}
               onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.color = 'rgba(110,231,216,0.35)';
+                (e.currentTarget as HTMLElement).style.color = '#6b7280';
                 (e.currentTarget as HTMLElement).style.background = 'transparent';
               }}
             >
@@ -202,9 +202,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               onClick={() => setCollapsed(false)}
               className="absolute -right-3 top-3 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150"
               style={{
-                background: '#1e1c1e',
-                border: '1px solid rgba(110,231,216,0.22)',
-                color: '#6EE7D8',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
+                color: '#14b8a6',
               }}
               aria-label="Expand sidebar"
             >
@@ -223,7 +223,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {!collapsed && (
                 <p
                   className="px-3 pb-1.5 text-[9px] font-bold uppercase tracking-[0.12em]"
-                  style={{ color: 'rgba(110,231,216,0.30)' }}
+                  style={{ color: '#6b7280' }}
                 >
                   {group}
                 </p>
@@ -238,18 +238,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     title={collapsed ? label : undefined}
                     className="relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150"
                     style={{
-                      color:      active ? '#6EE7D8'                : 'rgba(255,255,255,0.40)',
-                      background: active ? 'rgba(110,231,216,0.09)' : 'transparent',
+                      color: active ? '#14b8a6' : '#374151',
+                      background: active ? '#ecfdf8' : 'transparent',
                     }}
                     onMouseEnter={e => {
                       if (!active) {
-                        (e.currentTarget as HTMLElement).style.color      = 'rgba(255,255,255,0.75)';
-                        (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)';
+                        (e.currentTarget as HTMLElement).style.color = '#14b8a6';
+                        (e.currentTarget as HTMLElement).style.background = '#f5f7f4';
                       }
                     }}
                     onMouseLeave={e => {
                       if (!active) {
-                        (e.currentTarget as HTMLElement).style.color      = 'rgba(255,255,255,0.40)';
+                        (e.currentTarget as HTMLElement).style.color = '#374151';
                         (e.currentTarget as HTMLElement).style.background = 'transparent';
                       }
                     }}
@@ -285,7 +285,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* User row */}
         <div
           className="flex-shrink-0 px-3 py-4"
-          style={{ borderTop: '1px solid rgba(110,231,216,0.08)' }}
+          style={{ borderTop: '1px solid #e5e7eb' }}
         >
           {collapsed ? (
             <div
@@ -303,10 +303,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 {avatarLetter}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold truncate leading-tight" style={{ color: '#d1faf5' }}>
+                <p className="text-xs font-semibold truncate leading-tight" style={{ color: '#1f2937' }}>
                   {displayName}
                 </p>
-                <p className="text-[10px] truncate leading-tight mt-0.5" style={{ color: 'rgba(255,255,255,0.30)' }}>
+                <p className="text-[10px] truncate leading-tight mt-0.5" style={{ color: '#6b7280' }}>
                   {displayEmail || ' '}
                 </p>
               </div>
@@ -316,9 +316,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 disabled={!authReady}
                 title="Log out"
                 className="p-1.5 rounded-lg transition-all duration-150 flex-shrink-0"
-                style={{ color: 'rgba(255,255,255,0.28)', opacity: !authReady ? 0.5 : 1 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.08)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.28)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                style={{ color: '#6b7280', opacity: !authReady ? 0.5 : 1 }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#ef4444'; (e.currentTarget as HTMLElement).style.background = '#fef2f2'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#6b7280'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
@@ -337,8 +337,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <header
           className="flex-shrink-0 flex items-center gap-4 px-5 sm:px-7"
           style={{
-            borderBottom: '1px solid rgba(110,231,216,0.09)',
-            background: 'rgba(34,32,34,0.96)',
+            borderBottom: '1px solid #e5e7eb',
+            background: 'rgba(252,252,249,0.95)',
             backdropFilter: 'blur(14px)',
             WebkitBackdropFilter: 'blur(14px)',
             minHeight: '56px',
@@ -347,7 +347,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Mobile hamburger */}
           <button
             className="md:hidden p-1.5 rounded-lg transition-colors duration-150"
-            style={{ color: '#6EE7D8' }}
+            style={{ color: '#14b8a6' }}
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
@@ -358,11 +358,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-xs min-w-0">
-            <span style={{ color: 'rgba(255,255,255,0.28)', fontWeight: 500 }}>EduFlow</span>
-            <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'rgba(110,231,216,0.28)' }}>
+            <span style={{ color: '#6b7280', fontWeight: 500 }}>EduFlow</span>
+            <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#9ca3af' }}>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-            <span className="font-semibold truncate" style={{ color: '#d1faf5' }}>{currentPage}</span>
+            <span className="font-semibold truncate" style={{ color: '#1f2937' }}>{currentPage}</span>
           </div>
 
           {/* Right region */}
@@ -371,13 +371,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs cursor-text transition-colors duration-150"
               style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(110,231,216,0.10)',
-                color: 'rgba(255,255,255,0.28)',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
+                color: '#6b7280',
                 minWidth: '160px',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.22)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.10)'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#14b8a6'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#e5e7eb'; }}
             >
               <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
@@ -385,7 +385,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <span>Search…</span>
               <span
                 className="ml-auto text-[10px] px-1.5 py-0.5 rounded font-mono"
-                style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.22)' }}
+                style={{ background: '#f5f7f4', color: '#6b7280' }}
               >
                 ⌘K
               </span>
@@ -394,9 +394,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* Notification bell */}
             <button
               className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center transition-all duration-150"
-              style={{ color: 'rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(110,231,216,0.08)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#6EE7D8'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.22)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.35)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.08)'; }}
+              style={{ color: '#6b7280', background: '#ffffff', border: '1px solid #e5e7eb' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#14b8a6'; (e.currentTarget as HTMLElement).style.borderColor = '#14b8a6'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#6b7280'; (e.currentTarget as HTMLElement).style.borderColor = '#e5e7eb'; }}
               aria-label="Notifications"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -416,7 +416,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* ── Page content ── */}
-        <main className="flex-1 overflow-auto" style={{ background: '#222022' }}>
+        <main className="flex-1 overflow-auto" style={{ background: '#fcfcf9' }}>
           {authReady && user ? children : null}
         </main>
       </div>
