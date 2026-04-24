@@ -6,17 +6,14 @@ export default function LicensePage() {
   return (
     <div className="min-h-screen px-4 py-20" style={{ background: '#fcfcf9' }}>
       <div className="max-w-4xl mx-auto">
+        {/* Header */}
         <div className="mb-12">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-sm font-medium mb-6 transition-colors"
             style={{ color: '#14b8a6' }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.color = '#0d9488';
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.color = '#14b8a6';
-            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#0d9488'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#14b8a6'; }}
           >
             ← Back to Home
           </Link>
@@ -29,115 +26,100 @@ export default function LicensePage() {
           </p>
         </div>
 
-        <div
-          className="rounded-2xl border p-8 md:p-12 space-y-8"
-          style={{ background: '#ffffff', borderColor: '#e5e7eb' }}
-        >
+        {/* Content Card */}
+        <div className="rounded-2xl border p-8 md:p-12 space-y-8" style={{ background: '#ffffff', borderColor: '#e5e7eb' }}>
           <section>
             <h2 className="text-2xl font-bold mb-4" style={{ color: '#1f2937' }}>
-              License Agreement
+              EduFlow AI – Proprietary License
             </h2>
-            <p className="leading-relaxed mb-4" style={{ color: '#4b5563' }}>
-              © 2026 EduFlow AI. All rights reserved.
-            </p>
             <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              This software and all associated documentation, source code, and compiled binaries are the exclusive property of EduFlow AI. This license grants you a limited, non-exclusive, non-transferable, and revocable right to use EduFlow AI solely for personal, educational, or authorized organizational purposes.
+              Copyright © 2026 Prabhakar Shukla. All Rights Reserved.
             </p>
           </section>
 
           <section>
             <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              Grant of License
+              1. Ownership
             </h3>
             <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              Subject to the terms and conditions of this License Agreement, EduFlow AI grants you a non-exclusive, non-transferable license to access and use EduFlow AI for your personal, educational, or authorized organizational purposes. This license does not include the right to modify, reproduce, distribute, transmit, display, or sublicense EduFlow AI or any portion thereof.
+              This software, including all source code, design, structure, features, and related materials (collectively, the "Software"), is the exclusive property of Prabhakar Shukla (hereinafter referred to as the "Owner").
             </p>
           </section>
 
           <section>
             <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              Restrictions
+              2. Restrictions
             </h3>
-            <div style={{ color: '#6b7280' }}>
-              <p className="leading-relaxed mb-4">You may not:</p>
-              <ul className="space-y-3 ml-4">
-                <li className="flex items-start">
+            <p className="leading-relaxed mb-4" style={{ color: '#6b7280' }}>
+              You are NOT permitted to:
+            </p>
+            <ul className="space-y-3 ml-4">
+              {[
+                'Copy, reproduce, or redistribute the Software or any portion of it',
+                'Modify, adapt, reverse engineer, or create derivative works',
+                'Use the Software for commercial purposes',
+                'Sell, sublicense, or exploit the Software in any form',
+              ].map((item, idx) => (
+                <li key={idx} className="flex items-start">
                   <span className="mr-3 font-semibold" style={{ color: '#14b8a6' }}>•</span>
-                  <span>Copy, modify, or create derivative works based on EduFlow AI</span>
+                  <span style={{ color: '#6b7280' }}>{item}</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="mr-3 font-semibold" style={{ color: '#14b8a6' }}>•</span>
-                  <span>Reverse engineer, decompile, or disassemble EduFlow AI</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-3 font-semibold" style={{ color: '#14b8a6' }}>•</span>
-                  <span>Distribute, sell, rent, lease, or transfer licenses to EduFlow AI</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-3 font-semibold" style={{ color: '#14b8a6' }}>•</span>
-                  <span>Sublicense or use EduFlow AI for commercial purposes without explicit written permission</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-3 font-semibold" style={{ color: '#14b8a6' }}>•</span>
-                  <span>Remove or obscure any proprietary notices, labels, or marks</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-3 font-semibold" style={{ color: '#14b8a6' }}>•</span>
-                  <span>Use EduFlow AI in violation of applicable laws or regulations</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-3 font-semibold" style={{ color: '#14b8a6' }}>•</span>
-                  <span>Attempt unauthorized access to EduFlow AI or related systems</span>
-                </li>
-              </ul>
-            </div>
+              ))}
+            </ul>
           </section>
 
           <section>
             <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              Ownership
+              3. Limited Access
             </h3>
             <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              EduFlow AI retains all right, title, and interest in EduFlow AI, including all copies, modifications, and derivative works. No title to the intellectual property is transferred to you. All rights not expressly granted are reserved to EduFlow AI.
+              Access to this repository or Software does NOT grant any rights to use, copy, or distribute the code unless explicitly permitted in writing by the Owner.
             </p>
           </section>
 
           <section>
             <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              Termination
+              4. Permissions
             </h3>
-            <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              This License Agreement is effective until terminated. Your rights will terminate automatically without notice if you fail to comply with any terms of this agreement. Upon termination, you must cease all use of EduFlow AI.
+            <p className="leading-relaxed mb-3" style={{ color: '#6b7280' }}>
+              Any use of the Software beyond viewing requires prior written permission from the Owner.
+            </p>
+            <p className="leading-relaxed mb-2" style={{ color: '#6b7280' }}>
+              For permissions, contact:
+            </p>
+            <p className="font-medium" style={{ color: '#14b8a6' }}>
+              Email: prabhakarshukla669@gmail.com
             </p>
           </section>
 
           <section>
             <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              Disclaimer of Warranties
+              5. Enforcement
             </h3>
             <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              EduFlow AI is provided "as is" without warranty of any kind, express or implied, including merchantability, fitness for a particular purpose, and noninfringement.
+              Any unauthorized use, reproduction, or distribution of the Software may result in legal action.
             </p>
           </section>
 
           <section>
             <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              Limitation of Liability
+              6. Disclaimer
             </h3>
             <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              In no event shall EduFlow AI be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of, or inability to use, EduFlow AI.
+              The Software is provided "as is", without warranty of any kind. The Owner shall not be liable for any damages arising from its use.
             </p>
           </section>
 
           <section>
             <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              Contact
+              7. Updates
             </h3>
             <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              If you have questions about this License Agreement, please contact us through our website or support channels.
+              The Owner reserves the right to modify or update this license at any time without prior notice.
             </p>
           </section>
 
+          {/* CTA Button */}
           <div className="pt-6 flex gap-4">
             <Link
               href="/"
