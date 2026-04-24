@@ -7,26 +7,22 @@ const cols = [
     title: 'Product',
     links: [
       { label: 'Features',  href: '/#features'  },
-      { label: 'Pricing',   href: '/pricing'     },
-      { label: 'Changelog', href: '/changelog'   },
-      { label: 'Roadmap',   href: '/roadmap'     },
+      { label: 'Dashboard', href: '/dashboard'  },
     ],
   },
   {
     title: 'Company',
     links: [
-      { label: 'About',   href: '/about'   },
-      { label: 'Blog',    href: '/blog'    },
-      { label: 'Careers', href: '/careers' },
-      { label: 'Contact', href: '/contact' },
+      { label: 'About',   href: '/about'     },
+      { label: 'Contact', href: '/#contact'  },
     ],
   },
   {
     title: 'Legal',
     links: [
-      { label: 'Privacy Policy',   href: '/privacy' },
-      { label: 'Terms of Service', href: '/terms'   },
-      { label: 'Cookie Policy',    href: '/cookies' },
+      { label: 'License',              href: '/license'  },
+      { label: 'Terms & Conditions',   href: '/terms'    },
+      { label: 'Privacy Policy',       href: '/privacy'  },
     ],
   },
 ];
@@ -81,17 +77,21 @@ export default function Footer() {
             <div className="flex gap-3">
               {[
                 {
-                  label: 'Twitter',
-                  path: 'M23 3a10.9 10.9 0 01-3.14 1.53A4.48 4.48 0 0019.4 1s-4 1-4 4c0 .06 0 .12.01.18A12.78 12.78 0 013 2s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z',
+                  label: 'Instagram',
+                  href: 'https://www.instagram.com/prabhakar_.shukla',
+                  path: 'M16 11.37A5 5 0 1111.63 7H16m0-7h.01M21 8v8a4 4 0 01-4 4H7a4 4 0 01-4-4V8a4 4 0 014-4h10a4 4 0 014 4z',
                 },
                 {
                   label: 'GitHub',
+                  href: 'https://github.com/prabhakarshukla',
                   path: 'M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22',
                 },
-              ].map(({ label, path }) => (
+              ].map(({ label, href, path }) => (
                 <a
                   key={label}
-                  href="#"
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={label}
                   className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-150"
                   style={{
@@ -159,7 +159,7 @@ export default function Footer() {
             color: 'rgba(255,255,255,0.3)',
           }}
         >
-          <span>© {new Date().getFullYear()} EduFlow AI. All rights reserved.</span>
+          <span>© 2026 EduFlow AI. Built as a student productivity project.</span>
           <span style={{ color: 'rgba(110,231,216,0.55)' }}>
             Built for students, by students. 🎓
           </span>

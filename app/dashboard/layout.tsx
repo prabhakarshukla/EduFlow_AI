@@ -316,7 +316,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 disabled={!authReady}
                 title="Log out"
                 className="p-1.5 rounded-lg transition-all duration-150 flex-shrink-0"
-                style={{ color: '#6b7280', opacity: !authReady ? 0.5 : 1 }}
+                style={{ color: '#6b7280' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#ef4444'; (e.currentTarget as HTMLElement).style.background = '#fef2f2'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#6b7280'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >

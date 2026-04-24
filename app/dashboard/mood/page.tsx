@@ -33,7 +33,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <p
       className="text-[10px] font-semibold uppercase tracking-widest mb-4"
-      style={{ color: 'rgba(110,231,216,0.40)' }}
+      style={{ color: '#6b7280' }}
     >
       {children}
     </p>
@@ -270,7 +270,7 @@ export default function MoodTrackerPage() {
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(110,231,216,0.45)' }}>
+            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#6b7280' }}>
               Today&apos;s Mood
             </p>
             {todayLatestEntry ? (
@@ -309,7 +309,7 @@ export default function MoodTrackerPage() {
               style={{
                 background: 'rgba(248,113,113,0.12)',
                 border: '1px solid rgba(248,113,113,0.30)',
-                color: '#fecaca',
+                color: '#b91c1c',
               }}
             >
               {error}
@@ -378,7 +378,7 @@ export default function MoodTrackerPage() {
                       className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
                       style={{
                         background: active ? 'rgba(110,231,216,0.18)' : 'rgba(255,255,255,0.06)',
-                        color: active ? '#6EE7D8' : 'rgba(255,255,255,0.45)',
+                        color: active ? '#0d9488' : '#9ca3af',
                       }}
                     >
                       {v}/5
@@ -444,7 +444,7 @@ export default function MoodTrackerPage() {
             className="mt-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all duration-200"
             style={{
               background: saving ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg,#6EE7D8,#14B8A6)',
-              color: saving ? 'rgba(255,255,255,0.25)' : '#111',
+              color: saving ? '#9ca3af' : '#111827',
               boxShadow: saving ? 'none' : '0 4px 16px rgba(110,231,216,0.28)',
               opacity: saving ? 0.85 : 1,
               cursor: saving ? 'not-allowed' : 'pointer',
@@ -616,7 +616,7 @@ export default function MoodTrackerPage() {
                     title="Delete"
                     style={{ color: '#6b7280', transition: uiTransition }}
                     onMouseEnter={ev => { (ev.currentTarget as HTMLElement).style.color = '#f87171'; }}
-                    onMouseLeave={ev => { (ev.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.30)'; }}
+                    onMouseLeave={ev => { (ev.currentTarget as HTMLElement).style.color = '#6b7280'; }}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}

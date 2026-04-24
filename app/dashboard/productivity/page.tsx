@@ -25,7 +25,7 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] font-semibold uppercase tracking-widest mb-4" style={{ color: 'rgba(110,231,216,0.40)' }}>
+    <p className="text-[10px] font-semibold uppercase tracking-widest mb-4" style={{ color: '#6b7280' }}>
       {children}
     </p>
   );
@@ -222,7 +222,7 @@ export default function ProductivityPage() {
               style={{
                 background: 'rgba(248,113,113,0.10)',
                 border: '1px solid rgba(248,113,113,0.22)',
-                color: '#fecaca',
+                color: '#b91c1c',
               }}
             >
               {error}
@@ -302,7 +302,7 @@ export default function ProductivityPage() {
                   !saving && subject.trim() && sessionDate && Number(durationMinutes) > 0
                     ? 'linear-gradient(135deg,#6EE7D8,#14B8A6)'
                     : 'rgba(255,255,255,0.06)',
-                color: !saving && subject.trim() && sessionDate && Number(durationMinutes) > 0 ? '#111' : 'rgba(255,255,255,0.25)',
+                color: !saving && subject.trim() && sessionDate && Number(durationMinutes) > 0 ? '#111827' : '#9ca3af',
                 boxShadow:
                   !saving && subject.trim() && sessionDate && Number(durationMinutes) > 0
                     ? '0 4px 16px rgba(110,231,216,0.28)'
@@ -381,7 +381,7 @@ export default function ProductivityPage() {
                         (e.currentTarget as HTMLElement).style.color = '#f87171';
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.30)';
+                        (e.currentTarget as HTMLElement).style.color = '#6b7280';
                       }}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

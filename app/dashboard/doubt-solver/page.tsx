@@ -89,7 +89,7 @@ export default function DoubtSolverPage() {
         className="rounded-2xl p-5 space-y-4"
         style={{ background: '#ffffff', border: '1px solid #e5e7eb' }}
       >
-        <label htmlFor="question" className="text-xs font-semibold" style={{ color: 'rgba(209,250,245,0.75)' }}>
+        <label htmlFor="question" className="text-xs font-semibold" style={{ color: '#6b7280' }}>
           Your question
         </label>
         <textarea
@@ -119,7 +119,7 @@ export default function DoubtSolverPage() {
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
             style={{
               background: canSubmit ? 'linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)' : 'rgba(255,255,255,0.06)',
-              color: canSubmit ? '#0d2420' : 'rgba(255,255,255,0.30)',
+              color: canSubmit ? '#0d2420' : '#9ca3af',
               boxShadow: canSubmit ? '0 4px 16px rgba(110,231,216,0.28)' : 'none',
               cursor: canSubmit ? 'pointer' : 'not-allowed',
             }}
@@ -156,7 +156,7 @@ export default function DoubtSolverPage() {
             type="button"
             onClick={() => { setQuestion(''); resetState(); }}
             className="px-4 py-2.5 text-xs font-medium rounded-xl transition-colors duration-150"
-            style={{ background: 'rgba(110,231,216,0.05)', border: '1px solid rgba(110,231,216,0.14)', color: 'rgba(110,231,216,0.80)' }}
+            style={{ background: 'rgba(110,231,216,0.05)', border: '1px solid rgba(110,231,216,0.14)', color: '#0d9488' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.30)'; (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.09)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.14)'; (e.currentTarget as HTMLElement).style.background = 'rgba(110,231,216,0.05)'; }}
           >
@@ -166,7 +166,7 @@ export default function DoubtSolverPage() {
 
         {/* Example questions */}
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider mb-2.5" style={{ color: 'rgba(110,231,216,0.35)' }}>
+          <p className="text-[10px] font-semibold uppercase tracking-wider mb-2.5" style={{ color: '#6b7280' }}>
             Try an example
           </p>
           <div className="flex flex-wrap gap-2">
@@ -245,7 +245,7 @@ export default function DoubtSolverPage() {
             <svg className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#f87171' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-sm" style={{ color: '#fca5a5' }}>{error ?? 'Failed to solve your doubt.'}</p>
+            <p className="text-sm" style={{ color: '#b91c1c' }}>{error ?? 'Failed to solve your doubt.'}</p>
           </div>
         )}
 

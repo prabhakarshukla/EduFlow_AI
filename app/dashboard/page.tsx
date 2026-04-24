@@ -86,7 +86,7 @@ const priorityStyle = (p: string) => ({
   color:
     p === 'high'   ? '#f87171' :
     p === 'medium' ? '#fbbf24' :
-                     'rgba(255,255,255,0.35)',
+                     '#9ca3af',
 });
 
 const fmtCompact = (n: number) => new Intl.NumberFormat(undefined, { notation: 'compact' }).format(n);
@@ -357,7 +357,7 @@ export default function DashboardPage() {
       {/* ── Welcome header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <p className="text-xs font-medium tracking-wide uppercase" style={{ color: 'rgba(110,231,216,0.50)' }}>
+          <p className="text-xs font-medium tracking-wide uppercase" style={{ color: '#6b7280' }}>
             {now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
           <h1 className="text-2xl sm:text-[28px] font-bold tracking-tight" style={{ color: '#1f2937' }}>
@@ -405,7 +405,7 @@ export default function DashboardPage() {
       {/* ── Overview cards ── */}
       <section>
         <div className="flex items-center gap-2 mb-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.10em]" style={{ color: 'rgba(110,231,216,0.40)' }}>
+          <p className="text-[10px] font-bold uppercase tracking-[0.10em]" style={{ color: '#6b7280' }}>
             Overview
           </p>
           <div className="flex-1 h-px" style={{ background: 'rgba(110,231,216,0.07)' }} />
@@ -585,9 +585,9 @@ export default function DashboardPage() {
           <Link
             href="/dashboard/study-planner"
             className="mt-4 flex items-center gap-1.5 text-xs font-medium transition-colors duration-150"
-            style={{ color: 'rgba(110,231,216,0.45)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#6EE7D8'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(110,231,216,0.45)'; }}
+            style={{ color: '#0d9488' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#115e59'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#0d9488'; }}
           >
             View all tasks
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -633,7 +633,7 @@ export default function DashboardPage() {
                     const el = e.currentTarget as HTMLElement;
                     el.style.borderColor = 'rgba(110,231,216,0.09)';
                     el.style.background  = 'rgba(110,231,216,0.04)';
-                    el.style.color       = 'rgba(255,255,255,0.50)';
+                    el.style.color       = '#374151';
                     el.style.transform   = 'translateY(0)';
                   }}
                 >

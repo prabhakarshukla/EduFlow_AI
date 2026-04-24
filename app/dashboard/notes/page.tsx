@@ -28,7 +28,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <p
       className="text-[10px] font-semibold uppercase tracking-widest mb-4"
-      style={{ color: 'rgba(110,231,216,0.40)' }}
+      style={{ color: '#6b7280' }}
     >
       {children}
     </p>
@@ -374,7 +374,7 @@ export default function NotesPage() {
             style={{
               background: selectedId ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.03)',
               border: '1px solid #e5e7eb',
-              color: selectedId ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.25)',
+              color: selectedId ? '#374151' : '#9ca3af',
               cursor: selectedId ? 'pointer' : 'not-allowed',
             }}
           >
@@ -388,7 +388,7 @@ export default function NotesPage() {
             style={{
               background: 'rgba(248,113,113,0.08)',
               border: '1px solid rgba(248,113,113,0.22)',
-              color: selectedId ? '#fecaca' : 'rgba(255,255,255,0.25)',
+              color: selectedId ? '#b91c1c' : '#9ca3af',
               opacity: selectedId ? 1 : 0.6,
               cursor: selectedId ? 'pointer' : 'not-allowed',
             }}
@@ -428,7 +428,7 @@ export default function NotesPage() {
                   style={{
                     background: 'rgba(248,113,113,0.10)',
                     border: '1px solid rgba(248,113,113,0.22)',
-                    color: '#fecaca',
+                    color: '#b91c1c',
                   }}
                 >
                   {error}
@@ -519,9 +519,9 @@ export default function NotesPage() {
                       }}
                       className="mt-0.5 p-1.5 rounded-lg transition-colors duration-150"
                       title={n.pinned ? 'Unpin' : 'Pin'}
-                      style={{ color: n.pinned ? '#fbbf24' : 'rgba(255,255,255,0.25)' }}
+                      style={{ color: n.pinned ? '#fbbf24' : '#9ca3af' }}
                       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fbbf24'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = n.pinned ? '#fbbf24' : 'rgba(255,255,255,0.25)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = n.pinned ? '#fbbf24' : '#9ca3af'; }}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
@@ -564,7 +564,7 @@ export default function NotesPage() {
                 style={{ background: 'rgba(110,231,216,0.04)', border: '1px solid rgba(110,231,216,0.14)' }}
               >
                 <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(110,231,216,0.50)' }}>
+                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#6b7280' }}>
                     AI Notes Generator
                   </p>
                   <span className="text-[11px]" style={{ color: '#6b7280' }}>
@@ -608,7 +608,7 @@ export default function NotesPage() {
                     style={{
                       background: 'rgba(248,113,113,0.10)',
                       border: '1px solid rgba(248,113,113,0.22)',
-                      color: '#fecaca',
+                      color: '#b91c1c',
                     }}
                   >
                     {aiError}

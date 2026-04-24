@@ -50,7 +50,7 @@ const deadlines: Deadline[] = [
 
 /* ── Priority helpers ───────────────────────────────────────────── */
 const pColor = (p: Priority) =>
-  p === 'high' ? '#f87171' : p === 'medium' ? '#fbbf24' : '#7ca8a3';
+  p === 'high' ? '#f87171' : p === 'medium' ? '#fbbf24' : '#6b7280';
 const pBg = (p: Priority) =>
   p === 'high' ? 'rgba(239,68,68,0.10)' : p === 'medium' ? 'rgba(245,158,11,0.10)' : 'rgba(255,255,255,0.05)';
 
@@ -69,8 +69,7 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
 /* ── Section label ──────────────────────────────────────────────── */
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] font-semibold uppercase tracking-widest mb-4"
-      style={{ color: 'rgba(110,231,216,0.40)' }}>
+    <p className="text-[10px] font-semibold uppercase tracking-widest mb-4" style={{ color: '#6b7280' }}>
       {children}
     </p>
   );
@@ -414,7 +413,7 @@ export default function StudyPlannerPage() {
                 }}
               >
                 <span className="text-[10px] font-semibold uppercase"
-                  style={{ color: d.active ? '#6EE7D8' : 'rgba(255,255,255,0.35)' }}>
+                  style={{ color: d.active ? '#0d9488' : '#9ca3af' }}>
                   {d.day}
                 </span>
                 <span className="text-sm font-bold"
@@ -425,7 +424,7 @@ export default function StudyPlannerPage() {
                   className="text-[9px] font-medium px-1.5 py-0.5 rounded-full"
                   style={{
                     background: d.active ? 'rgba(110,231,216,0.20)' : 'rgba(255,255,255,0.06)',
-                    color:      d.active ? '#6EE7D8' : 'rgba(255,255,255,0.35)',
+                    color:      d.active ? '#0d9488' : '#9ca3af',
                   }}
                 >
                   {d.tasks}t
@@ -496,7 +495,7 @@ export default function StudyPlannerPage() {
                 role="alert"
                 style={{ background: 'rgba(248,113,113,0.10)', border: '1px solid rgba(248,113,113,0.22)' }}
               >
-                <p className="text-sm" style={{ color: '#fecaca' }}>{error}</p>
+                <p className="text-sm" style={{ color: '#b91c1c' }}>{error}</p>
                 <button
                   type="button"
                   onClick={loadTasks}
@@ -504,7 +503,7 @@ export default function StudyPlannerPage() {
                   style={{
                     background: 'rgba(248,113,113,0.12)',
                     border: '1px solid rgba(248,113,113,0.25)',
-                    color: '#fecaca',
+                    color: '#b91c1c',
                   }}
                 >
                   Retry
@@ -588,7 +587,7 @@ export default function StudyPlannerPage() {
                   title="Delete"
                   style={{ color: '#6b7280' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.30)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#6b7280'; }}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3m-4 0h14" />
@@ -611,7 +610,7 @@ export default function StudyPlannerPage() {
                 style={{
                   background: 'rgba(248,113,113,0.10)',
                   border: '1px solid rgba(248,113,113,0.22)',
-                  color: '#fecaca',
+                  color: '#b91c1c',
                 }}
               >
                 {error}
@@ -689,7 +688,7 @@ export default function StudyPlannerPage() {
                     style={{
                       background: newPriority === p ? pBg(p) : 'rgba(255,255,255,0.04)',
                       border:     `1px solid ${newPriority === p ? pColor(p) + '55' : 'rgba(255,255,255,0.08)'}`,
-                      color:      newPriority === p ? pColor(p) : 'rgba(255,255,255,0.40)',
+                      color:      newPriority === p ? pColor(p) : '#6b7280',
                     }}
                   >
                     {p}
@@ -706,7 +705,7 @@ export default function StudyPlannerPage() {
                 background:  newLabel.trim() && !saving
                   ? 'linear-gradient(135deg,#6EE7D8,#14B8A6)'
                   : 'rgba(255,255,255,0.06)',
-                color:       newLabel.trim() && !saving ? '#111' : 'rgba(255,255,255,0.25)',
+                color:       newLabel.trim() && !saving ? '#111827' : '#9ca3af',
                 boxShadow:   newLabel.trim() && !saving ? '0 4px 16px rgba(110,231,216,0.28)' : 'none',
                 cursor:      newLabel.trim() && !saving ? 'pointer' : 'not-allowed',
                 opacity:     saving ? 0.8 : 1,
