@@ -6,123 +6,135 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen px-4 py-20" style={{ background: '#fcfcf9' }}>
       <div className="max-w-4xl mx-auto">
+        {/* Header */}
         <div className="mb-12">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-sm font-medium mb-6 transition-colors"
             style={{ color: '#14b8a6' }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.color = '#0d9488';
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.color = '#14b8a6';
-            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#0d9488'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#14b8a6'; }}
           >
             ← Back to Home
           </Link>
 
           <h1 className="text-5xl font-bold mb-4" style={{ color: '#1f2937' }}>
-            Terms & Conditions
+            Terms and Conditions
           </h1>
           <p className="text-lg" style={{ color: '#6b7280' }}>
-            Last updated: April 2026
+            Last Updated: April 2026
           </p>
         </div>
 
-        <div
-          className="rounded-2xl border p-8 md:p-12 space-y-8"
-          style={{ background: '#ffffff', borderColor: '#e5e7eb' }}
-        >
+        {/* Content Card */}
+        <div className="rounded-2xl border p-8 md:p-12 space-y-8" style={{ background: '#ffffff', borderColor: '#e5e7eb' }}>
           <section>
-            <h2 className="text-2xl font-bold mb-4" style={{ color: '#1f2937' }}>
-              Terms & Conditions
-            </h2>
-            <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              Welcome to EduFlow AI. These Terms & Conditions govern your use of our website, services, and applications. By accessing or using EduFlow AI, you agree to be bound by these terms.
+            <p className="leading-relaxed text-lg" style={{ color: '#6b7280' }}>
+              Welcome to EduFlow AI ("we", "our", "us").
+            </p>
+            <p className="leading-relaxed mt-4" style={{ color: '#6b7280' }}>
+              By accessing or using our platform, you agree to comply with and be bound by these Terms and Conditions.
             </p>
           </section>
 
           <section>
             <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              1. Use License
+              1. Use of Service
+            </h3>
+            <p className="leading-relaxed mb-4" style={{ color: '#6b7280' }}>
+              You agree to use EduFlow AI only for lawful purposes. You must not:
+            </p>
+            <ul className="space-y-3 ml-4">
+              {[
+                'Use the platform for illegal or harmful activities',
+                'Attempt to hack, disrupt, or misuse the system',
+                'Copy or exploit any part of the platform without permission',
+              ].map((item, idx) => (
+                <li key={idx} className="flex items-start">
+                  <span className="mr-3 font-semibold" style={{ color: '#14b8a6' }}>•</span>
+                  <span style={{ color: '#6b7280' }}>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
+              2. User Accounts
+            </h3>
+            <ul className="space-y-3 ml-4">
+              {[
+                'You are responsible for maintaining the confidentiality of your account',
+                'We are not liable for any unauthorized access to your account',
+              ].map((item, idx) => (
+                <li key={idx} className="flex items-start">
+                  <span className="mr-3 font-semibold" style={{ color: '#14b8a6' }}>•</span>
+                  <span style={{ color: '#6b7280' }}>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
+              3. Intellectual Property
             </h3>
             <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              Permission is granted to temporarily download materials for personal, non-commercial viewing. You may not modify, copy, reverse engineer, or use materials for commercial purposes without permission.
+              All content, features, and code are the exclusive property of EduFlow AI and are protected under applicable laws.
             </p>
           </section>
 
           <section>
             <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              2. Disclaimer of Warranties
+              4. Limitation of Liability
+            </h3>
+            <p className="leading-relaxed mb-4" style={{ color: '#6b7280' }}>
+              We are not responsible for:
+            </p>
+            <ul className="space-y-3 ml-4">
+              {[
+                'Any data loss',
+                'Any academic or personal outcomes based on AI suggestions',
+              ].map((item, idx) => (
+                <li key={idx} className="flex items-start">
+                  <span className="mr-3 font-semibold" style={{ color: '#14b8a6' }}>•</span>
+                  <span style={{ color: '#6b7280' }}>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
+              5. Termination
             </h3>
             <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              Materials are provided on an "as is" basis. EduFlow AI makes no warranties, expressed or implied, and disclaims all warranties including merchantability, fitness for a particular purpose, and non-infringement.
+              We reserve the right to suspend or terminate access if users violate these terms.
             </p>
           </section>
 
           <section>
             <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              3. Limitations
+              6. Changes to Terms
             </h3>
             <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              In no event shall EduFlow AI be liable for damages arising from use or inability to use materials, even if notified of such possibility.
+              We may update these Terms at any time without prior notice.
             </p>
           </section>
 
           <section>
             <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              4. Accuracy of Materials
+              7. Contact
             </h3>
-            <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              Materials may contain technical, typographical, or photographic errors. EduFlow AI does not warrant accuracy, completeness, or currency. Changes may be made without notice.
+            <p className="leading-relaxed mb-2" style={{ color: '#6b7280' }}>
+              For any queries, contact us at:
+            </p>
+            <p className="font-medium" style={{ color: '#14b8a6' }}>
+              Email: prabhakarshukla669@gmail.com
             </p>
           </section>
 
-          <section>
-            <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              5. Links
-            </h3>
-            <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              EduFlow AI has not reviewed all linked sites and is not responsible for their contents. Links do not imply endorsement. Use of linked websites is at your own risk.
-            </p>
-          </section>
-
-          <section>
-            <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              6. Modifications
-            </h3>
-            <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              EduFlow AI may revise these Terms & Conditions without notice. By continuing to use this website, you agree to be bound by the then current version.
-            </p>
-          </section>
-
-          <section>
-            <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              7. Governing Law
-            </h3>
-            <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              These Terms & Conditions are governed by and construed in accordance with the laws of India, without regard to conflicts of law principles.
-            </p>
-          </section>
-
-          <section>
-            <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              8. User Conduct
-            </h3>
-            <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              You agree not to violate laws, infringe rights, restrict others' use, harm EduFlow AI infrastructure, or submit false information.
-            </p>
-          </section>
-
-          <section>
-            <h3 className="text-xl font-semibold mb-4" style={{ color: '#1f2937' }}>
-              9. Contact Information
-            </h3>
-            <p className="leading-relaxed" style={{ color: '#6b7280' }}>
-              For questions about these Terms & Conditions, please contact us through our website support channels.
-            </p>
-          </section>
-
+          {/* CTA Button */}
           <div className="pt-6 flex gap-4">
             <Link
               href="/"
