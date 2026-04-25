@@ -14,35 +14,44 @@ const features = [
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden" style={{ background: '#fcfcf9' }}>
-      <div
-        className="absolute inset-y-0 right-0 hidden w-[58%] lg:block pointer-events-none"
-        style={{
-          background:
-            'linear-gradient(128deg, rgba(196,181,253,0.28) 0%, rgba(233,213,255,0.2) 24%, rgba(110,231,216,0.24) 58%, rgba(167,243,208,0.18) 76%, rgba(249,216,193,0.16) 100%)',
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute top-8 right-0 hidden h-[520px] w-[48%] lg:block pointer-events-none"
-        style={{
-          background:
-            'linear-gradient(142deg, rgba(249,216,193,0.27) 4%, rgba(253,230,138,0.2) 36%, rgba(196,181,253,0.18) 66%, rgba(110,231,216,0.15) 100%)',
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute top-12 right-10 hidden h-[360px] w-[38%] lg:block pointer-events-none"
-        aria-hidden="true"
-        style={{
-          background:
-            'repeating-linear-gradient(135deg, rgba(255,255,255,0.14) 0px, rgba(255,255,255,0.14) 10px, rgba(255,255,255,0.02) 10px, rgba(255,255,255,0.02) 22px)',
-          opacity: 0.55,
-        }}
-      />
+    <section className="relative isolate overflow-hidden bg-[#fcfcf9] min-h-[min(100vh,980px)]">
+      <div className="absolute inset-0">
+        <Image
+          src="/images/hero1.png"
+          alt="EduFlow AI hero background"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(90deg, rgba(252,252,249,0.98) 0%, rgba(252,252,249,0.92) 32%, rgba(252,252,249,0.58) 48%, rgba(252,252,249,0.12) 66%, rgba(252,252,249,0.02) 100%)',
+          }}
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-y-0 left-0 w-full lg:w-[62%]"
+          style={{
+            background:
+              'linear-gradient(90deg, rgba(252,252,249,0.98) 0%, rgba(252,252,249,0.94) 38%, rgba(252,252,249,0.78) 64%, rgba(252,252,249,0.12) 100%)',
+          }}
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-y-0 left-0 w-full lg:w-[48%] opacity-70"
+          style={{
+            background:
+              'radial-gradient(circle at 18% 42%, rgba(110,231,216,0.22) 0%, rgba(110,231,216,0.12) 26%, rgba(110,231,216,0.02) 54%, rgba(110,231,216,0) 72%)',
+          }}
+          aria-hidden="true"
+        />
+      </div>
 
-      <div className="relative mx-auto grid w-full max-w-7xl grid-cols-1 items-end gap-10 px-5 pb-20 pt-28 sm:px-8 lg:grid-cols-[1.02fr,0.98fr] lg:gap-6">
-        <div className="relative z-10 max-w-xl">
+      <div className="relative mx-auto flex min-h-[min(100vh,980px)] w-full max-w-7xl items-center px-5 py-20 sm:px-8 sm:py-24 lg:px-8">
+        <div className="relative z-10 max-w-2xl rounded-[32px] border border-white/40 bg-white/55 p-6 shadow-[0_20px_70px_rgba(15,23,42,0.08)] backdrop-blur-[10px] sm:p-8 lg:max-w-[46%] lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-0">
           <div
             className="mb-5 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold"
             style={{ background: '#f5f7f4', border: '1px solid #e5e7eb', color: '#14b8a6' }}
@@ -104,55 +113,6 @@ export default function Hero() {
                 {f.label}
               </span>
             ))}
-          </div>
-        </div>
-
-        <div className="relative flex items-end justify-center lg:justify-end">
-          <div
-            className="absolute bottom-2 right-4 h-[280px] w-[300px] rounded-[32px] sm:h-[330px] sm:w-[360px] lg:bottom-6 lg:right-12 lg:h-[390px] lg:w-[430px]"
-            style={{
-              background:
-                'linear-gradient(132deg, rgba(196,181,253,0.31) 0%, rgba(233,213,255,0.24) 28%, rgba(110,231,216,0.23) 58%, rgba(167,243,208,0.17) 76%, rgba(249,216,193,0.19) 100%)',
-            }}
-            aria-hidden="true"
-          />
-          <div
-            className="absolute bottom-10 right-20 hidden h-[240px] w-[300px] rounded-[28px] lg:block"
-            style={{
-              background:
-                'linear-gradient(120deg, rgba(249,216,193,0.26) 0%, rgba(253,230,138,0.19) 30%, rgba(196,181,253,0.18) 74%, rgba(110,231,216,0.15) 100%)',
-              boxShadow: '0 16px 34px rgba(196,181,253,0.12)',
-            }}
-            aria-hidden="true"
-          />
-          <div
-            className="absolute bottom-12 right-12 hidden h-[220px] w-[280px] rounded-[28px] lg:block"
-            style={{
-              background:
-                'repeating-linear-gradient(140deg, rgba(255,255,255,0.12) 0px, rgba(255,255,255,0.12) 10px, rgba(255,255,255,0.02) 10px, rgba(255,255,255,0.02) 20px)',
-              opacity: 0.45,
-            }}
-            aria-hidden="true"
-          />
-          <div
-            className="absolute bottom-0 right-0 h-[120px] w-[140px] rounded-3xl sm:h-[150px] sm:w-[170px] lg:bottom-8 lg:right-2 lg:h-[180px] lg:w-[220px]"
-            style={{
-              backgroundImage: 'radial-gradient(circle, rgba(196,181,253,0.3) 1.1px, transparent 1.1px)',
-              backgroundSize: '14px 14px',
-              opacity: 0.3,
-            }}
-            aria-hidden="true"
-          />
-
-          <div className="relative block w-full max-w-[540px] translate-x-0 sm:max-w-[560px] lg:max-w-[650px] lg:-translate-x-[260px] lg:-translate-y-20">
-            <Image
-              src="/images/hero.png"
-              alt="EduFlow AI dashboard preview"
-              width={1150}
-              height={900}
-              priority
-              className="h-auto w-full object-contain align-bottom"
-            />
           </div>
         </div>
       </div>

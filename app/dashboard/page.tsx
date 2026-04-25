@@ -120,14 +120,20 @@ const formatHoursMinutes = (minutes: number) => {
   return `${hours}h ${mins}m`;
 };
 
+const resolveDisplayName = (user: { email?: string | null; user_metadata?: Record<string, unknown> | null } | null) => {
+  const fullName = typeof user?.user_metadata?.full_name === 'string' ? user.user_metadata.full_name.trim() : '';
+  const name = typeof user?.user_metadata?.name === 'string' ? user.user_metadata.name.trim() : '';
+  const emailPrefix = user?.email?.trim()?.split('@')[0]?.trim() ?? '';
+
+  return fullName || name || emailPrefix || 'Student';
+};
+
 /* ── Dashboard page ── */
 export default function DashboardPage() {
   const now     = new Date();
-  const hour    = now.getHours();
-  const greeting =
-    hour < 12 ? 'Good morning' :
-    hour < 18 ? 'Good afternoon' :
-                'Good evening';
+  const greeting = 'Welcome back';
+
+  const [displayName, setDisplayName] = useState('Student');
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -155,6 +161,8 @@ export default function DashboardPage() {
         if (!alive) return;
         if (uErr) { setError(uErr.message); return; }
         if (!u.user) { setError('You need to be logged in.'); return; }
+
+        setDisplayName(resolveDisplayName(u.user));
 
         const [allTasksRes, doneTasksRes, notesCountRes, latestNoteRes, latestMoodRes, productivityRes] = await Promise.all([
           supabase.from('study_tasks').select('id,title,label,status,created_at').order('created_at', { ascending: false }).limit(4),
@@ -361,7 +369,7 @@ export default function DashboardPage() {
             {now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
           <h1 className="text-2xl sm:text-[28px] font-bold tracking-tight" style={{ color: '#1f2937' }}>
-            {greeting}, Student 👋
+            {greeting}, {displayName} 👋
           </h1>
           <p className="text-sm" style={{ color: '#6b7280' }}>
             {error ? (
