@@ -116,30 +116,6 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-2.5 flex-shrink-0">
             {authReady && user ? (
               <>
-                <Link
-                  href="/dashboard"
-                  className="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-150"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #14b8a6 0%, #6ee7d8 100%)",
-                    color: "#ffffff",
-                    boxShadow: "0 6px 16px rgba(20,184,166,0.24)",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.boxShadow =
-                      "0 10px 22px rgba(20,184,166,0.32)";
-                    (e.currentTarget as HTMLElement).style.transform =
-                      "translateY(-1px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.boxShadow =
-                      "0 6px 16px rgba(20,184,166,0.24)";
-                    (e.currentTarget as HTMLElement).style.transform =
-                      "translateY(0)";
-                  }}
-                >
-                  Open App
-                </Link>
                 <button
                   type="button"
                   onClick={handleLogout}
@@ -276,17 +252,6 @@ export default function Navbar() {
             <div className="flex flex-col gap-2">
               {authReady && user ? (
                 <>
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setMobileOpen(false)}
-                    className="px-4 py-2.5 text-center text-sm font-semibold rounded-xl border transition-colors"
-                    style={{
-                      color: "#6EE7D8",
-                      borderColor: "rgba(110,231,216,0.20)",
-                    }}
-                  >
-                    Open App
-                  </Link>
                   <button
                     type="button"
                     onClick={handleLogout}
