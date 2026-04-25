@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '../components/layout/navbar';
 import Footer from '../components/layout/footer';
+import { ThemeProvider } from '@/context/ThemeContext';
 
 export const metadata: Metadata = {
   title: 'EduFlow AI — Your AI-Powered Student Assistant',
@@ -27,10 +28,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body style={{ background: '#222022' }}>
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+      <body>
+        <ThemeProvider>
+          <Navbar />
+          <main className="min-h-screen">{children}</main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

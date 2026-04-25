@@ -22,7 +22,7 @@ function Card({
   return (
     <div
       className={`rounded-2xl p-6 transition-all duration-200 ${className}`}
-      style={{ background: '#ffffff', border: '1px solid #e5e7eb', ...style }}
+      style={{ background: 'var(--ui-surface)', border: '1px solid var(--ui-border)', ...style }}
     >
       {children}
     </div>
@@ -33,7 +33,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <p
       className="text-[10px] font-semibold uppercase tracking-widest mb-4"
-      style={{ color: '#6b7280' }}
+      style={{ color: 'var(--ui-muted)' }}
     >
       {children}
     </p>
@@ -238,23 +238,23 @@ export default function MoodTrackerPage() {
             </svg>
             Mood Tracker
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#1f2937' }}>
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--ui-heading)' }}>
             Check in. Stay balanced.
           </h1>
-          <p className="text-sm mt-1.5" style={{ color: '#6b7280' }}>
+          <p className="text-sm mt-1.5" style={{ color: 'var(--ui-muted)' }}>
             Log your mood in seconds and spot patterns over time.
           </p>
         </div>
 
         <div
           className="flex items-center gap-3 px-4 py-2.5 rounded-xl flex-shrink-0"
-          style={{ background: '#ffffff', border: '1px solid rgba(110,231,216,0.15)' }}
+          style={{ background: 'var(--ui-surface)', border: '1px solid rgba(110,231,216,0.15)' }}
         >
           <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#6EE7D8' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span className="text-sm font-semibold" style={{ color: '#1f2937' }}>
+          <span className="text-sm font-semibold" style={{ color: 'var(--ui-heading)' }}>
             {todaysAvg ? `Today avg: ${todaysAvg}/5` : 'Today avg: —'}
           </span>
         </div>
@@ -263,25 +263,25 @@ export default function MoodTrackerPage() {
       <Card
         className="p-5 sm:p-6"
         style={{
-          background: 'linear-gradient(135deg, #ffffff, #f5f7f4)',
-          border: '1px solid #e5e7eb',
+          background: 'linear-gradient(135deg, var(--ui-surface), var(--ui-surface-2))',
+          border: '1px solid var(--ui-border)',
           boxShadow: '0 10px 24px rgba(31,41,55,0.08)',
         } as React.CSSProperties}
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#6b7280' }}>
+            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--ui-muted)' }}>
               Today&apos;s Mood
             </p>
             {todayLatestEntry ? (
               <div className="mt-1.5 flex items-center gap-2">
                 <span className="text-lg">{moodEmoji[todayLatestEntry.mood] ?? '🙂'}</span>
-                <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>
+                <p className="text-sm font-semibold" style={{ color: 'var(--ui-heading)' }}>
                   {moodMeta[todayLatestEntry.mood]?.label ?? 'Logged'} ({todayLatestEntry.mood}/5)
                 </p>
               </div>
             ) : (
-              <p className="text-sm mt-1.5" style={{ color: '#6b7280' }}>
+              <p className="text-sm mt-1.5" style={{ color: 'var(--ui-muted)' }}>
                 No mood saved today yet.
               </p>
             )}
@@ -289,7 +289,7 @@ export default function MoodTrackerPage() {
           {todayLatestEntry?.note ? (
             <p
               className="text-xs sm:text-sm max-w-xl rounded-xl px-3 py-2.5"
-              style={{ color: '#6b7280', background: 'rgba(110,231,216,0.07)', border: '1px solid rgba(110,231,216,0.20)' }}
+              style={{ color: 'var(--ui-muted)', background: 'rgba(110,231,216,0.07)', border: '1px solid rgba(110,231,216,0.20)' }}
             >
               {todayLatestEntry.note}
             </p>
@@ -322,7 +322,7 @@ export default function MoodTrackerPage() {
               style={{
                 background: 'rgba(110,231,216,0.14)',
                 border: '1px solid rgba(110,231,216,0.30)',
-                color: '#1f2937',
+                color: 'var(--ui-heading)',
               }}
             >
               {success}
@@ -342,7 +342,7 @@ export default function MoodTrackerPage() {
                   style={{
                     background: active ? `linear-gradient(135deg, ${meta.bg}, rgba(110,231,216,0.08))` : 'rgba(255,255,255,0.03)',
                     border: `1px solid ${active ? 'rgba(110,231,216,0.45)' : 'rgba(110,231,216,0.14)'}`,
-                    color: active ? '#1f2937' : '#6b7280',
+                    color: active ? 'var(--ui-heading)' : 'var(--ui-muted)',
                     boxShadow: active
                       ? '0 0 0 2px rgba(110,231,216,0.14), 0 10px 20px rgba(110,231,216,0.12)'
                       : '0 2px 8px rgba(0,0,0,0.10)',
@@ -378,13 +378,13 @@ export default function MoodTrackerPage() {
                       className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
                       style={{
                         background: active ? 'rgba(110,231,216,0.18)' : 'rgba(255,255,255,0.06)',
-                        color: active ? '#0d9488' : '#9ca3af',
+                        color: active ? '#0d9488' : 'var(--ui-subtle)',
                       }}
                     >
                       {v}/5
                     </span>
                   </div>
-                  <p className="mt-2 text-xs font-semibold" style={{ color: active ? '#1f2937' : '#6b7280' }}>
+                  <p className="mt-2 text-xs font-semibold" style={{ color: active ? 'var(--ui-heading)' : 'var(--ui-muted)' }}>
                     {meta.label}
                   </p>
                 </button>
@@ -394,12 +394,12 @@ export default function MoodTrackerPage() {
 
           <div
             className="rounded-xl px-3 py-2.5"
-            style={{ background: '#f5f7f4', border: '1px solid #e5e7eb' }}
+            style={{ background: 'var(--ui-surface-2)', border: '1px solid var(--ui-border)' }}
           >
-            <p className="text-xs font-semibold" style={{ color: '#1f2937' }}>
+            <p className="text-xs font-semibold" style={{ color: 'var(--ui-heading)' }}>
               {moodMeta[mood].label}
             </p>
-            <p className="text-[11px] mt-0.5" style={{ color: '#6b7280' }}>
+            <p className="text-[11px] mt-0.5" style={{ color: 'var(--ui-muted)' }}>
               Add a quick note (optional) — what influenced today?
             </p>
           </div>
@@ -412,15 +412,15 @@ export default function MoodTrackerPage() {
             style={{
               minHeight: '110px',
               resize: 'none',
-              background: '#ffffff',
+              background: 'var(--ui-surface)',
               border: '1px solid rgba(110,231,216,0.15)',
-              color: '#1f2937',
+              color: 'var(--ui-heading)',
               outline: 'none',
             }}
           />
 
           <div>
-            <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
+            <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--ui-heading)' }}>
               Time (optional)
             </label>
             <input
@@ -429,9 +429,9 @@ export default function MoodTrackerPage() {
               onChange={e => setOccurredAt(e.target.value)}
               className="rounded-xl px-3 py-2.5 text-sm w-full"
               style={{
-                background: '#ffffff',
+                background: 'var(--ui-surface)',
                 border: '1px solid rgba(110,231,216,0.15)',
-                color: '#1f2937',
+                color: 'var(--ui-heading)',
                 outline: 'none',
               }}
             />
@@ -444,7 +444,7 @@ export default function MoodTrackerPage() {
             className="mt-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all duration-200"
             style={{
               background: saving ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg,#6EE7D8,#14B8A6)',
-              color: saving ? '#9ca3af' : '#111827',
+              color: saving ? 'var(--ui-subtle)' : '#111827',
               boxShadow: saving ? 'none' : '0 4px 16px rgba(110,231,216,0.28)',
               opacity: saving ? 0.85 : 1,
               cursor: saving ? 'not-allowed' : 'pointer',
@@ -487,7 +487,7 @@ export default function MoodTrackerPage() {
           <div className="flex items-center justify-between mb-5">
             <div>
               <SectionLabel>Mood History</SectionLabel>
-              <p className="text-sm font-semibold -mt-2" style={{ color: '#1f2937' }}>
+              <p className="text-sm font-semibold -mt-2" style={{ color: 'var(--ui-heading)' }}>
                 {entries.length} check-in{entries.length === 1 ? '' : 's'}
               </p>
             </div>
@@ -496,9 +496,9 @@ export default function MoodTrackerPage() {
               onClick={loadEntries}
               className="px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200"
               style={{
-                background: '#f5f7f4',
-                border: '1px solid #e5e7eb',
-                color: '#374151',
+                background: 'var(--ui-surface-2)',
+                border: '1px solid var(--ui-border)',
+                color: 'var(--ui-text)',
                 transition: uiTransition,
               }}
               onMouseEnter={e => {
@@ -523,7 +523,7 @@ export default function MoodTrackerPage() {
                   <div
                     key={i}
                     className="rounded-xl p-4 animate-pulse"
-                    style={{ background: '#f5f7f4', border: '1px solid #e5e7eb' }}
+                    style={{ background: 'var(--ui-surface-2)', border: '1px solid var(--ui-border)' }}
                   >
                     <div className="h-3 w-32 rounded mb-2" style={{ background: 'rgba(255,255,255,0.10)' }} />
                     <div className="h-3 w-full rounded" style={{ background: 'rgba(255,255,255,0.07)' }} />
@@ -538,8 +538,8 @@ export default function MoodTrackerPage() {
                 style={{ background: 'rgba(110,231,216,0.06)', border: '1px dashed rgba(110,231,216,0.22)' }}
               >
                 <p className="text-lg mb-2">🧠</p>
-                <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>No mood check-ins yet</p>
-                <p className="text-[11px] mt-1.5" style={{ color: '#6b7280' }}>
+                <p className="text-sm font-semibold" style={{ color: 'var(--ui-heading)' }}>No mood check-ins yet</p>
+                <p className="text-[11px] mt-1.5" style={{ color: 'var(--ui-muted)' }}>
                   Start tracking how you feel each day to build better study habits.
                 </p>
               </div>
@@ -552,8 +552,8 @@ export default function MoodTrackerPage() {
                   key={e.id}
                   className="group flex items-start gap-4 p-4 rounded-xl transition-all duration-200"
                   style={{
-                    background: '#f5f7f4',
-                    border: '1px solid #e5e7eb',
+                    background: 'var(--ui-surface-2)',
+                    border: '1px solid var(--ui-border)',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.10)',
                     transition: uiTransition,
                   }}
@@ -583,7 +583,7 @@ export default function MoodTrackerPage() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>
+                      <p className="text-sm font-semibold" style={{ color: 'var(--ui-heading)' }}>
                         {moodEmoji[e.mood] ?? '🙂'} {meta.label}
                       </p>
                       <span className="text-[10px] font-medium px-2.5 py-1 rounded-full"
@@ -600,9 +600,9 @@ export default function MoodTrackerPage() {
                       style={{
                         minHeight: '64px',
                         resize: 'none',
-                        background: '#ffffff',
-                        border: '1px solid #e5e7eb',
-                        color: '#1f2937',
+                        background: 'var(--ui-surface)',
+                        border: '1px solid var(--ui-border)',
+                        color: 'var(--ui-heading)',
                         outline: 'none',
                       }}
                       onBlur={(ev) => updateNote(e.id, ev.currentTarget.value)}
@@ -614,9 +614,9 @@ export default function MoodTrackerPage() {
                     onClick={() => deleteEntry(e.id)}
                     className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1.5 rounded-lg mt-1"
                     title="Delete"
-                    style={{ color: '#6b7280', transition: uiTransition }}
+                    style={{ color: 'var(--ui-muted)', transition: uiTransition }}
                     onMouseEnter={ev => { (ev.currentTarget as HTMLElement).style.color = '#f87171'; }}
-                    onMouseLeave={ev => { (ev.currentTarget as HTMLElement).style.color = '#6b7280'; }}
+                    onMouseLeave={ev => { (ev.currentTarget as HTMLElement).style.color = 'var(--ui-muted)'; }}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}

@@ -85,7 +85,7 @@ export default function Features() {
     <section
       id="features"
       className="relative py-32 overflow-hidden"
-      style={{ background: '#f5f7f4' }}
+      style={{ background: 'var(--ui-surface-2)' }}
     >
       <div
         className="absolute inset-0 pointer-events-none"
@@ -116,9 +116,9 @@ export default function Features() {
           <div
             className="inline-flex items-center gap-2 text-xs font-semibold px-3.5 py-1.5 rounded-full mb-5"
             style={{
-              background: '#fcfcf9',
+              background: 'var(--ui-surface)',
               color: '#14b8a6',
-              border: '1px solid #e5e7eb',
+              border: '1px solid var(--ui-border)',
             }}
           >
             <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#6ee7d8' }} />
@@ -129,7 +129,7 @@ export default function Features() {
             className="font-bold tracking-tight mb-4"
             style={{
               fontSize: 'clamp(2rem, 4.5vw, 3rem)',
-              color: '#1f2937',
+              color: 'var(--ui-heading)',
               letterSpacing: '-0.02em',
               lineHeight: 1.1,
             }}
@@ -151,7 +151,7 @@ export default function Features() {
 
           <p
             className="max-w-xl mx-auto leading-relaxed"
-            style={{ fontSize: '1.0625rem', color: '#6b7280' }}
+            style={{ fontSize: '1.0625rem', color: 'var(--ui-muted)' }}
           >
             No switching apps. No friction. Just one beautifully designed space that
             keeps you organised, focused, and one step ahead.
@@ -193,10 +193,10 @@ function FeatureCard({ title, description, icon, accent, accentBg, tag, href }: 
   return (
     <Link href={href} className="block focus:outline-none group">
       <div
-        className="relative rounded-2xl p-6 h-full flex flex-col gap-4 transition-all duration-250 overflow-hidden"
+        className="relative rounded-2xl p-6 h-full flex flex-col gap-4 transition-all duration-250 overflow-hidden dark:bg-slate-900/80 dark:border-slate-700"
         style={{
-          background: '#fcfcf9',
-          border: '1px solid #e5e7eb',
+          background: 'var(--ui-surface)',
+          border: '1px solid var(--ui-border)',
           boxShadow: '0 10px 25px rgba(31,41,55,0.05)',
         }}
         onMouseEnter={e => {
@@ -207,7 +207,7 @@ function FeatureCard({ title, description, icon, accent, accentBg, tag, href }: 
         }}
         onMouseLeave={e => {
           const el = e.currentTarget as HTMLElement;
-          el.style.borderColor = '#e5e7eb';
+          el.style.borderColor = 'var(--ui-border)';
           el.style.boxShadow = '0 10px 25px rgba(31,41,55,0.05)';
           el.style.transform = 'translateY(0)';
         }}
@@ -229,7 +229,7 @@ function FeatureCard({ title, description, icon, accent, accentBg, tag, href }: 
           <span
             className="text-[10px] font-semibold px-2.5 py-1 rounded-full"
             style={{
-              background: '#f5f7f4',
+              background: 'var(--ui-surface-2)',
               color: accent,
               border: `1px solid ${accent}36`,
             }}
@@ -242,11 +242,11 @@ function FeatureCard({ title, description, icon, accent, accentBg, tag, href }: 
         <div className="flex-1 flex flex-col gap-2">
           <h3
             className="text-[15px] font-semibold leading-snug"
-            style={{ color: '#1f2937' }}
+            style={{ color: 'var(--ui-heading)' }}
           >
             {title}
           </h3>
-          <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
+          <p className="text-sm leading-relaxed" style={{ color: 'var(--ui-muted)' }}>
             {description}
           </p>
         </div>

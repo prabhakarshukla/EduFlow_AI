@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useTheme } from "@/hooks/useTheme";
 
 function Card({
   children,
@@ -17,9 +18,9 @@ function Card({
     <div
       className={`rounded-xl p-6 transition-all duration-200 ${className}`}
       style={{
-        background: "#ffffff",
-        border: "1px solid #e5e7eb",
-        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
+        background: "var(--ui-surface)",
+        border: "1px solid var(--ui-border)",
+        boxShadow: "var(--ui-shadow-card)",
         ...style,
       }}
     >
@@ -32,7 +33,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <p
       className="text-[10px] font-semibold uppercase tracking-widest mb-4"
-      style={{ color: "#6b7280" }}
+      style={{ color: "var(--ui-muted)" }}
     >
       {children}
     </p>
@@ -40,14 +41,20 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default function SettingsPage() {
+  const { theme, isDark, setTheme } = useTheme();
   const [name, setName] = useState("EduFlow Student");
   const [email, setEmail] = useState("");
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [remindersEnabled, setRemindersEnabled] = useState(false);
+  const [preferencesHydrated, setPreferencesHydrated] = useState(false);
+  const [notificationPermissionStatus, setNotificationPermissionStatus] = useState<
+    "enabled" | "disabled" | "denied" | "unsupported"
+  >("disabled");
+  const [notificationStatusMessage, setNotificationStatusMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [loading, setLoading] = useState(true);
-
+  const NOTIFICATIONS_KEY = "notificationsEnabled";
+  const REMINDERS_KEY = "remindersEnabled";
   // Load current user email on mount
   useEffect(() => {
     const loadUser = async () => {
@@ -58,12 +65,108 @@ export default function SettingsPage() {
         }
       } catch (error) {
         console.error("Error loading user:", error);
-      } finally {
-        setLoading(false);
       }
     };
     loadUser();
   }, []);
+
+  // Load persisted preference toggles on mount
+  useEffect(() => {
+    try {
+      const savedNotifications = localStorage.getItem(NOTIFICATIONS_KEY);
+      const savedReminders = localStorage.getItem(REMINDERS_KEY);
+
+      if (savedNotifications !== null) {
+        setNotificationsEnabled(savedNotifications === "true");
+      }
+      if (savedReminders !== null) {
+        setRemindersEnabled(savedReminders === "true");
+      }
+    } catch (error) {
+      console.error("Error loading preference settings:", error);
+    } finally {
+      setPreferencesHydrated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!preferencesHydrated) return;
+    if (typeof window === "undefined") return;
+
+    if (!("Notification" in window)) {
+      setNotificationsEnabled(false);
+      setNotificationPermissionStatus("unsupported");
+      setNotificationStatusMessage("Browser notifications are not supported in this browser.");
+      return;
+    }
+
+    if (Notification.permission === "denied") {
+      setNotificationsEnabled(false);
+      setNotificationPermissionStatus("denied");
+      setNotificationStatusMessage("Notification permission is blocked in your browser settings.");
+      return;
+    }
+
+    setNotificationPermissionStatus(notificationsEnabled ? "enabled" : "disabled");
+    setNotificationStatusMessage(null);
+  }, [notificationsEnabled, preferencesHydrated]);
+
+  // Persist preference toggles after initial hydration
+  useEffect(() => {
+    if (!preferencesHydrated) return;
+
+    try {
+      localStorage.setItem(NOTIFICATIONS_KEY, String(notificationsEnabled));
+      localStorage.setItem(REMINDERS_KEY, String(remindersEnabled));
+    } catch (error) {
+      console.error("Error saving preference settings:", error);
+    }
+  }, [notificationsEnabled, remindersEnabled, preferencesHydrated]);
+
+  const handleNotificationsToggle = async () => {
+    if (notificationsEnabled) {
+      setNotificationsEnabled(false);
+      setNotificationPermissionStatus(
+        typeof window !== "undefined" && "Notification" in window && Notification.permission === "denied"
+          ? "denied"
+          : "disabled"
+      );
+      setNotificationStatusMessage(null);
+      return;
+    }
+
+    if (typeof window === "undefined" || !("Notification" in window)) {
+      setNotificationsEnabled(false);
+      setNotificationPermissionStatus("unsupported");
+      setNotificationStatusMessage("Browser notifications are not supported in this browser.");
+      return;
+    }
+
+    try {
+      const permission = Notification.permission === "granted"
+        ? "granted"
+        : await Notification.requestPermission();
+
+      if (permission === "granted") {
+        setNotificationsEnabled(true);
+        setNotificationPermissionStatus("enabled");
+        setNotificationStatusMessage(null);
+        return;
+      }
+
+      setNotificationsEnabled(false);
+      setNotificationPermissionStatus(permission === "denied" ? "denied" : "disabled");
+      setNotificationStatusMessage(
+        permission === "denied"
+          ? "Notification permission is blocked in your browser settings."
+          : "Notification permission was not granted."
+      );
+    } catch (error) {
+      setNotificationsEnabled(false);
+      setNotificationPermissionStatus("disabled");
+      setNotificationStatusMessage("Unable to request notification permission right now.");
+    }
+  };
 
   const handleSave = async () => {
     // Validate name
@@ -93,11 +196,11 @@ export default function SettingsPage() {
       <div className="space-y-2">
         <h1
           className="text-2xl sm:text-[28px] font-bold tracking-tight"
-          style={{ color: "#1f2937" }}
+          style={{ color: "var(--ui-heading)" }}
         >
           Settings
         </h1>
-        <p className="text-sm" style={{ color: "#6b7280" }}>
+        <p className="text-sm" style={{ color: "var(--ui-muted)" }}>
           Manage your EduFlow AI preferences and account options.
         </p>
       </div>
@@ -131,7 +234,7 @@ export default function SettingsPage() {
               <SectionLabel>Account</SectionLabel>
               <h2
                 className="text-lg font-semibold mb-4"
-                style={{ color: "#374151" }}
+                  style={{ color: "var(--ui-text)" }}
               >
                 Profile & Email
               </h2>
@@ -141,7 +244,7 @@ export default function SettingsPage() {
               <div>
                 <label
                   className="text-xs font-medium tracking-wide uppercase mb-2 block"
-                  style={{ color: "#9ca3af" }}
+                  style={{ color: "var(--ui-subtle)" }}
                 >
                   Email
                 </label>
@@ -152,12 +255,12 @@ export default function SettingsPage() {
                   placeholder="Loading..."
                   className="w-full px-3 py-2 text-sm rounded-lg"
                   style={{
-                    background: "#f9fafb",
-                    color: "#6b7280",
-                    border: "1px solid #e5e7eb",
+                    background: "var(--ui-surface-2)",
+                    color: "var(--ui-muted)",
+                    border: "1px solid var(--ui-border)",
                   }}
                 />
-                <p className="text-xs mt-1" style={{ color: "#d1d5db" }}>
+                <p className="text-xs mt-1" style={{ color: "var(--ui-subtle)" }}>
                   Managed through authentication
                 </p>
               </div>
@@ -165,7 +268,7 @@ export default function SettingsPage() {
               <div>
                 <label
                   className="text-xs font-medium tracking-wide uppercase mb-2 block"
-                  style={{ color: "#9ca3af" }}
+                  style={{ color: "var(--ui-subtle)" }}
                 >
                   Name
                 </label>
@@ -176,9 +279,9 @@ export default function SettingsPage() {
                   placeholder="Enter your name"
                   className="w-full px-3 py-2 text-sm rounded-lg transition-all duration-200"
                   style={{
-                    background: "#ffffff",
-                    color: "#1f2937",
-                    border: "1px solid #e5e7eb",
+                    background: "var(--ui-surface)",
+                    color: "var(--ui-text)",
+                    border: "1px solid var(--ui-border)",
                     outline: "none",
                   }}
                   onFocus={(e) => {
@@ -186,7 +289,7 @@ export default function SettingsPage() {
                     e.currentTarget.style.boxShadow = "0 0 0 3px rgba(20, 184, 166, 0.1)";
                   }}
                   onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#e5e7eb";
+                    e.currentTarget.style.borderColor = "var(--ui-border)";
                     e.currentTarget.style.boxShadow = "none";
                   }}
                 />
@@ -197,8 +300,8 @@ export default function SettingsPage() {
                 disabled={saving}
                 className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200"
                 style={{
-                  background: saving ? "#d1d5db" : "linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)",
-                  color: saving ? "#6b7280" : "#0d2420",
+                  background: saving ? "var(--ui-border)" : "linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)",
+                  color: saving ? "var(--ui-muted)" : "#0d2420",
                   border: "none",
                   cursor: saving ? "not-allowed" : "pointer",
                 }}
@@ -228,7 +331,7 @@ export default function SettingsPage() {
               <SectionLabel>Preferences</SectionLabel>
               <h2
                 className="text-lg font-semibold mb-4"
-                style={{ color: "#374151" }}
+                  style={{ color: "var(--ui-text)" }}
               >
                 Customization
               </h2>
@@ -239,42 +342,69 @@ export default function SettingsPage() {
                 <div>
                   <p
                     className="text-sm font-medium"
-                    style={{ color: "#1f2937" }}
+                    style={{ color: "var(--ui-text)" }}
                   >
                     Theme
                   </p>
-                  <p className="text-xs mt-1" style={{ color: "#6b7280" }}>
-                    Light mode
-                  </p>
-                </div>
-                <div
-                  className="px-2.5 py-1 rounded-full text-xs font-medium"
-                  style={{
-                    background: "rgba(20, 184, 166, 0.1)",
-                    color: "#14b8a6",
-                  }}
-                >
-                  Active
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-gray-200">
-                <div>
-                  <p
-                    className="text-sm font-medium"
-                    style={{ color: "#1f2937" }}
-                  >
-                    Notifications
-                  </p>
-                  <p className="text-xs mt-1" style={{ color: "#6b7280" }}>
-                    Alert settings
+                  <p className="text-xs mt-1" style={{ color: "var(--ui-muted)" }}>
+                    {isDark ? "Dark mode" : "Light mode"}
                   </p>
                 </div>
                 <button
-                  onClick={() => setNotificationsEnabled(!notificationsEnabled)}
+                  type="button"
+                  onClick={() => setTheme(isDark ? "light" : "dark")}
                   className="relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-200"
                   style={{
-                    background: notificationsEnabled ? "#14b8a6" : "#d1d5db",
+                    background: isDark ? "#14b8a6" : "var(--ui-border)",
+                  }}
+                >
+                  <span
+                    className="inline-block h-4 w-4 transform rounded-full transition-all duration-200"
+                    style={{
+                      background: "#ffffff",
+                      marginLeft: isDark ? "1.5rem" : "0.25rem",
+                    }}
+                  />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between pt-2" style={{ borderTop: "1px solid var(--ui-border)" }}>
+                <div>
+                  <p
+                    className="text-sm font-medium"
+                    style={{ color: "var(--ui-text)" }}
+                  >
+                    Notifications
+                  </p>
+                  <p className="text-xs mt-1" style={{ color: "var(--ui-muted)" }}>
+                    Alert settings
+                  </p>
+                  <p className="text-xs mt-1" style={{ color: "var(--ui-subtle)" }}>
+                    {notificationPermissionStatus === "denied"
+                      ? "Permission denied"
+                      : notificationsEnabled
+                        ? "Enabled"
+                        : "Disabled"}
+                  </p>
+                  {notificationStatusMessage && (
+                    <p
+                      className="text-[11px] mt-1 leading-relaxed"
+                      style={{
+                        color: notificationPermissionStatus === "denied" || notificationPermissionStatus === "unsupported"
+                          ? "#f87171"
+                          : "var(--ui-muted)",
+                      }}
+                    >
+                      {notificationStatusMessage}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleNotificationsToggle}
+                  className="relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-200"
+                  style={{
+                    background: notificationsEnabled ? "#14b8a6" : "var(--ui-border)",
                   }}
                 >
                   <span
@@ -287,23 +417,27 @@ export default function SettingsPage() {
                 </button>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-gray-200">
+              <div className="flex items-center justify-between pt-2" style={{ borderTop: "1px solid var(--ui-border)" }}>
                 <div>
                   <p
                     className="text-sm font-medium"
-                    style={{ color: "#1f2937" }}
+                    style={{ color: "var(--ui-text)" }}
                   >
                     Reminders
                   </p>
-                  <p className="text-xs mt-1" style={{ color: "#6b7280" }}>
+                  <p className="text-xs mt-1" style={{ color: "var(--ui-muted)" }}>
                     Study reminders
+                  </p>
+                  <p className="text-xs mt-1" style={{ color: "var(--ui-subtle)" }}>
+                    {remindersEnabled ? "Enabled" : "Disabled"}
                   </p>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setRemindersEnabled(!remindersEnabled)}
                   className="relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-200"
                   style={{
-                    background: remindersEnabled ? "#14b8a6" : "#d1d5db",
+                    background: remindersEnabled ? "#14b8a6" : "var(--ui-border)",
                   }}
                 >
                   <span
@@ -326,7 +460,7 @@ export default function SettingsPage() {
               <SectionLabel>Data & Privacy</SectionLabel>
               <h2
                 className="text-lg font-semibold mb-4"
-                style={{ color: "#374151" }}
+                  style={{ color: "var(--ui-text)" }}
               >
                 Legal & Policy
               </h2>
@@ -402,7 +536,7 @@ export default function SettingsPage() {
         className="px-6 py-4 rounded-lg text-xs text-center"
         style={{
           background: "rgba(20, 184, 166, 0.05)",
-          color: "#6b7280",
+          color: "var(--ui-muted)",
           border: "1px solid rgba(20, 184, 166, 0.1)",
         }}
       >

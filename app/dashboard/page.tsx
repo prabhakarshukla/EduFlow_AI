@@ -86,7 +86,7 @@ const priorityStyle = (p: string) => ({
   color:
     p === 'high'   ? '#f87171' :
     p === 'medium' ? '#fbbf24' :
-                     '#9ca3af',
+                     'var(--ui-subtle)',
 });
 
 const fmtCompact = (n: number) => new Intl.NumberFormat(undefined, { notation: 'compact' }).format(n);
@@ -365,13 +365,13 @@ export default function DashboardPage() {
       {/* ── Welcome header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <p className="text-xs font-medium tracking-wide uppercase" style={{ color: '#6b7280' }}>
+          <p className="text-xs font-medium tracking-wide uppercase" style={{ color: 'var(--ui-muted)' }}>
             {now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
-          <h1 className="text-2xl sm:text-[28px] font-bold tracking-tight" style={{ color: '#1f2937' }}>
+          <h1 className="text-2xl sm:text-[28px] font-bold tracking-tight" style={{ color: 'var(--ui-heading)' }}>
             {greeting}, {displayName} 👋
           </h1>
-          <p className="text-sm" style={{ color: '#6b7280' }}>
+          <p className="text-sm" style={{ color: 'var(--ui-muted)' }}>
             {error ? (
               <>We couldn&apos;t load your overview right now.</>
             ) : (
@@ -413,7 +413,7 @@ export default function DashboardPage() {
       {/* ── Overview cards ── */}
       <section>
         <div className="flex items-center gap-2 mb-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.10em]" style={{ color: '#6b7280' }}>
+          <p className="text-[10px] font-bold uppercase tracking-[0.10em]" style={{ color: 'var(--ui-muted)' }}>
             Overview
           </p>
           <div className="flex-1 h-px" style={{ background: 'rgba(110,231,216,0.07)' }} />
@@ -426,8 +426,8 @@ export default function DashboardPage() {
               href={card.href}
               className="group flex flex-col gap-3.5 p-4 rounded-2xl transition-all duration-200"
               style={{
-                background: '#ffffff',
-                border: '1px solid #e5e7eb',
+                background: 'var(--ui-surface)',
+                border: '1px solid var(--ui-border)',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.14)',
               }}
               onMouseEnter={e => {
@@ -464,13 +464,13 @@ export default function DashboardPage() {
               </div>
 
               <div className="space-y-0.5">
-                <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: '#6b7280' }}>
+                <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--ui-muted)' }}>
                   {card.title}
                 </p>
-                <p className="text-xl font-bold leading-tight" style={{ color: '#1f2937' }}>
+                <p className="text-xl font-bold leading-tight" style={{ color: 'var(--ui-heading)' }}>
                   {card.value}
                 </p>
-                <p className="text-[11px]" style={{ color: '#6b7280' }}>
+                <p className="text-[11px]" style={{ color: 'var(--ui-muted)' }}>
                   {card.sub}
                 </p>
               </div>
@@ -493,17 +493,17 @@ export default function DashboardPage() {
         <div
           className="lg:col-span-3 rounded-2xl p-5"
           style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
+            background: 'var(--ui-surface)',
+            border: '1px solid var(--ui-border)',
             boxShadow: '0 1px 3px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.14)',
           }}
         >
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-sm font-semibold" style={{ color: '#1f2937', letterSpacing: '-0.01em' }}>
+              <h2 className="text-sm font-semibold" style={{ color: 'var(--ui-heading)', letterSpacing: '-0.01em' }}>
                 Today&apos;s Focus
               </h2>
-              <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--ui-muted)' }}>
                 {loading ? 'Loading tasks…' : `${focusItems.filter(t => t.done).length} of ${focusItems.length} tasks completed`}
               </p>
             </div>
@@ -520,7 +520,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Progress bar */}
-          <div className="w-full h-1.5 rounded-full mb-4" style={{ background: '#f5f7f4' }}>
+          <div className="w-full h-1.5 rounded-full mb-4" style={{ background: 'var(--ui-surface-2)' }}>
             <div
               className="h-1.5 rounded-full transition-all duration-700"
               style={{
@@ -538,15 +538,15 @@ export default function DashboardPage() {
                 <div
                   key={i}
                   className="flex items-center gap-3 p-3 rounded-xl animate-pulse"
-                  style={{ background: '#f5f7f4' }}
+                  style={{ background: 'var(--ui-surface-2)' }}
                 >
                   <div className="w-4 h-4 rounded-full flex-shrink-0" style={{ background: 'rgba(110,231,216,0.08)' }} />
-                  <div className="flex-1 h-3 rounded" style={{ background: '#f5f7f4' }} />
-                  <div className="h-4 w-12 rounded" style={{ background: '#f5f7f4' }} />
+                  <div className="flex-1 h-3 rounded" style={{ background: 'var(--ui-surface-2)' }} />
+                  <div className="h-4 w-12 rounded" style={{ background: 'var(--ui-surface-2)' }} />
                 </div>
               ))
             ) : error ? (
-              <div className="text-xs py-2" style={{ color: '#6b7280' }}>
+              <div className="text-xs py-2" style={{ color: 'var(--ui-muted)' }}>
                 Couldn&apos;t load tasks right now.
               </div>
             ) : focusItems.length ? (
@@ -571,7 +571,7 @@ export default function DashboardPage() {
                   </div>
                   <span
                     className={`text-sm flex-1 truncate ${task.done ? 'line-through' : ''}`}
-                    style={{ color: task.done ? '#9ca3af' : '#1f2937' }}
+                    style={{ color: task.done ? 'var(--ui-subtle)' : 'var(--ui-heading)' }}
                   >
                     {task.label}
                   </span>
@@ -584,7 +584,7 @@ export default function DashboardPage() {
                 </div>
               ))
             ) : (
-              <div className="text-xs py-2" style={{ color: '#6b7280' }}>
+              <div className="text-xs py-2" style={{ color: 'var(--ui-muted)' }}>
                 No tasks yet — create one to see it here.
               </div>
             )}
@@ -611,12 +611,12 @@ export default function DashboardPage() {
           <div
             className="rounded-2xl p-5"
             style={{
-              background: '#ffffff',
-              border: '1px solid #e5e7eb',
+              background: 'var(--ui-surface)',
+              border: '1px solid var(--ui-border)',
               boxShadow: '0 1px 3px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.14)',
             }}
           >
-            <h2 className="text-sm font-semibold mb-3.5" style={{ color: '#1f2937', letterSpacing: '-0.01em' }}>
+            <h2 className="text-sm font-semibold mb-3.5" style={{ color: 'var(--ui-heading)', letterSpacing: '-0.01em' }}>
               Quick Actions
             </h2>
             <div className="grid grid-cols-2 gap-2">
@@ -627,21 +627,21 @@ export default function DashboardPage() {
                   className="flex items-center gap-2.5 p-3 rounded-xl text-xs font-medium transition-all duration-150"
                   style={{
                     background: 'rgba(110,231,216,0.04)',
-                    border: '1px solid #e5e7eb',
-                    color: '#374151',
+                    border: '1px solid var(--ui-border)',
+                    color: 'var(--ui-text)',
                   }}
                   onMouseEnter={e => {
                     const el = e.currentTarget as HTMLElement;
                     el.style.borderColor = 'rgba(110,231,216,0.28)';
                     el.style.background  = 'rgba(110,231,216,0.08)';
-                    el.style.color       = '#1f2937';
+                    el.style.color       = 'var(--ui-heading)';
                     el.style.transform   = 'translateY(-1px)';
                   }}
                   onMouseLeave={e => {
                     const el = e.currentTarget as HTMLElement;
                     el.style.borderColor = 'rgba(110,231,216,0.09)';
                     el.style.background  = 'rgba(110,231,216,0.04)';
-                    el.style.color       = '#374151';
+                    el.style.color       = 'var(--ui-text)';
                     el.style.transform   = 'translateY(0)';
                   }}
                 >
@@ -653,7 +653,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="min-w-0">
                     <p className="font-semibold truncate leading-tight">{action.label}</p>
-                    <p className="text-[10px] leading-tight mt-0.5 truncate" style={{ color: '#6b7280' }}>
+                    <p className="text-[10px] leading-tight mt-0.5 truncate" style={{ color: 'var(--ui-muted)' }}>
                       {action.description}
                     </p>
                   </div>
@@ -666,12 +666,12 @@ export default function DashboardPage() {
           <div
             className="rounded-2xl p-5 flex-1"
             style={{
-              background: '#ffffff',
-              border: '1px solid #e5e7eb',
+              background: 'var(--ui-surface)',
+              border: '1px solid var(--ui-border)',
               boxShadow: '0 1px 3px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.14)',
             }}
           >
-            <h2 className="text-sm font-semibold mb-4" style={{ color: '#1f2937', letterSpacing: '-0.01em' }}>
+            <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--ui-heading)', letterSpacing: '-0.01em' }}>
               Recent Activity
             </h2>
             <div className="space-y-3.5">
@@ -685,10 +685,10 @@ export default function DashboardPage() {
                     }}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs leading-snug" style={{ color: '#1f2937' }}>{item.text}</p>
+                    <p className="text-xs leading-snug" style={{ color: 'var(--ui-heading)' }}>{item.text}</p>
                     <div className="flex items-center gap-2 mt-1">
                       {item.time && (
-                        <span className="text-[10px]" style={{ color: '#6b7280' }}>{item.time}</span>
+                        <span className="text-[10px]" style={{ color: 'var(--ui-muted)' }}>{item.time}</span>
                       )}
                       <span
                         className="text-[9px] font-semibold px-1.5 py-0.5 rounded"

@@ -75,10 +75,10 @@ export default function DoubtSolverPage() {
           </svg>
           AI Doubt Solver
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#1f2937' }}>
+        <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--ui-heading)' }}>
           Ask any academic doubt.
         </h1>
-        <p className="text-sm mt-1.5" style={{ color: '#6b7280' }}>
+        <p className="text-sm mt-1.5" style={{ color: 'var(--ui-muted)' }}>
           Type your question clearly and get an instant AI-generated explanation with examples.
         </p>
       </div>
@@ -87,9 +87,9 @@ export default function DoubtSolverPage() {
       <form
         onSubmit={handleSubmit}
         className="rounded-2xl p-5 space-y-4"
-        style={{ background: '#ffffff', border: '1px solid #e5e7eb' }}
+        style={{ background: 'var(--ui-surface)', border: '1px solid var(--ui-border)' }}
       >
-        <label htmlFor="question" className="text-xs font-semibold" style={{ color: '#6b7280' }}>
+        <label htmlFor="question" className="text-xs font-semibold" style={{ color: 'var(--ui-muted)' }}>
           Your question
         </label>
         <textarea
@@ -103,9 +103,9 @@ export default function DoubtSolverPage() {
           rows={5}
           className="w-full rounded-xl px-4 py-3 text-sm resize-y outline-none transition-all duration-200"
           style={{
-            background: '#ffffff',
+            background: 'var(--ui-surface)',
             border: '1px solid rgba(110,231,216,0.15)',
-            color: '#1f2937',
+            color: 'var(--ui-heading)',
             lineHeight: 1.7,
           }}
           onFocus={e => { e.currentTarget.style.borderColor = 'rgba(110,231,216,0.40)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(110,231,216,0.07)'; }}
@@ -119,7 +119,7 @@ export default function DoubtSolverPage() {
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
             style={{
               background: canSubmit ? 'linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)' : 'rgba(255,255,255,0.06)',
-              color: canSubmit ? '#0d2420' : '#9ca3af',
+              color: canSubmit ? '#0d2420' : 'var(--ui-subtle)',
               boxShadow: canSubmit ? '0 4px 16px rgba(110,231,216,0.28)' : 'none',
               cursor: canSubmit ? 'pointer' : 'not-allowed',
             }}
@@ -166,7 +166,7 @@ export default function DoubtSolverPage() {
 
         {/* Example questions */}
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider mb-2.5" style={{ color: '#6b7280' }}>
+          <p className="text-[10px] font-semibold uppercase tracking-wider mb-2.5" style={{ color: 'var(--ui-muted)' }}>
             Try an example
           </p>
           <div className="flex flex-wrap gap-2">
@@ -176,9 +176,9 @@ export default function DoubtSolverPage() {
                 type="button"
                 onClick={() => { setQuestion(q); if (status !== 'idle') resetState(); }}
                 className="text-xs px-3 py-1.5 rounded-lg transition-all duration-150"
-                style={{ background: '#f5f7f4', border: '1px solid #e5e7eb', color: '#6b7280' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.24)'; (e.currentTarget as HTMLElement).style.color = '#1f2937'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.10)'; (e.currentTarget as HTMLElement).style.color = '#6b7280'; }}
+                style={{ background: 'var(--ui-surface-2)', border: '1px solid var(--ui-border)', color: 'var(--ui-muted)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.24)'; (e.currentTarget as HTMLElement).style.color = 'var(--ui-heading)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.10)'; (e.currentTarget as HTMLElement).style.color = 'var(--ui-muted)'; }}
               >
                 {q}
               </button>
@@ -191,12 +191,12 @@ export default function DoubtSolverPage() {
       <div
         className="rounded-2xl p-5 min-h-[200px] transition-all duration-300"
         style={{
-          background: '#ffffff',
+          background: 'var(--ui-surface)',
           border: `1px solid ${status === 'success' ? 'rgba(110,231,216,0.22)' : status === 'error' ? 'rgba(248,113,113,0.22)' : 'rgba(110,231,216,0.12)'}`,
         }}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold" style={{ color: '#1f2937' }}>Answer</h2>
+          <h2 className="text-sm font-semibold" style={{ color: 'var(--ui-heading)' }}>Answer</h2>
           {status === 'success' && (
             <span
               className="flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full"
@@ -219,7 +219,7 @@ export default function DoubtSolverPage() {
                   d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
             </div>
-            <p className="text-sm font-medium" style={{ color: '#6b7280' }}>
+            <p className="text-sm font-medium" style={{ color: 'var(--ui-muted)' }}>
               Ask a question to get your AI-powered answer
             </p>
           </div>
@@ -228,11 +228,11 @@ export default function DoubtSolverPage() {
         {status === 'loading' && (
           <div className="space-y-3">
             {[6, 5, 4, 3].map((w, i) => (
-              <div key={i} className={`h-3 rounded-lg w-${w}/6 animate-pulse`} style={{ background: '#f5f7f4' }} />
+              <div key={i} className={`h-3 rounded-lg w-${w}/6 animate-pulse`} style={{ background: 'var(--ui-surface-2)' }} />
             ))}
             <div className="flex items-center gap-2 mt-4">
               <div className="w-4 h-4 rounded-full animate-pulse" style={{ background: 'rgba(110,231,216,0.20)' }} />
-              <p className="text-xs" style={{ color: '#6b7280' }}>EduFlow AI is thinking…</p>
+              <p className="text-xs" style={{ color: 'var(--ui-muted)' }}>EduFlow AI is thinking…</p>
             </div>
           </div>
         )}
@@ -253,7 +253,7 @@ export default function DoubtSolverPage() {
           <div className="space-y-4">
             {/* Mint top accent line */}
             <div className="h-px w-full mb-4" style={{ background: 'linear-gradient(90deg, #6EE7D8, transparent)' }} />
-            <p className="text-sm leading-[1.85] whitespace-pre-wrap" style={{ color: '#1f2937' }}>
+            <p className="text-sm leading-[1.85] whitespace-pre-wrap" style={{ color: 'var(--ui-heading)' }}>
               {result.answer}
             </p>
             {result.source && (

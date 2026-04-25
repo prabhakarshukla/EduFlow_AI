@@ -183,7 +183,7 @@ export default function DashboardLayout({
   return (
     <div
       className="flex min-h-screen"
-      style={{ background: "#fcfcf9", paddingTop: "64px" }}
+      style={{ background: "var(--ui-bg)", paddingTop: "64px" }}
     >
       {/* ── Mobile overlay ── */}
       {mobileOpen && (
@@ -204,27 +204,27 @@ export default function DashboardLayout({
           top: "64px",
           height: "calc(100vh - 64px)",
           width: collapsed ? "64px" : "224px",
-          background: "#ffffff",
-          borderRight: "1px solid #e5e7eb",
+          background: "var(--ui-surface)",
+          borderRight: "1px solid var(--ui-border)",
         }}
       >
         {/* Collapse toggle row */}
         <div
           className="flex items-center justify-end px-3 py-3 flex-shrink-0"
-          style={{ borderBottom: "1px solid #e5e7eb", minHeight: "52px" }}
+          style={{ borderBottom: "1px solid var(--ui-border)", minHeight: "52px" }}
         >
           {!collapsed ? (
             <button
               onClick={() => setCollapsed(true)}
               className="p-1.5 rounded-lg transition-all duration-150"
-              style={{ color: "#6b7280" }}
+              style={{ color: "var(--ui-muted)" }}
               aria-label="Collapse sidebar"
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLElement).style.color = "#14b8a6";
                 (e.currentTarget as HTMLElement).style.background = "#f5f7f4";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.color = "#6b7280";
+                (e.currentTarget as HTMLElement).style.color = "var(--ui-muted)";
                 (e.currentTarget as HTMLElement).style.background =
                   "transparent";
               }}
@@ -248,8 +248,8 @@ export default function DashboardLayout({
               onClick={() => setCollapsed(false)}
               className="absolute -right-3 top-3 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150"
               style={{
-                background: "#ffffff",
-                border: "1px solid #e5e7eb",
+                background: "var(--ui-surface)",
+                border: "1px solid var(--ui-border)",
                 color: "#14b8a6",
               }}
               aria-label="Expand sidebar"
@@ -279,7 +279,7 @@ export default function DashboardLayout({
               {!collapsed && (
                 <p
                   className="px-3 pb-1.5 text-[9px] font-bold uppercase tracking-[0.12em]"
-                  style={{ color: "#6b7280" }}
+                  style={{ color: "var(--ui-muted)" }}
                 >
                   {group}
                 </p>
@@ -294,21 +294,21 @@ export default function DashboardLayout({
                     title={collapsed ? label : undefined}
                     className="relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150"
                     style={{
-                      color: active ? "#14b8a6" : "#374151",
-                      background: active ? "#ecfdf8" : "transparent",
+                      color: active ? "#14b8a6" : "var(--ui-text)",
+                      background: active ? "var(--ui-active-bg)" : "transparent",
                     }}
                     onMouseEnter={(e) => {
                       if (!active) {
                         (e.currentTarget as HTMLElement).style.color =
                           "#14b8a6";
                         (e.currentTarget as HTMLElement).style.background =
-                          "#f5f7f4";
+                          "var(--ui-hover)";
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!active) {
                         (e.currentTarget as HTMLElement).style.color =
-                          "#374151";
+                          "var(--ui-text)";
                         (e.currentTarget as HTMLElement).style.background =
                           "transparent";
                       }
@@ -350,7 +350,7 @@ export default function DashboardLayout({
         {/* User row */}
         <div
           className="flex-shrink-0 px-3 py-4"
-          style={{ borderTop: "1px solid #e5e7eb" }}
+          style={{ borderTop: "1px solid var(--ui-border)" }}
         >
           {collapsed ? (
             <div
@@ -376,13 +376,13 @@ export default function DashboardLayout({
               <div className="flex-1 min-w-0">
                 <p
                   className="text-xs font-semibold truncate leading-tight"
-                  style={{ color: "#1f2937" }}
+                  style={{ color: "var(--ui-text)" }}
                 >
                   {displayName}
                 </p>
                 <p
                   className="text-[10px] truncate leading-tight mt-0.5"
-                  style={{ color: "#6b7280" }}
+                  style={{ color: "var(--ui-muted)" }}
                 >
                   {displayEmail || " "}
                 </p>
@@ -393,13 +393,13 @@ export default function DashboardLayout({
                 disabled={!authReady}
                 title="Log out"
                 className="p-1.5 rounded-lg transition-all duration-150 flex-shrink-0"
-                style={{ color: "#6b7280" }}
+                style={{ color: "var(--ui-muted)" }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLElement).style.color = "#ef4444";
                   (e.currentTarget as HTMLElement).style.background = "#fef2f2";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.color = "#6b7280";
+                  (e.currentTarget as HTMLElement).style.color = "var(--ui-muted)";
                   (e.currentTarget as HTMLElement).style.background =
                     "transparent";
                 }}
@@ -429,8 +429,8 @@ export default function DashboardLayout({
         <header
           className="flex-shrink-0 flex items-center gap-4 px-5 sm:px-7"
           style={{
-            borderBottom: "1px solid #e5e7eb",
-            background: "rgba(252,252,249,0.95)",
+            borderBottom: "1px solid var(--ui-border)",
+            background: "color-mix(in srgb, var(--ui-bg) 95%, transparent)",
             backdropFilter: "blur(14px)",
             WebkitBackdropFilter: "blur(14px)",
             minHeight: "56px",
@@ -460,7 +460,7 @@ export default function DashboardLayout({
 
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-xs min-w-0">
-            <span style={{ color: "#6b7280", fontWeight: 500 }}>EduFlow</span>
+            <span style={{ color: "var(--ui-muted)", fontWeight: 500 }}>EduFlow</span>
             <svg
               className="w-3 h-3 flex-shrink-0"
               fill="none"
@@ -477,7 +477,7 @@ export default function DashboardLayout({
             </svg>
             <span
               className="font-semibold truncate"
-              style={{ color: "#1f2937" }}
+              style={{ color: "var(--ui-text)" }}
             >
               {currentPage}
             </span>
@@ -489,16 +489,16 @@ export default function DashboardLayout({
             <div
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs cursor-text transition-colors duration-150"
               style={{
-                background: "#ffffff",
-                border: "1px solid #e5e7eb",
-                color: "#6b7280",
+                background: "var(--ui-surface)",
+                border: "1px solid var(--ui-border)",
+                color: "var(--ui-muted)",
                 minWidth: "160px",
               }}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLElement).style.borderColor = "#14b8a6";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.borderColor = "#e5e7eb";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--ui-border)";
               }}
             >
               <svg
@@ -517,7 +517,7 @@ export default function DashboardLayout({
               <span>Search…</span>
               <span
                 className="ml-auto text-[10px] px-1.5 py-0.5 rounded font-mono"
-                style={{ background: "#f5f7f4", color: "#6b7280" }}
+                style={{ background: "var(--ui-hover)", color: "var(--ui-muted)" }}
               >
                 ⌘K
               </span>
@@ -527,17 +527,17 @@ export default function DashboardLayout({
             <button
               className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center transition-all duration-150"
               style={{
-                color: "#6b7280",
-                background: "#ffffff",
-                border: "1px solid #e5e7eb",
+                color: "var(--ui-muted)",
+                background: "var(--ui-surface)",
+                border: "1px solid var(--ui-border)",
               }}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLElement).style.color = "#14b8a6";
                 (e.currentTarget as HTMLElement).style.borderColor = "#14b8a6";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.color = "#6b7280";
-                (e.currentTarget as HTMLElement).style.borderColor = "#e5e7eb";
+                (e.currentTarget as HTMLElement).style.color = "var(--ui-muted)";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--ui-border)";
               }}
               aria-label="Notifications"
             >
@@ -573,7 +573,7 @@ export default function DashboardLayout({
         {/* ── Page content ── */}
         <main
           className="flex-1 overflow-auto"
-          style={{ background: "#fcfcf9" }}
+          style={{ background: "var(--ui-bg)" }}
         >
           {authReady && user ? children : null}
         </main>

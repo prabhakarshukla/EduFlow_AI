@@ -53,9 +53,9 @@ export default function Navbar() {
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        background: scrolled ? "rgba(34,32,34,0.92)" : "transparent",
+        background: scrolled ? "var(--ui-surface)" : "transparent",
         borderBottom: scrolled
-          ? "1px solid rgba(110,231,216,0.10)"
+          ? "1px solid var(--ui-border)"
           : "1px solid transparent",
         backdropFilter: scrolled ? "blur(16px) saturate(1.4)" : "none",
         WebkitBackdropFilter: scrolled ? "blur(16px) saturate(1.4)" : "none",
@@ -95,14 +95,15 @@ export default function Navbar() {
                 key={label}
                 href={href}
                 className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
-                style={{ color: "#374151" }}
+                style={{ color: "var(--ui-text)" }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLElement).style.color = "#14b8a6";
                   (e.currentTarget as HTMLElement).style.background =
                     "rgba(110,231,216,0.14)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.color = "#374151";
+                  (e.currentTarget as HTMLElement).style.color =
+                    "var(--ui-text)";
                   (e.currentTarget as HTMLElement).style.background =
                     "transparent";
                 }}
@@ -121,17 +122,17 @@ export default function Navbar() {
                   onClick={handleLogout}
                   className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
                   style={{
-                    color: "#1f2937",
-                    border: "1px solid #e5e7eb",
-                    background: "#ffffff",
+                    color: "var(--ui-text)",
+                    border: "1px solid var(--ui-border)",
+                    background: "var(--ui-surface)",
                   }}
                   onMouseEnter={(e) => {
                     (e.currentTarget as HTMLElement).style.background =
-                      "#f5f7f4";
+                      "var(--ui-hover)";
                   }}
                   onMouseLeave={(e) => {
                     (e.currentTarget as HTMLElement).style.background =
-                      "#ffffff";
+                      "var(--ui-surface)";
                   }}
                 >
                   Log out
@@ -142,15 +143,15 @@ export default function Navbar() {
                 <Link
                   href="/auth/login"
                   className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap"
-                  style={{ color: "rgba(255,255,255,0.55)" }}
+                  style={{ color: "var(--ui-muted)" }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.color = "#d1faf5";
+                    (e.currentTarget as HTMLElement).style.color = "#14b8a6";
                     (e.currentTarget as HTMLElement).style.background =
-                      "rgba(255,255,255,0.05)";
+                      "var(--ui-hover)";
                   }}
                   onMouseLeave={(e) => {
                     (e.currentTarget as HTMLElement).style.color =
-                      "rgba(255,255,255,0.55)";
+                      "var(--ui-muted)";
                     (e.currentTarget as HTMLElement).style.background =
                       "transparent";
                   }}
@@ -234,7 +235,7 @@ export default function Navbar() {
         {mobileOpen && (
           <div
             className="md:hidden pb-5 pt-3"
-            style={{ borderTop: "1px solid rgba(110,231,216,0.10)" }}
+            style={{ borderTop: "1px solid var(--ui-border)" }}
           >
             <nav className="flex flex-col gap-1 mb-4">
               {navLinks.map(({ label, href }) => (
@@ -243,7 +244,7 @@ export default function Navbar() {
                   href={href}
                   onClick={() => setMobileOpen(false)}
                   className="px-4 py-2.5 text-sm font-medium rounded-lg transition-colors duration-150"
-                  style={{ color: "#374151" }}
+                  style={{ color: "var(--ui-text)" }}
                 >
                   {label}
                 </Link>
@@ -271,8 +272,8 @@ export default function Navbar() {
                     href="/auth/login"
                     className="px-4 py-2.5 text-center text-sm font-medium rounded-xl border transition-colors"
                     style={{
-                      color: "rgba(255,255,255,0.55)",
-                      borderColor: "rgba(110,231,216,0.16)",
+                      color: "var(--ui-muted)",
+                      borderColor: "var(--ui-border)",
                     }}
                   >
                     Log in

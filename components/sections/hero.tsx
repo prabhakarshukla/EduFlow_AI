@@ -14,7 +14,7 @@ const features = [
 
 export default function Hero() {
   return (
-    <section className="relative isolate overflow-hidden bg-[#fcfcf9] min-h-[min(100vh,980px)]">
+    <section className="relative isolate overflow-hidden min-h-[min(100vh,980px)]" style={{ background: 'var(--ui-bg)' }}>
       <div className="absolute inset-0">
         <Image
           src="/images/hero1.png"
@@ -29,6 +29,14 @@ export default function Hero() {
           style={{
             background:
               'linear-gradient(90deg, rgba(252,252,249,0.98) 0%, rgba(252,252,249,0.92) 32%, rgba(252,252,249,0.58) 48%, rgba(252,252,249,0.12) 66%, rgba(252,252,249,0.02) 100%)',
+          }}
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-0 hidden dark:block"
+          style={{
+            background:
+              'linear-gradient(90deg, rgba(2,6,23,0.86) 0%, rgba(2,6,23,0.76) 34%, rgba(2,6,23,0.54) 58%, rgba(2,6,23,0.20) 74%, rgba(2,6,23,0.08) 100%)',
           }}
           aria-hidden="true"
         />
@@ -54,7 +62,7 @@ export default function Hero() {
         <div className="relative z-10 max-w-2xl rounded-[32px] border border-white/40 bg-white/55 p-6 shadow-[0_20px_70px_rgba(15,23,42,0.08)] backdrop-blur-[10px] sm:p-8 lg:max-w-[46%] lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-0">
           <div
             className="mb-5 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold"
-            style={{ background: '#f5f7f4', border: '1px solid #e5e7eb', color: '#14b8a6' }}
+            style={{ background: 'var(--ui-surface-2)', border: '1px solid var(--ui-border)', color: '#14b8a6' }}
           >
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: '#6ee7d8' }} />
             Premium student workspace
@@ -62,7 +70,7 @@ export default function Hero() {
 
           <h1
             className="mb-6 font-extrabold leading-[1.05] tracking-tight"
-            style={{ fontSize: 'clamp(2.4rem, 6vw, 4.5rem)', color: '#1f2937', letterSpacing: '-0.02em' }}
+            style={{ fontSize: 'clamp(2.4rem, 6vw, 4.5rem)', color: 'var(--ui-heading)', letterSpacing: '-0.02em' }}
           >
             Study with clarity.
             <br />
@@ -71,7 +79,7 @@ export default function Hero() {
 
           <p
             className="mb-8 max-w-lg leading-relaxed"
-            style={{ fontSize: 'clamp(1rem, 1.8vw, 1.12rem)', color: '#6b7280' }}
+            style={{ fontSize: 'clamp(1rem, 1.8vw, 1.12rem)', color: 'var(--ui-muted)' }}
           >
             EduFlow AI brings your planning, doubt solving, notes, and productivity habits
             into one beautifully organized space built for modern students.
@@ -92,13 +100,13 @@ export default function Hero() {
             <Link
               href="/#features"
               className="inline-flex items-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-semibold transition-colors duration-200"
-              style={{ color: '#1f2937', border: '1px solid #e5e7eb', background: '#ffffff' }}
+              style={{ color: 'var(--ui-heading)', border: '1px solid var(--ui-border)', background: 'var(--ui-surface)' }}
             >
               Explore features
             </Link>
           </div>
 
-          <p className="text-sm" style={{ color: '#6b7280' }}>
+          <p className="text-sm" style={{ color: 'var(--ui-muted)' }}>
             Trusted by students who want consistent, focused progress.
           </p>
 
@@ -107,7 +115,7 @@ export default function Hero() {
               <span
                 key={f.label}
                 className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs"
-                style={{ background: '#ffffff', border: '1px solid #e5e7eb', color: '#6b7280' }}
+                style={{ background: 'var(--ui-surface)', border: '1px solid var(--ui-border)', color: 'var(--ui-muted)' }}
               >
                 <span>{f.icon}</span>
                 {f.label}

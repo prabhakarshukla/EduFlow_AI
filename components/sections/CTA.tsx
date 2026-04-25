@@ -12,7 +12,7 @@ export default function Cta() {
   return (
     <section
       className="relative py-36 overflow-hidden"
-      style={{ background: '#fcfcf9' }}
+      style={{ background: 'var(--ui-bg)' }}
     >
       <div
         className="absolute top-0 left-0 right-0 h-px"
@@ -61,9 +61,9 @@ export default function Cta() {
         <div
           className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full"
           style={{
-            background: '#f5f7f4',
+            background: 'var(--ui-surface-2)',
             color: '#14b8a6',
-            border: '1px solid #e5e7eb',
+            border: '1px solid var(--ui-border)',
           }}
         >
           <span
@@ -78,7 +78,7 @@ export default function Cta() {
             className="font-extrabold tracking-tight leading-[1.06]"
             style={{
               fontSize: 'clamp(2.2rem, 5.5vw, 3.6rem)',
-              color: '#1f2937',
+              color: 'var(--ui-heading)',
               letterSpacing: '-0.025em',
             }}
           >
@@ -99,7 +99,7 @@ export default function Cta() {
           </h2>
           <p
             className="leading-relaxed max-w-xl mx-auto"
-            style={{ fontSize: '1.0625rem', color: '#6b7280' }}
+            style={{ fontSize: '1.0625rem', color: 'var(--ui-muted)' }}
           >
             No credit card. No setup. Just sign up in 30 seconds and start planning,
             learning, and achieving — with AI always by your side.
@@ -136,22 +136,22 @@ export default function Cta() {
             href="/#features"
             className="inline-flex items-center gap-2 px-7 py-4 rounded-2xl text-sm font-semibold transition-all duration-200"
             style={{
-              color: '#1f2937',
-              border: '1px solid #e5e7eb',
-              background: '#ffffff',
+              color: 'var(--ui-heading)',
+              border: '1px solid var(--ui-border)',
+              background: 'var(--ui-surface)',
             }}
             onMouseEnter={e => {
               const el = e.currentTarget as HTMLElement;
               el.style.borderColor = '#14b8a6';
               el.style.color = '#0f766e';
-              el.style.background = '#f5fffe';
+              el.style.background = 'var(--ui-hover)';
               el.style.transform = 'translateY(-1px)';
             }}
             onMouseLeave={e => {
               const el = e.currentTarget as HTMLElement;
-              el.style.borderColor = '#e5e7eb';
-              el.style.color = '#1f2937';
-              el.style.background = '#ffffff';
+              el.style.borderColor = 'var(--ui-border)';
+              el.style.color = 'var(--ui-heading)';
+              el.style.background = 'var(--ui-surface)';
               el.style.transform = 'translateY(0)';
             }}
           >
@@ -164,7 +164,7 @@ export default function Cta() {
             <span
               key={text}
               className="flex items-center gap-1.5 text-xs"
-              style={{ color: '#6b7280' }}
+              style={{ color: 'var(--ui-muted)' }}
             >
               <span className="font-bold" style={{ color: '#14b8a6' }}>{icon}</span>
               {text}

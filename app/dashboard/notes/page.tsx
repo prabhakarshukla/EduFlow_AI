@@ -17,7 +17,7 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
   return (
     <div
       className={`rounded-2xl p-6 transition-all duration-200 ${className}`}
-      style={{ background: '#ffffff', border: '1px solid #e5e7eb' }}
+      style={{ background: 'var(--ui-surface)', border: '1px solid var(--ui-border)' }}
     >
       {children}
     </div>
@@ -28,7 +28,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <p
       className="text-[10px] font-semibold uppercase tracking-widest mb-4"
-      style={{ color: '#6b7280' }}
+      style={{ color: 'var(--ui-muted)' }}
     >
       {children}
     </p>
@@ -348,10 +348,10 @@ export default function NotesPage() {
             </svg>
             Notes
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#1f2937' }}>
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--ui-heading)' }}>
             Write once. Review fast.
           </h1>
-          <p className="text-sm mt-1.5" style={{ color: '#6b7280' }}>
+          <p className="text-sm mt-1.5" style={{ color: 'var(--ui-muted)' }}>
             Keep clean, revision-ready notes — organised by subject.
           </p>
         </div>
@@ -373,8 +373,8 @@ export default function NotesPage() {
             className="px-4 py-2.5 text-xs font-semibold rounded-xl transition-all duration-150"
             style={{
               background: selectedId ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.03)',
-              border: '1px solid #e5e7eb',
-              color: selectedId ? '#374151' : '#9ca3af',
+              border: '1px solid var(--ui-border)',
+              color: selectedId ? 'var(--ui-text)' : 'var(--ui-subtle)',
               cursor: selectedId ? 'pointer' : 'not-allowed',
             }}
           >
@@ -388,7 +388,7 @@ export default function NotesPage() {
             style={{
               background: 'rgba(248,113,113,0.08)',
               border: '1px solid rgba(248,113,113,0.22)',
-              color: selectedId ? '#b91c1c' : '#9ca3af',
+              color: selectedId ? '#b91c1c' : 'var(--ui-subtle)',
               opacity: selectedId ? 1 : 0.6,
               cursor: selectedId ? 'pointer' : 'not-allowed',
             }}
@@ -408,9 +408,9 @@ export default function NotesPage() {
               onClick={loadNotes}
               className="px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150"
               style={{
-                background: '#f5f7f4',
-                border: '1px solid #e5e7eb',
-                color: '#374151',
+                background: 'var(--ui-surface-2)',
+                border: '1px solid var(--ui-border)',
+                color: 'var(--ui-text)',
               }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.28)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.12)'; }}
@@ -441,7 +441,7 @@ export default function NotesPage() {
                   style={{
                     background: 'rgba(110,231,216,0.10)',
                     border: '1px solid rgba(110,231,216,0.22)',
-                    color: '#1f2937',
+                    color: 'var(--ui-heading)',
                   }}
                 >
                   {success}
@@ -456,9 +456,9 @@ export default function NotesPage() {
             placeholder="Search notes…"
             className="rounded-xl px-3 py-2.5 text-sm w-full mb-4"
             style={{
-              background: '#ffffff',
+              background: 'var(--ui-surface)',
               border: '1px solid rgba(110,231,216,0.15)',
-              color: '#1f2937',
+              color: 'var(--ui-heading)',
               outline: 'none',
             }}
           />
@@ -467,9 +467,9 @@ export default function NotesPage() {
             {loading && (
               <div
                 className="rounded-xl p-4"
-                style={{ background: '#f5f7f4', border: '1px solid #e5e7eb' }}
+                style={{ background: 'var(--ui-surface-2)', border: '1px solid var(--ui-border)' }}
               >
-                <p className="text-sm" style={{ color: '#6b7280' }}>Loading your notes…</p>
+                <p className="text-sm" style={{ color: 'var(--ui-muted)' }}>Loading your notes…</p>
               </div>
             )}
 
@@ -478,8 +478,8 @@ export default function NotesPage() {
                 className="rounded-xl p-5"
                 style={{ background: 'rgba(110,231,216,0.05)', border: '1px dashed rgba(110,231,216,0.18)' }}
               >
-                <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>No notes yet.</p>
-                <p className="text-[11px] mt-1" style={{ color: '#6b7280' }}>
+                <p className="text-sm font-semibold" style={{ color: 'var(--ui-heading)' }}>No notes yet.</p>
+                <p className="text-[11px] mt-1" style={{ color: 'var(--ui-muted)' }}>
                   Create your first note — keep it structured and concise.
                 </p>
               </div>
@@ -519,9 +519,9 @@ export default function NotesPage() {
                       }}
                       className="mt-0.5 p-1.5 rounded-lg transition-colors duration-150"
                       title={n.pinned ? 'Unpin' : 'Pin'}
-                      style={{ color: n.pinned ? '#fbbf24' : '#9ca3af' }}
+                      style={{ color: n.pinned ? '#fbbf24' : 'var(--ui-subtle)' }}
                       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fbbf24'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = n.pinned ? '#fbbf24' : '#9ca3af'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = n.pinned ? '#fbbf24' : 'var(--ui-subtle)'; }}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
@@ -529,10 +529,10 @@ export default function NotesPage() {
                       </svg>
                     </button>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate" style={{ color: '#1f2937' }}>
+                      <p className="text-sm font-semibold truncate" style={{ color: 'var(--ui-heading)' }}>
                         {n.title || 'Untitled note'}
                       </p>
-                      <p className="text-[11px] mt-0.5 truncate" style={{ color: '#6b7280' }}>
+                      <p className="text-[11px] mt-0.5 truncate" style={{ color: 'var(--ui-muted)' }}>
                         {(n.subject ?? 'General')}{' '}• updated {fmt(n.updated_at)}
                       </p>
                     </div>
@@ -552,8 +552,8 @@ export default function NotesPage() {
               className="rounded-xl p-5"
               style={{ background: 'rgba(110,231,216,0.05)', border: '1px dashed rgba(110,231,216,0.18)' }}
             >
-              <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>Select a note to edit.</p>
-              <p className="text-[11px] mt-1" style={{ color: '#6b7280' }}>
+              <p className="text-sm font-semibold" style={{ color: 'var(--ui-heading)' }}>Select a note to edit.</p>
+              <p className="text-[11px] mt-1" style={{ color: 'var(--ui-muted)' }}>
                 Or create a new note to start writing.
               </p>
             </div>
@@ -564,10 +564,10 @@ export default function NotesPage() {
                 style={{ background: 'rgba(110,231,216,0.04)', border: '1px solid rgba(110,231,216,0.14)' }}
               >
                 <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#6b7280' }}>
+                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--ui-muted)' }}>
                     AI Notes Generator
                   </p>
-                  <span className="text-[11px]" style={{ color: '#6b7280' }}>
+                  <span className="text-[11px]" style={{ color: 'var(--ui-muted)' }}>
                     Auto-fills this editor
                   </span>
                 </div>
@@ -581,9 +581,9 @@ export default function NotesPage() {
                     placeholder="Enter topic (e.g. Electromagnetic Induction)"
                     className="rounded-xl px-3 py-2.5 text-sm w-full"
                     style={{
-                      background: '#ffffff',
+                      background: 'var(--ui-surface)',
                       border: '1px solid rgba(110,231,216,0.15)',
-                      color: '#1f2937',
+                      color: 'var(--ui-heading)',
                       outline: 'none',
                     }}
                     disabled={!selectedId || aiLoading}
@@ -618,7 +618,7 @@ export default function NotesPage() {
 
               <div className="grid sm:grid-cols-3 gap-3">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--ui-heading)' }}>
                     Title
                   </label>
                   <input
@@ -627,16 +627,16 @@ export default function NotesPage() {
                     placeholder="e.g. Chapter 4 — Thermodynamics"
                     className="rounded-xl px-3 py-2.5 text-sm w-full"
                     style={{
-                      background: '#ffffff',
+                      background: 'var(--ui-surface)',
                       border: '1px solid rgba(110,231,216,0.15)',
-                      color: '#1f2937',
+                      color: 'var(--ui-heading)',
                       outline: 'none',
                     }}
                     disabled={!selectedId}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--ui-heading)' }}>
                     Subject
                   </label>
                   <input
@@ -645,9 +645,9 @@ export default function NotesPage() {
                     placeholder="e.g. Physics"
                     className="rounded-xl px-3 py-2.5 text-sm w-full"
                     style={{
-                      background: '#ffffff',
+                      background: 'var(--ui-surface)',
                       border: '1px solid rgba(110,231,216,0.15)',
-                      color: '#1f2937',
+                      color: 'var(--ui-heading)',
                       outline: 'none',
                     }}
                     disabled={!selectedId}
@@ -670,13 +670,13 @@ export default function NotesPage() {
                 >
                   {pinned ? 'Pinned' : 'Pin'}
                 </button>
-                <span className="text-[11px]" style={{ color: '#6b7280' }}>
+                <span className="text-[11px]" style={{ color: 'var(--ui-muted)' }}>
                   {selected ? `Last updated ${fmt(selected.updated_at)}` : ' '}
                 </span>
               </div>
 
               <div className="flex-1 flex flex-col">
-                <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--ui-heading)' }}>
                   Content
                 </label>
                 <textarea
@@ -687,9 +687,9 @@ export default function NotesPage() {
                   style={{
                     minHeight: '360px',
                     resize: 'none',
-                    background: '#ffffff',
+                    background: 'var(--ui-surface)',
                     border: '1px solid rgba(110,231,216,0.15)',
-                    color: '#1f2937',
+                    color: 'var(--ui-heading)',
                     outline: 'none',
                     lineHeight: 1.6,
                   }}

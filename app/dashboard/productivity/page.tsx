@@ -16,7 +16,7 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
   return (
     <div
       className={`rounded-2xl p-6 transition-all duration-200 ${className}`}
-      style={{ background: '#ffffff', border: '1px solid #e5e7eb' }}
+      style={{ background: 'var(--ui-surface)', border: '1px solid var(--ui-border)' }}
     >
       {children}
     </div>
@@ -25,7 +25,7 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] font-semibold uppercase tracking-widest mb-4" style={{ color: '#6b7280' }}>
+    <p className="text-[10px] font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ui-muted)' }}>
       {children}
     </p>
   );
@@ -189,10 +189,10 @@ export default function ProductivityPage() {
             </svg>
             Productivity Tracker
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#1f2937' }}>
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--ui-heading)' }}>
             Track sessions. Improve consistency.
           </h1>
-          <p className="text-sm mt-1.5" style={{ color: '#6b7280' }}>
+          <p className="text-sm mt-1.5" style={{ color: 'var(--ui-muted)' }}>
             Log focused study sessions and monitor your progress every day.
           </p>
         </div>
@@ -206,8 +206,8 @@ export default function ProductivityPage() {
           { label: "Today's Study Time", value: `${stats.todayMinutes} min` },
         ].map((card) => (
           <Card key={card.label} className="p-5">
-            <p className="text-xs" style={{ color: '#6b7280' }}>{card.label}</p>
-            <p className="text-2xl font-bold mt-1" style={{ color: '#1f2937' }}>{card.value}</p>
+            <p className="text-xs" style={{ color: 'var(--ui-muted)' }}>{card.label}</p>
+            <p className="text-2xl font-bold mt-1" style={{ color: 'var(--ui-heading)' }}>{card.value}</p>
           </Card>
         ))}
       </div>
@@ -231,7 +231,7 @@ export default function ProductivityPage() {
 
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--ui-heading)' }}>
                 Subject
               </label>
               <input
@@ -240,12 +240,12 @@ export default function ProductivityPage() {
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="e.g. Mathematics"
                 className="rounded-xl px-3 py-2.5 text-sm w-full"
-                style={{ background: '#ffffff', border: '1px solid rgba(110,231,216,0.15)', color: '#1f2937', outline: 'none' }}
+                style={{ background: 'var(--ui-surface)', border: '1px solid rgba(110,231,216,0.15)', color: 'var(--ui-heading)', outline: 'none' }}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--ui-heading)' }}>
                 Duration (minutes)
               </label>
               <input
@@ -255,12 +255,12 @@ export default function ProductivityPage() {
                 onChange={(e) => setDurationMinutes(e.target.value)}
                 placeholder="e.g. 50"
                 className="rounded-xl px-3 py-2.5 text-sm w-full"
-                style={{ background: '#ffffff', border: '1px solid rgba(110,231,216,0.15)', color: '#1f2937', outline: 'none' }}
+                style={{ background: 'var(--ui-surface)', border: '1px solid rgba(110,231,216,0.15)', color: 'var(--ui-heading)', outline: 'none' }}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--ui-heading)' }}>
                 Session Date
               </label>
               <input
@@ -268,12 +268,12 @@ export default function ProductivityPage() {
                 value={sessionDate}
                 onChange={(e) => setSessionDate(e.target.value)}
                 className="rounded-xl px-3 py-2.5 text-sm w-full"
-                style={{ background: '#ffffff', border: '1px solid rgba(110,231,216,0.15)', color: '#1f2937', outline: 'none' }}
+                style={{ background: 'var(--ui-surface)', border: '1px solid rgba(110,231,216,0.15)', color: 'var(--ui-heading)', outline: 'none' }}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#1f2937' }}>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--ui-heading)' }}>
                 Notes (optional)
               </label>
               <textarea
@@ -282,9 +282,9 @@ export default function ProductivityPage() {
                 placeholder="What did you study in this session?"
                 className="rounded-xl px-3 py-2.5 text-sm w-full"
                 style={{
-                  background: '#ffffff',
+                  background: 'var(--ui-surface)',
                   border: '1px solid rgba(110,231,216,0.15)',
-                  color: '#1f2937',
+                  color: 'var(--ui-heading)',
                   outline: 'none',
                   minHeight: '88px',
                   resize: 'none',
@@ -302,7 +302,7 @@ export default function ProductivityPage() {
                   !saving && subject.trim() && sessionDate && Number(durationMinutes) > 0
                     ? 'linear-gradient(135deg,#6EE7D8,#14B8A6)'
                     : 'rgba(255,255,255,0.06)',
-                color: !saving && subject.trim() && sessionDate && Number(durationMinutes) > 0 ? '#111827' : '#9ca3af',
+                color: !saving && subject.trim() && sessionDate && Number(durationMinutes) > 0 ? '#111827' : 'var(--ui-subtle)',
                 boxShadow:
                   !saving && subject.trim() && sessionDate && Number(durationMinutes) > 0
                     ? '0 4px 16px rgba(110,231,216,0.28)'
@@ -324,9 +324,9 @@ export default function ProductivityPage() {
               onClick={loadSessions}
               className="px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150"
               style={{
-                background: '#f5f7f4',
-                border: '1px solid #e5e7eb',
-                color: '#374151',
+                background: 'var(--ui-surface-2)',
+                border: '1px solid var(--ui-border)',
+                color: 'var(--ui-text)',
               }}
             >
               Refresh
@@ -335,15 +335,15 @@ export default function ProductivityPage() {
 
           <div className="space-y-2.5">
             {loading && (
-              <div className="rounded-xl p-4" style={{ background: '#f5f7f4', border: '1px solid #e5e7eb' }}>
-                <p className="text-sm" style={{ color: '#6b7280' }}>Loading your sessions…</p>
+              <div className="rounded-xl p-4" style={{ background: 'var(--ui-surface-2)', border: '1px solid var(--ui-border)' }}>
+                <p className="text-sm" style={{ color: 'var(--ui-muted)' }}>Loading your sessions…</p>
               </div>
             )}
 
             {!loading && sessions.length === 0 && !error && (
               <div className="rounded-xl p-5" style={{ background: 'rgba(110,231,216,0.05)', border: '1px dashed rgba(110,231,216,0.18)' }}>
-                <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>No sessions yet.</p>
-                <p className="text-[11px] mt-1" style={{ color: '#6b7280' }}>
+                <p className="text-sm font-semibold" style={{ color: 'var(--ui-heading)' }}>No sessions yet.</p>
+                <p className="text-[11px] mt-1" style={{ color: 'var(--ui-muted)' }}>
                   Add your first session to start tracking productivity.
                 </p>
               </div>
@@ -354,18 +354,18 @@ export default function ProductivityPage() {
                 <div
                   key={session.id}
                   className="group rounded-xl p-4 transition-all duration-150"
-                  style={{ background: '#f5f7f4', border: '1px solid #e5e7eb' }}
+                  style={{ background: 'var(--ui-surface-2)', border: '1px solid var(--ui-border)' }}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>
+                      <p className="text-sm font-semibold" style={{ color: 'var(--ui-heading)' }}>
                         {session.subject}
                       </p>
-                      <p className="text-[11px] mt-0.5" style={{ color: '#6b7280' }}>
+                      <p className="text-[11px] mt-0.5" style={{ color: 'var(--ui-muted)' }}>
                         {session.duration_minutes} min • {formatDate(session.session_date)}
                       </p>
                       {session.notes ? (
-                        <p className="text-xs mt-2 whitespace-pre-wrap" style={{ color: '#374151' }}>
+                        <p className="text-xs mt-2 whitespace-pre-wrap" style={{ color: 'var(--ui-text)' }}>
                           {session.notes}
                         </p>
                       ) : null}
@@ -375,13 +375,13 @@ export default function ProductivityPage() {
                       type="button"
                       onClick={() => deleteSession(session.id)}
                       className="p-1.5 rounded-lg transition-colors duration-150"
-                      style={{ color: '#6b7280' }}
+                      style={{ color: 'var(--ui-muted)' }}
                       title="Delete session"
                       onMouseEnter={(e) => {
                         (e.currentTarget as HTMLElement).style.color = '#f87171';
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.color = '#6b7280';
+                        (e.currentTarget as HTMLElement).style.color = 'var(--ui-muted)';
                       }}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

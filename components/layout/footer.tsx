@@ -30,9 +30,9 @@ const cols = [
 export default function Footer() {
   return (
     <footer
+      className="bg-[#222022] dark:bg-[#020617]"
       style={{
-        background: '#222022',
-        borderTop: '1px solid rgba(110,231,216,0.14)',
+        borderTop: '1px solid var(--ui-border)',
       }}
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8 py-16">
