@@ -2,14 +2,64 @@ import { NextResponse } from 'next/server';
 
 const OPENROUTER_MODEL = process.env.OPENAI_MODEL || 'openrouter/free';
 
+type RequestBody = {
+  question?: string;
+  agentType?: 'doubt' | 'mood';
+  userMessage?: string;
+  context?: { selectedMood?: string; recentTasks?: string[] };
+};
+
+const moodDescriptions: Record<string, string> = {
+  tired: 'I\'m feeling tired and low on energy',
+  neutral: 'I\'m feeling okay, neither energized nor drained',
+  motivated: 'I\'m feeling motivated and energized',
+};
+
+function getMoodPrompt(selectedMood: string, recentTasks: string[] = []): string {
+  const moodDesc = moodDescriptions[selectedMood] || 'feeling neutral';
+  const taskContext = recentTasks.length > 0
+    ? `\n\nRecent tasks/subjects: ${recentTasks.join(', ')}`
+    : '';
+
+  return (
+    `${moodDesc}. Give me 2-3 short, actionable study suggestions that match my current mood and energy level. ` +
+    `Keep each suggestion to 1-2 sentences. Focus on techniques that will help me study effectively right now.${taskContext}`
+  );
+}
+
+function getMoodSystemPrompt(): string {
+  return (
+    'You are EduFlow AI, a helpful academic tutor focused on mood-aware productivity. ' +
+    'Provide personalized, actionable study suggestions based on the user\'s current mood and energy level. ' +
+    'Keep suggestions concise, friendly, and practical. ' +
+    'Consider their mood when recommending study techniques and break strategies.'
+  );
+}
+
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as { question?: string };
-    const question = body.question?.trim();
+    const body = (await req.json()) as RequestBody;
+    const agentType = body.agentType || 'doubt';
+
+    let question: string | undefined;
+    let systemPrompt: string;
+
+    if (agentType === 'mood') {
+      const selectedMood = body.context?.selectedMood || 'neutral';
+      const recentTasks = body.context?.recentTasks || [];
+      question = getMoodPrompt(selectedMood, recentTasks);
+      systemPrompt = getMoodSystemPrompt();
+    } else {
+      question = body.question?.trim();
+      systemPrompt =
+        'You are EduFlow AI, a helpful academic tutor. ' +
+        'Give clear, concise, accurate explanations for students. ' +
+        'Use simple language first, then include a short example when relevant.';
+    }
 
     if (!question) {
       return NextResponse.json(
-        { error: 'Question is required.' },
+        { error: 'Question or mood context is required.' },
         { status: 400 }
       );
     }
@@ -21,11 +71,6 @@ export async function POST(req: Request) {
         { status: 500 }
       );
     }
-
-    const systemPrompt =
-      'You are EduFlow AI, a helpful academic tutor. ' +
-      'Give clear, concise, accurate explanations for students. ' +
-      'Use simple language first, then include a short example when relevant.';
 
     const aiRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -39,7 +84,8 @@ export async function POST(req: Request) {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: question },
         ],
-        temperature: 0.4,
+        temperature: agentType === 'mood' ? 0.6 : 0.4,
+        max_tokens: agentType === 'mood' ? 300 : 800,
       }),
     });
 
@@ -65,6 +111,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({
+      response: answer,
       answer,
     });
   } catch (err) {
@@ -73,7 +120,7 @@ export async function POST(req: Request) {
         error:
           err instanceof Error
             ? err.message
-            : 'Unexpected server error while solving doubt.',
+            : 'Unexpected server error while processing request.',
       },
       { status: 500 }
     );
