@@ -812,6 +812,11 @@ export default function MoodTrackerPage() {
             )}
           </div>
         </Card>
+<<<<<<< HEAD
+=======
+
+        {/* History */}
+>>>>>>> 614982d59c1fea824a5e43c670478bd90ccfe799
         <Card className="lg:col-span-2">
           <div className="flex items-center justify-between mb-5">
             <div>
