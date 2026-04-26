@@ -249,21 +249,25 @@ export default function MoodTrackerPage() {
     setSuggestion(null);
     setSuggestionsLoading(true);
     try {
-      const res = await fetch('/api/mood-suggestions', {
+      const res = await fetch("/api/doubt-solver", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+        agentType: "mood",
+        userMessage: "Give study advice based on my current mood",
+        context: {
           mood: suggestionMood,
-          recentTasks: entries
-            .filter(e => {
-              const d = new Date(e.occurred_at);
-              const today = new Date();
-              return d.toDateString() === today.toDateString();
-            })
-            .slice(0, 2)
-            .map(e => e.note)
-            .filter((n): n is string => !!n),
-        }),
+         recentTasks: entries
+        .filter((e) => {
+        const d = new Date(e.occurred_at);
+        const today = new Date();
+        return d.toDateString() === today.toDateString();
+      })
+      .slice(0, 2)
+      .map((e) => e.note)
+      .filter((n): n is string => !!n),
+  },
+}),
       });
 
       const data = (await res.json()) as { suggestion?: string; error?: string };
@@ -812,11 +816,8 @@ export default function MoodTrackerPage() {
             )}
           </div>
         </Card>
-<<<<<<< HEAD
-=======
 
         {/* History */}
->>>>>>> 614982d59c1fea824a5e43c670478bd90ccfe799
         <Card className="lg:col-span-2">
           <div className="flex items-center justify-between mb-5">
             <div>
