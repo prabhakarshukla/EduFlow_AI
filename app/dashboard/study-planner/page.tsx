@@ -200,6 +200,10 @@ export default function StudyPlannerPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [planPrompt, setPlanPrompt] = useState("");
+  const [planLoading, setPlanLoading] = useState(false);
+  const [planError, setPlanError] = useState<string | null>(null);
+  const [generatedPlan, setGeneratedPlan] = useState<string | null>(null);
 
   const [newLabel, setNewLabel] = useState("");
   const [newSubject, setNewSubject] = useState("");
@@ -462,6 +466,57 @@ export default function StudyPlannerPage() {
     }
   };
 
+  const generateAiPlan = async () => {
+    const prompt = planPrompt.trim();
+    if (!prompt) return;
+
+    setPlanLoading(true);
+    setPlanError(null);
+    setGeneratedPlan(null);
+
+    try {
+      const context = {
+        source: "study-planner",
+        totalTasks: tasks.length,
+        pendingTasks: tasks
+          .filter((task) => task.status !== "done")
+          .map((task) => ({
+            title: task.title,
+            subject: task.subject,
+            due: task.due,
+            priority: task.priority,
+            status: task.status,
+          })),
+      };
+
+      const response = await fetch("/api/doubt-solver", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agentType: "planner",
+          userMessage: prompt,
+          context,
+        }),
+      });
+
+      const data = (await response.json()) as { answer?: string; error?: string };
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to generate study plan.");
+      }
+
+      if (!data.answer?.trim()) {
+        throw new Error("AI returned an empty study plan.");
+      }
+
+      setGeneratedPlan(data.answer.trim());
+    } catch (e) {
+      setPlanError(e instanceof Error ? e.message : "Failed to generate study plan.");
+    } finally {
+      setPlanLoading(false);
+    }
+  };
+
   /* Input focus ring helper */
   const inputStyle = (field: string): React.CSSProperties => ({
     background: "var(--ui-surface)",
@@ -546,6 +601,83 @@ export default function StudyPlannerPage() {
           </span>
         </div>
       </div>
+
+      <Card>
+        <SectionLabel>AI Study Plan Generator</SectionLabel>
+        <div className="space-y-3">
+          <input
+            type="text"
+            value={planPrompt}
+            onChange={(e) => setPlanPrompt(e.target.value)}
+            placeholder="Ask AI to generate your study plan..."
+            className="w-full"
+            style={{
+              background: "var(--ui-surface)",
+              border: "1px solid rgba(110,231,216,0.15)",
+              color: "var(--ui-heading)",
+              outline: "none",
+              borderRadius: "0.75rem",
+              padding: "0.625rem 0.875rem",
+              fontSize: "0.875rem",
+            }}
+          />
+
+          <button
+            type="button"
+            onClick={generateAiPlan}
+            disabled={planLoading || !planPrompt.trim()}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+            style={{
+              background:
+                !planLoading && planPrompt.trim()
+                  ? "linear-gradient(135deg,#6EE7D8,#14B8A6)"
+                  : "rgba(255,255,255,0.06)",
+              color: !planLoading && planPrompt.trim() ? "#111827" : "var(--ui-subtle)",
+              boxShadow:
+                !planLoading && planPrompt.trim()
+                  ? "0 4px 16px rgba(110,231,216,0.28)"
+                  : "none",
+              cursor: !planLoading && planPrompt.trim() ? "pointer" : "not-allowed",
+            }}
+          >
+            {planLoading ? "Generating..." : "Generate Plan"}
+          </button>
+
+          {planError && (
+            <div
+              className="rounded-xl p-3 text-sm"
+              role="alert"
+              style={{
+                background: "rgba(248,113,113,0.10)",
+                border: "1px solid rgba(248,113,113,0.22)",
+                color: "#b91c1c",
+              }}
+            >
+              {planError}
+            </div>
+          )}
+
+          {generatedPlan && (
+            <div
+              className="rounded-xl p-4"
+              style={{
+                background: "rgba(110,231,216,0.06)",
+                border: "1px solid rgba(110,231,216,0.22)",
+              }}
+            >
+              <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: "#0f766e" }}>
+                Generated Plan
+              </p>
+              <p
+                className="text-sm whitespace-pre-wrap leading-relaxed"
+                style={{ color: "var(--ui-heading)" }}
+              >
+                {generatedPlan}
+              </p>
+            </div>
+          )}
+        </div>
+      </Card>
 
       {/* ── Row 1: Progress summary + Weekly plan ── */}
       <div className="grid lg:grid-cols-3 gap-5">
