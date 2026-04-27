@@ -6,7 +6,7 @@ EduFlow AI is a full-stack student assistant SaaS that brings study planning, no
 
 ---
 
-## 🚀 Overview
+##  Overview
 
 Students often use too many separate tools for planning, notes, doubts, focus tracking, and motivation. EduFlow AI was built to solve that problem by combining the most useful student workflows in one place.
 
@@ -16,7 +16,7 @@ The goal is simple: help students stay organized, consistent, and supported whil
 
 ---
 
-## ✨ Features
+##  Features
 
 ### Study & Planning
 
@@ -51,7 +51,7 @@ The goal is simple: help students stay organized, consistent, and supported whil
 
 ---
 
-## 🧠 AI Capabilities
+##  AI Capabilities
 
 EduFlow AI uses AI APIs through OpenRouter / LLM providers to make studying more interactive and helpful.
 
@@ -69,7 +69,7 @@ The project includes a multi-agent AI approach, allowing different AI workflows 
 
 ---
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 ### Frontend
 
@@ -106,7 +106,7 @@ The project includes a multi-agent AI approach, allowing different AI workflows 
 
 ![Study Planner Screenshot](./public/images/study-planner.png)
 
-![AI Doubt Solver Screenshot](./public/images/doubt-solver.png)
+![AI Doubt Solver Screenshot](./public/images/ai-doubt-solver.png)
 
 ![Notes Screenshot](./public/images/notes.png)
 
@@ -151,7 +151,7 @@ npm run dev
 Open the app in your browser:
 
 ```text
-http://localhost:3000
+(https://eduflow-ai-olive.vercel.app/)
 ```
 
 ### 5. Build for production
@@ -162,7 +162,7 @@ npm run build
 
 ---
 
-## 🔐 Environment Variables
+## Environment Variables
 
 Example `.env.local`:
 
@@ -175,17 +175,7 @@ GEMINI_MODEL=gemini-2.5-flash
 OPENAI_API_KEY=
 ```
 
-For OpenRouter/OpenAI-compatible fallback, keep:
-
-```env
-OPENAI_API_KEY=
-OPENAI_MODEL=
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-```
-
----
-
-## 📊 Key Features Highlight
+##  Key Features Highlight
 
 ### Streak System
 
@@ -201,7 +191,7 @@ AI tools are built directly into the study workflow, so students can generate no
 
 ---
 
-## 🧩 Challenges I Faced
+##  Challenges I Faced
 
 Building EduFlow AI involved several real-world challenges:
 
@@ -215,7 +205,7 @@ Building EduFlow AI involved several real-world challenges:
 
 ---
 
-## 🚀 Future Improvements
+##  Future Improvements
 
 - Heatmap calendar for long-term study consistency
 - Advanced AI study insights
@@ -227,7 +217,7 @@ Building EduFlow AI involved several real-world challenges:
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome.
 
@@ -242,13 +232,13 @@ Please keep changes clean, focused, and easy to review.
 
 ---
 
-## 📄 License
+##  License
 
 This project is licensed under the MIT License.
 
 ---
 
-## 🙌 Acknowledgements
+##  Acknowledgements
 
 Thanks to the tools and platforms that make this project possible:
 
@@ -261,10 +251,11 @@ Thanks to the tools and platforms that make this project possible:
 
 ---
 
-## 📬 Contact
+##  Contact
 
 Created by **Your Name**
 
-- GitHub: [https://github.com/your-username](https://github.com/your-username)
-- LinkedIn: [https://linkedin.com/in/your-profile](https://linkedin.com/in/your-profile)
-- Portfolio: [https://your-portfolio.com](https://your-portfolio.com)
+- GitHub: https://github.com/prabhakarshukla
+- LinkedIn: www.linkedin.com/in/prabhakar-shukla-90334b399
+- Instagram: https://www.instagram.com/prabhakar_.shukla
+- Gmail: prabhakarshukla669@gmail.com 
