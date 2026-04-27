@@ -1,9 +1,0 @@
-# Query: /api/mood-suggest
-# ContextLines: 1
-
-1 result - 1 file
-
-app\dashboard\mood\page.tsx:
-  251      try {
-  252:       const res = await fetch("/api/doubt-solver", {
-  253          method: 'POST',
