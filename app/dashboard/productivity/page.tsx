@@ -79,6 +79,7 @@ export default function ProductivityPage() {
     upcomingDeadlines: [],
   });
   const [aiInsightsLoading, setAiInsightsLoading] = useState(false);
+  const [aiInsightsTyping, setAiInsightsTyping] = useState(false);
   const [aiInsightsError, setAiInsightsError] = useState<string | null>(null);
   const [generatedInsights, setGeneratedInsights] = useState<string | null>(
     null,
@@ -298,8 +299,9 @@ export default function ProductivityPage() {
 
   const generateAiInsights = async () => {
     setAiInsightsLoading(true);
+    setAiInsightsTyping(false);
     setAiInsightsError(null);
-    setGeneratedInsights(null);
+    setGeneratedInsights("Thinking...");
 
     try {
       const context = {
@@ -337,11 +339,27 @@ export default function ProductivityPage() {
         throw new Error("AI returned empty insights.");
       }
 
-      setGeneratedInsights(data.answer.trim());
+      const insights = data.answer.trim();
+      setGeneratedInsights("");
+      setAiInsightsTyping(true);
+
+      let index = 0;
+      const chunkSize = 5;
+      const timer = window.setInterval(() => {
+        index += chunkSize;
+        setGeneratedInsights(insights.slice(0, index));
+
+        if (index >= insights.length) {
+          window.clearInterval(timer);
+          setAiInsightsTyping(false);
+        }
+      }, 10);
     } catch (e) {
       setAiInsightsError(
         e instanceof Error ? e.message : "Failed to generate insights.",
       );
+      setGeneratedInsights(null);
+      setAiInsightsTyping(false);
     } finally {
       setAiInsightsLoading(false);
     }
@@ -419,23 +437,45 @@ export default function ProductivityPage() {
           <button
             type="button"
             onClick={generateAiInsights}
-            disabled={aiInsightsLoading}
+            disabled={aiInsightsLoading || aiInsightsTyping}
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
             style={{
-              background: !aiInsightsLoading
+              background: !aiInsightsLoading && !aiInsightsTyping
                 ? "linear-gradient(135deg,#6EE7D8,#14B8A6)"
                 : "rgba(255,255,255,0.06)",
-              color: !aiInsightsLoading ? "#111827" : "var(--ui-subtle)",
-              boxShadow: !aiInsightsLoading
+              color: !aiInsightsLoading && !aiInsightsTyping ? "#111827" : "var(--ui-subtle)",
+              boxShadow: !aiInsightsLoading && !aiInsightsTyping
                 ? "0 4px 16px rgba(110,231,216,0.28)"
                 : "none",
-              cursor: !aiInsightsLoading ? "pointer" : "not-allowed",
+              cursor: !aiInsightsLoading && !aiInsightsTyping ? "pointer" : "not-allowed",
             }}
           >
             {aiInsightsLoading
-              ? "Analyzing your productivity..."
-              : "Analyze My Productivity"}
+              ? "Thinking..."
+              : aiInsightsTyping
+                ? "Typing insights..."
+                : "Analyze My Productivity"}
           </button>
+          {aiInsightsLoading && (
+            <div
+              className="rounded-xl p-4 space-y-2"
+              style={{
+                background: "rgba(110,231,216,0.06)",
+                border: "1px solid rgba(110,231,216,0.18)",
+              }}
+            >
+              <p className="text-xs font-semibold" style={{ color: "#0f766e" }}>
+                Thinking...
+              </p>
+              {["100%", "86%", "68%", "48%"].map((width) => (
+                <div
+                  key={width}
+                  className="h-2.5 rounded-lg animate-pulse"
+                  style={{ width, background: "rgba(110,231,216,0.18)" }}
+                />
+              ))}
+            </div>
+          )}
           {aiInsightsError && (
             <div
               className="rounded-xl p-3 text-sm"
@@ -468,6 +508,7 @@ export default function ProductivityPage() {
                 style={{ color: "var(--ui-heading)" }}
               >
                 {generatedInsights}
+                {aiInsightsTyping && <span className="animate-pulse">|</span>}
               </p>
             </div>
           )}

@@ -88,6 +88,7 @@ export default function MoodTrackerPage() {
     "tired" | "neutral" | "motivated"
   >("neutral");
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  const [suggestionTyping, setSuggestionTyping] = useState(false);
   const [suggestionsError, setSuggestionsError] = useState<string | null>(null);
   const [suggestion, setSuggestion] = useState<string | null>(null);
 
@@ -246,7 +247,8 @@ export default function MoodTrackerPage() {
 
   const getSuggestion = async () => {
     setSuggestionsError(null);
-    setSuggestion(null);
+    setSuggestion("Thinking...");
+    setSuggestionTyping(false);
     setSuggestionsLoading(true);
     try {
       const res = await fetch("/api/doubt-solver", {
@@ -284,11 +286,33 @@ export default function MoodTrackerPage() {
 
       const aiResponse =
         data.response || data.suggestion || data.answer || null;
-      setSuggestion(aiResponse);
+      if (!aiResponse?.trim()) {
+        setSuggestionsError("AI returned an empty suggestion.");
+        setSuggestion(null);
+        return;
+      }
+
+      const suggestionText = aiResponse.trim();
+      setSuggestion("");
+      setSuggestionTyping(true);
+
+      let index = 0;
+      const chunkSize = 4;
+      const timer = window.setInterval(() => {
+        index += chunkSize;
+        setSuggestion(suggestionText.slice(0, index));
+
+        if (index >= suggestionText.length) {
+          window.clearInterval(timer);
+          setSuggestionTyping(false);
+        }
+      }, 12);
     } catch (e) {
       setSuggestionsError(
         e instanceof Error ? e.message : "Failed to get suggestions.",
       );
+      setSuggestion(null);
+      setSuggestionTyping(false);
     } finally {
       setSuggestionsLoading(false);
     }
@@ -744,38 +768,44 @@ export default function MoodTrackerPage() {
             <button
               type="button"
               onClick={getSuggestion}
-              disabled={suggestionsLoading}
+              disabled={suggestionsLoading || suggestionTyping}
               className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
               style={{
-                background: suggestionsLoading
+                background: suggestionsLoading || suggestionTyping
                   ? "rgba(255,255,255,0.06)"
                   : "linear-gradient(135deg,#6EE7D8,#14B8A6)",
-                color: suggestionsLoading ? "var(--ui-subtle)" : "#111827",
-                boxShadow: suggestionsLoading
+                color:
+                  suggestionsLoading || suggestionTyping
+                    ? "var(--ui-subtle)"
+                    : "#111827",
+                boxShadow: suggestionsLoading || suggestionTyping
                   ? "none"
                   : "0 4px 16px rgba(110,231,216,0.28)",
-                opacity: suggestionsLoading ? 0.85 : 1,
-                cursor: suggestionsLoading ? "not-allowed" : "pointer",
+                opacity: suggestionsLoading || suggestionTyping ? 0.85 : 1,
+                cursor:
+                  suggestionsLoading || suggestionTyping
+                    ? "not-allowed"
+                    : "pointer",
                 transition: uiTransition,
               }}
               onMouseEnter={(e) => {
-                if (!suggestionsLoading)
+                if (!suggestionsLoading && !suggestionTyping)
                   (e.currentTarget as HTMLElement).style.boxShadow =
                     "0 6px 20px rgba(110,231,216,0.34)";
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLElement).style.boxShadow =
-                  suggestionsLoading
+                  suggestionsLoading || suggestionTyping
                     ? "none"
                     : "0 4px 16px rgba(110,231,216,0.28)";
               }}
               onMouseDown={(e) => {
-                if (!suggestionsLoading)
+                if (!suggestionsLoading && !suggestionTyping)
                   (e.currentTarget as HTMLElement).style.transform =
                     "scale(0.99)";
               }}
               onMouseUp={(e) => {
-                if (!suggestionsLoading)
+                if (!suggestionsLoading && !suggestionTyping)
                   (e.currentTarget as HTMLElement).style.transform = "scale(1)";
               }}
             >
@@ -800,8 +830,10 @@ export default function MoodTrackerPage() {
                       d="M4 12a8 8 0 018-8v8H4z"
                     />
                   </svg>
-                  Analyzing your mood…
+                  Thinking...
                 </>
+              ) : suggestionTyping ? (
+                <>Typing suggestion...</>
               ) : (
                 <>
                   <svg
@@ -822,6 +854,27 @@ export default function MoodTrackerPage() {
               )}
             </button>
 
+            {suggestionsLoading && (
+              <div
+                className="rounded-xl p-3 space-y-2"
+                style={{
+                  background: "rgba(110,231,216,0.06)",
+                  border: "1px solid rgba(110,231,216,0.18)",
+                }}
+              >
+                <p className="text-xs font-semibold" style={{ color: "#0f766e" }}>
+                  Thinking...
+                </p>
+                {["100%", "84%", "62%"].map((width) => (
+                  <div
+                    key={width}
+                    className="h-2.5 rounded-lg animate-pulse"
+                    style={{ width, background: "rgba(110,231,216,0.18)" }}
+                  />
+                ))}
+              </div>
+            )}
+
             {suggestion && (
               <div
                 className="rounded-xl px-3.5 py-3 text-sm"
@@ -838,7 +891,10 @@ export default function MoodTrackerPage() {
                 >
                   ✨ Your personalized suggestion:
                 </p>
-                <p>{suggestion}</p>
+                <p>
+                  {suggestion}
+                  {suggestionTyping && <span className="animate-pulse">|</span>}
+                </p>
               </div>
             )}
           </div>

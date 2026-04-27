@@ -1,7 +1,7 @@
 // app/dashboard/doubt-solver/page.tsx
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 type SolverStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -22,6 +22,8 @@ export default function DoubtSolverPage() {
   const [status, setStatus] = useState<SolverStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SolverResult | null>(null);
+  const [displayedAnswer, setDisplayedAnswer] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
   const canSubmit = useMemo(() => question.trim().length > 0 && status !== 'loading', [question, status]);
 
@@ -29,7 +31,30 @@ export default function DoubtSolverPage() {
     setStatus('idle');
     setError(null);
     setResult(null);
+    setDisplayedAnswer('');
+    setIsTyping(false);
   };
+
+  useEffect(() => {
+    if (status !== 'success' || !result?.answer) return;
+
+    setDisplayedAnswer('');
+    setIsTyping(true);
+
+    let index = 0;
+    const chunkSize = 4;
+    const timer = window.setInterval(() => {
+      index += chunkSize;
+      setDisplayedAnswer(result.answer.slice(0, index));
+
+      if (index >= result.answer.length) {
+        window.clearInterval(timer);
+        setIsTyping(false);
+      }
+    }, 12);
+
+    return () => window.clearInterval(timer);
+  }, [result?.answer, status]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -39,6 +64,7 @@ export default function DoubtSolverPage() {
     setStatus('loading');
     setError(null);
     setResult(null);
+    setDisplayedAnswer('Thinking...');
 
     try {
       const res = await fetch('/api/doubt-solver', {
@@ -227,12 +253,19 @@ export default function DoubtSolverPage() {
 
         {status === 'loading' && (
           <div className="space-y-3">
-            {[6, 5, 4, 3].map((w, i) => (
-              <div key={i} className={`h-3 rounded-lg w-${w}/6 animate-pulse`} style={{ background: 'var(--ui-surface-2)' }} />
+            <p className="text-sm font-medium" style={{ color: '#0f766e' }}>
+              Thinking...
+            </p>
+            {['100%', '92%', '78%', '58%'].map((width, i) => (
+              <div
+                key={i}
+                className="h-3 rounded-lg animate-pulse"
+                style={{ width, background: 'rgba(110,231,216,0.16)' }}
+              />
             ))}
             <div className="flex items-center gap-2 mt-4">
               <div className="w-4 h-4 rounded-full animate-pulse" style={{ background: 'rgba(110,231,216,0.20)' }} />
-              <p className="text-xs" style={{ color: 'var(--ui-muted)' }}>EduFlow AI is thinking…</p>
+              <p className="text-xs" style={{ color: 'var(--ui-muted)' }}>EduFlow AI is preparing your answer...</p>
             </div>
           </div>
         )}
@@ -254,7 +287,8 @@ export default function DoubtSolverPage() {
             {/* Mint top accent line */}
             <div className="h-px w-full mb-4" style={{ background: 'linear-gradient(90deg, #6EE7D8, transparent)' }} />
             <p className="text-sm leading-[1.85] whitespace-pre-wrap" style={{ color: 'var(--ui-heading)' }}>
-              {result.answer}
+              {displayedAnswer}
+              {isTyping && <span className="animate-pulse">|</span>}
             </p>
             {result.source && (
               <span

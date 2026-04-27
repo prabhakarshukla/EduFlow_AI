@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatLastActiveDate, getStreak, type Streak } from "@/lib/streaks";
 
@@ -31,6 +31,128 @@ type DbTask = {
   status: "done" | "in_progress" | "todo" | string;
   created_at?: string | null;
 };
+
+const WeeklyProgressChart = memo(function WeeklyProgressChart({
+  loading,
+  weeklyProgress,
+  weeklyProgressError,
+  weeklyHasProgress,
+  weeklyMax,
+}: {
+  loading: boolean;
+  weeklyProgress: WeeklyProgressDay[];
+  weeklyProgressError: string | null;
+  weeklyHasProgress: boolean;
+  weeklyMax: number;
+}) {
+  if (loading) {
+    return (
+      <div className="grid grid-cols-7 gap-2 sm:gap-3 h-44 items-end">
+        {weeklyProgress.map((day) => (
+          <div key={day.key} className="flex flex-col items-center gap-2">
+            <div
+              className="w-full max-w-12 rounded-t-xl animate-pulse"
+              style={{
+                height: "72px",
+                background: "rgba(110,231,216,0.18)",
+              }}
+            />
+            <div
+              className="h-3 w-8 rounded animate-pulse"
+              style={{ background: "rgba(110,231,216,0.16)" }}
+            />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (weeklyProgressError) {
+    return (
+      <div
+        className="rounded-xl p-4 text-sm"
+        role="alert"
+        style={{
+          background: "rgba(248,113,113,0.10)",
+          border: "1px solid rgba(248,113,113,0.18)",
+          color: "#b91c1c",
+        }}
+      >
+        Weekly progress is unavailable.
+      </div>
+    );
+  }
+
+  if (!weeklyHasProgress) {
+    return (
+      <div
+        className="flex min-h-44 items-center justify-center rounded-xl px-4 text-center"
+        style={{
+          background: "rgba(110,231,216,0.07)",
+          border: "1px dashed rgba(20,184,166,0.22)",
+        }}
+      >
+        <p className="text-sm" style={{ color: "var(--ui-muted)" }}>
+          No weekly progress yet. Complete a task to see your progress.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-7 gap-2 sm:gap-3 h-48 items-end">
+      {weeklyProgress.map((day) => {
+        const height = Math.max(
+          10,
+          Math.round((day.count / weeklyMax) * 100),
+        );
+
+        return (
+          <div
+            key={day.key}
+            className="h-full flex flex-col items-center justify-end gap-2 min-w-0"
+          >
+            <span
+              className="text-[10px] sm:text-xs font-bold"
+              style={{ color: day.count ? "#0f766e" : "var(--ui-subtle)" }}
+            >
+              {day.count}
+            </span>
+            <div className="w-full flex items-end justify-center h-32 sm:h-36">
+              <div
+                className="w-full max-w-12 rounded-t-xl transition-all duration-300"
+                style={{
+                  height: `${height}%`,
+                  minHeight: day.count ? "18px" : "10px",
+                  background: day.count
+                    ? "linear-gradient(180deg, #6EE7D8 0%, #14B8A6 100%)"
+                    : "rgba(110,231,216,0.14)",
+                  boxShadow: day.count
+                    ? "0 10px 24px rgba(20,184,166,0.22)"
+                    : "none",
+                }}
+                title={`${day.label}: ${day.count} completed ${
+                  day.count === 1 ? "task" : "tasks"
+                }`}
+              />
+            </div>
+            <span
+              className="text-[10px] sm:text-xs font-semibold truncate"
+              style={{ color: "var(--ui-muted)" }}
+            >
+              {day.label}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+});
+type DbWeeklyTask = {
+  id: string;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
 type DbNote = {
   id: string;
   title: string | null;
@@ -56,6 +178,13 @@ type ActivityItem = {
   tag: string;
   tagColor?: string;
 };
+type WeeklyProgressDay = {
+  key: string;
+  label: string;
+  count: number;
+};
+
+const focusSkeletonRows = [0, 1, 2, 3];
 
 const quickActions: QuickAction[] = [
   {
@@ -184,6 +313,53 @@ const formatHoursMinutes = (minutes: number) => {
   return `${hours}h ${mins}m`;
 };
 
+const toLocalDateKey = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const buildWeeklyProgressDays = (): WeeklyProgressDay[] => {
+  const today = new Date();
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - (6 - index));
+
+    return {
+      key: toLocalDateKey(date),
+      label: date.toLocaleDateString(undefined, { weekday: "short" }),
+      count: 0,
+    };
+  });
+};
+
+const countWeeklyCompletedTasks = (
+  tasks: DbWeeklyTask[],
+): WeeklyProgressDay[] => {
+  const days = buildWeeklyProgressDays();
+  const dayCounts = new Map(days.map((day) => [day.key, 0]));
+
+  tasks.forEach((task) => {
+    const completedAt = task.updated_at ?? task.created_at;
+    if (!completedAt) return;
+
+    const completedDate = new Date(completedAt);
+    if (Number.isNaN(completedDate.getTime())) return;
+
+    const dateKey = toLocalDateKey(completedDate);
+    if (!dayCounts.has(dateKey)) return;
+
+    dayCounts.set(dateKey, (dayCounts.get(dateKey) ?? 0) + 1);
+  });
+
+  return days.map((day) => ({
+    ...day,
+    count: dayCounts.get(day.key) ?? 0,
+  }));
+};
+
 const resolveDisplayName = (
   user: {
     email?: string | null;
@@ -205,7 +381,7 @@ const resolveDisplayName = (
 
 /* ── Dashboard page ── */
 export default function DashboardPage() {
-  const now = new Date();
+  const now = useMemo(() => new Date(), []);
   const greeting = "Welcome back";
 
   const [displayName, setDisplayName] = useState("Student");
@@ -229,6 +405,12 @@ export default function DashboardPage() {
     useState<number>(0);
 
   const [streak, setStreak] = useState<Streak | null>(null);
+  const [weeklyProgress, setWeeklyProgress] = useState<WeeklyProgressDay[]>(
+    () => buildWeeklyProgressDays(),
+  );
+  const [weeklyProgressError, setWeeklyProgressError] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     let alive = true;
@@ -248,14 +430,19 @@ export default function DashboardPage() {
         }
 
         setDisplayName(resolveDisplayName(u.user));
+        setWeeklyProgress(buildWeeklyProgressDays());
+        setWeeklyProgressError(null);
 
         const [
           allTasksRes,
           doneTasksRes,
+          totalTasksCountRes,
+          weeklyTasksRes,
           notesCountRes,
           latestNoteRes,
           latestMoodRes,
           productivityRes,
+          streakData,
         ] = await Promise.all([
           supabase
             .from("study_tasks")
@@ -266,6 +453,15 @@ export default function DashboardPage() {
             .from("study_tasks")
             .select("id", { count: "exact", head: true })
             .eq("status", "done"),
+          supabase
+            .from("study_tasks")
+            .select("id", { count: "exact", head: true }),
+          supabase
+            .from("study_tasks")
+            .select("id,created_at,updated_at")
+            .eq("status", "done")
+            .order("created_at", { ascending: false })
+            .limit(500),
           supabase.from("notes").select("id", { count: "exact", head: true }),
           supabase
             .from("notes")
@@ -283,10 +479,9 @@ export default function DashboardPage() {
             .from("productivity_sessions")
             .select("duration_minutes,session_date")
             .eq("user_id", u.user.id),
+          getStreak(supabase, u.user.id),
         ]);
 
-        // Fetch streak data without creating an active day before a task is done.
-        const streakData = await getStreak(supabase, u.user.id);
         if (!alive) return;
         setStreak(streakData);
 
@@ -294,6 +489,32 @@ export default function DashboardPage() {
 
         if (allTasksRes.error) throw new Error(allTasksRes.error.message);
         if (doneTasksRes.error) throw new Error(doneTasksRes.error.message);
+        if (totalTasksCountRes.error)
+          throw new Error(totalTasksCountRes.error.message);
+        if (weeklyTasksRes.error) {
+          const fallbackWeeklyTasksRes = await supabase
+            .from("study_tasks")
+            .select("id,created_at")
+            .eq("status", "done")
+            .order("created_at", { ascending: false })
+            .limit(500);
+
+          if (fallbackWeeklyTasksRes.error) {
+            setWeeklyProgressError(fallbackWeeklyTasksRes.error.message);
+          } else {
+            setWeeklyProgress(
+              countWeeklyCompletedTasks(
+                (fallbackWeeklyTasksRes.data ?? []) as DbWeeklyTask[],
+              ),
+            );
+          }
+        } else {
+          setWeeklyProgress(
+            countWeeklyCompletedTasks(
+              (weeklyTasksRes.data ?? []) as DbWeeklyTask[],
+            ),
+          );
+        }
         if (notesCountRes.error) throw new Error(notesCountRes.error.message);
         if (latestNoteRes.error) throw new Error(latestNoteRes.error.message);
         if (latestMoodRes.error) throw new Error(latestMoodRes.error.message);
@@ -302,11 +523,6 @@ export default function DashboardPage() {
 
         const tasks = (allTasksRes.data ?? []) as DbTask[];
         const totalFromList = tasks.length;
-        const totalTasksCountRes = await supabase
-          .from("study_tasks")
-          .select("id", { count: "exact", head: true });
-        if (totalTasksCountRes.error)
-          throw new Error(totalTasksCountRes.error.message);
 
         const total = totalTasksCountRes.count ?? totalFromList ?? 0;
         const done = doneTasksRes.count ?? 0;
@@ -361,6 +577,38 @@ export default function DashboardPage() {
     const done = focusItems.filter((t) => t.done).length;
     return Math.round((done / focusItems.length) * 100);
   }, [focusItems]);
+  const focusDoneCount = useMemo(
+    () => focusItems.filter((task) => task.done).length,
+    [focusItems],
+  );
+  const focusSummary = useMemo(
+    () =>
+      loading
+        ? "Loading tasks..."
+        : `${focusDoneCount} of ${focusItems.length} tasks completed`,
+    [focusDoneCount, focusItems.length, loading],
+  );
+
+  const weeklyMax = useMemo(
+    () => Math.max(1, ...weeklyProgress.map((day) => day.count)),
+    [weeklyProgress],
+  );
+  const weeklyTotal = useMemo(
+    () => weeklyProgress.reduce((sum, day) => sum + day.count, 0),
+    [weeklyProgress],
+  );
+  const weeklyHasProgress = weeklyTotal > 0;
+  const weeklySummary = useMemo(() => {
+    if (loading) return "Loading weekly progress...";
+    if (weeklyProgressError) return "Could not load weekly progress right now.";
+    if (!weeklyHasProgress) {
+      return "No weekly progress yet. Complete a task to see your progress.";
+    }
+
+    return `${weeklyTotal} completed ${
+      weeklyTotal === 1 ? "task" : "tasks"
+    } this week`;
+  }, [loading, weeklyHasProgress, weeklyProgressError, weeklyTotal]);
 
   const overviewCards: OverviewCard[] = useMemo(() => {
     const tasksValue = loading ? "—" : `${taskDone} / ${taskTotal}`;
@@ -675,6 +923,62 @@ export default function DashboardPage() {
       : streakCount > 0
         ? "0 0 16px rgba(245,158,11,0.32), 0 0 28px rgba(20,184,166,0.16)"
         : "none";
+  const streakMetricItems = useMemo(
+    () => [
+      ["Current", streakCurrent],
+      ["Longest", streakLongest],
+      ["Last active", streakLastActive],
+    ],
+    [streakCurrent, streakLastActive, streakLongest],
+  );
+  const handlePrimaryCtaEnter = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      e.currentTarget.style.boxShadow =
+        "0 6px 22px rgba(110,231,216,0.44)";
+      e.currentTarget.style.transform = "translateY(-2px)";
+    },
+    [],
+  );
+  const handlePrimaryCtaLeave = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      e.currentTarget.style.boxShadow =
+        "0 3px 14px rgba(110,231,216,0.28)";
+      e.currentTarget.style.transform = "translateY(0)";
+    },
+    [],
+  );
+  const handleTextLinkEnter = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      e.currentTarget.style.color = "#115e59";
+    },
+    [],
+  );
+  const handleTextLinkLeave = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      e.currentTarget.style.color = "#0d9488";
+    },
+    [],
+  );
+  const handleQuickActionEnter = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      const el = e.currentTarget;
+      el.style.borderColor = "rgba(110,231,216,0.28)";
+      el.style.background = "rgba(110,231,216,0.08)";
+      el.style.color = "var(--ui-heading)";
+      el.style.transform = "translateY(-1px)";
+    },
+    [],
+  );
+  const handleQuickActionLeave = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      const el = e.currentTarget;
+      el.style.borderColor = "rgba(110,231,216,0.09)";
+      el.style.background = "rgba(110,231,216,0.04)";
+      el.style.color = "var(--ui-text)";
+      el.style.transform = "translateY(0)";
+    },
+    [],
+  );
 
   return (
     <div className="px-6 sm:px-8 py-8 max-w-[1280px] mx-auto space-y-8">
@@ -720,17 +1024,8 @@ export default function DashboardPage() {
             color: "#0d2420",
             boxShadow: "0 3px 14px rgba(110,231,216,0.28)",
           }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.boxShadow =
-              "0 6px 22px rgba(110,231,216,0.44)";
-            (e.currentTarget as HTMLElement).style.transform =
-              "translateY(-2px)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.boxShadow =
-              "0 3px 14px rgba(110,231,216,0.28)";
-            (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-          }}
+          onMouseEnter={handlePrimaryCtaEnter}
+          onMouseLeave={handlePrimaryCtaLeave}
         >
           <svg
             className="w-4 h-4"
@@ -947,11 +1242,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="grid grid-cols-3 gap-3 sm:min-w-[360px]">
-            {[
-              ["Current", streakCurrent],
-              ["Longest", streakLongest],
-              ["Last active", streakLastActive],
-            ].map(([label, value]) => (
+            {streakMetricItems.map(([label, value]) => (
               <div
                 key={label}
                 className="rounded-xl px-3 py-3 min-w-0 transition-transform duration-200 hover:-translate-y-0.5"
@@ -980,6 +1271,72 @@ export default function DashboardPage() {
         </div>
       </section>
 
+      <section
+        className="rounded-2xl p-5 sm:p-6"
+        style={{
+          background: "var(--ui-surface)",
+          border: "1px solid var(--ui-border)",
+          boxShadow:
+            "0 12px 32px rgba(15,118,110,0.08), inset 0 1px 0 rgba(255,255,255,0.55)",
+        }}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-6">
+          <div>
+            <p
+              className="text-[10px] font-bold uppercase tracking-[0.12em]"
+              style={{ color: "#0f766e" }}
+            >
+              Weekly Progress
+            </p>
+            <h2
+              className="text-lg sm:text-xl font-bold mt-1"
+              style={{ color: "var(--ui-heading)" }}
+            >
+              Last 7 days of completed tasks
+            </h2>
+            <p className="text-sm mt-1" style={{ color: "var(--ui-muted)" }}>
+              {weeklySummary}
+            </p>
+          </div>
+          <div
+            className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold self-start"
+            style={{
+              background: "rgba(110,231,216,0.12)",
+              border: "1px solid rgba(20,184,166,0.18)",
+              color: "#0f766e",
+            }}
+          >
+            <span
+              className="h-2 w-2 rounded-full"
+              style={{
+                background: weeklyHasProgress ? "#14B8A6" : "#99f6e4",
+                boxShadow: weeklyHasProgress
+                  ? "0 0 10px rgba(20,184,166,0.45)"
+                  : "none",
+              }}
+            />
+            Study tasks
+          </div>
+        </div>
+
+        <div
+          className="rounded-2xl p-4 sm:p-5"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(240,253,250,0.62), rgba(255,255,255,0.72))",
+            border: "1px solid rgba(20,184,166,0.12)",
+          }}
+        >
+          <WeeklyProgressChart
+            loading={loading}
+            weeklyProgress={weeklyProgress}
+            weeklyProgressError={weeklyProgressError}
+            weeklyHasProgress={weeklyHasProgress}
+            weeklyMax={weeklyMax}
+          />
+        </div>
+      </section>
+
       {/* ── Two-col: Today's Focus + Right column ── */}
       <div className="grid lg:grid-cols-5 gap-5">
         {/* Today's Focus */}
@@ -1004,9 +1361,7 @@ export default function DashboardPage() {
                 className="text-xs mt-0.5"
                 style={{ color: "var(--ui-muted)" }}
               >
-                {loading
-                  ? "Loading tasks…"
-                  : `${focusItems.filter((t) => t.done).length} of ${focusItems.length} tasks completed`}
+                {focusSummary}
               </p>
             </div>
             <span
@@ -1043,7 +1398,7 @@ export default function DashboardPage() {
           {/* Tasks list */}
           <div className="space-y-2">
             {loading ? (
-              Array.from({ length: 4 }).map((_, i) => (
+              focusSkeletonRows.map((i) => (
                 <div
                   key={i}
                   className="flex items-center gap-3 p-3 rounded-xl animate-pulse"
@@ -1138,12 +1493,8 @@ export default function DashboardPage() {
             href="/dashboard/study-planner"
             className="mt-4 flex items-center gap-1.5 text-xs font-medium transition-colors duration-150"
             style={{ color: "#0d9488" }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.color = "#115e59";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.color = "#0d9488";
-            }}
+            onMouseEnter={handleTextLinkEnter}
+            onMouseLeave={handleTextLinkLeave}
           >
             View all tasks
             <svg
@@ -1191,20 +1542,8 @@ export default function DashboardPage() {
                     border: "1px solid var(--ui-border)",
                     color: "var(--ui-text)",
                   }}
-                  onMouseEnter={(e) => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.borderColor = "rgba(110,231,216,0.28)";
-                    el.style.background = "rgba(110,231,216,0.08)";
-                    el.style.color = "var(--ui-heading)";
-                    el.style.transform = "translateY(-1px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.borderColor = "rgba(110,231,216,0.09)";
-                    el.style.background = "rgba(110,231,216,0.04)";
-                    el.style.color = "var(--ui-text)";
-                    el.style.transform = "translateY(0)";
-                  }}
+                  onMouseEnter={handleQuickActionEnter}
+                  onMouseLeave={handleQuickActionLeave}
                 >
                   <div
                     className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"

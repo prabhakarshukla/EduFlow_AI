@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import jsPDF from "jspdf";
 import { supabase } from "../../../lib/supabase";
+import { FormattedNote } from "@/components/notes/formatted-note";
+import { parseNoteBlocks, stripInlineMarkdown } from "@/utils/noteFormatting";
 
 type NoteRow = {
   id: string;
@@ -106,23 +108,70 @@ const exportNoteToPdf = (note: NoteRow) => {
     doc.line(margin, yPosition, pageWidth - margin, yPosition);
     yPosition += 6;
 
-    // Add content
-    doc.setFontSize(11);
-    doc.setTextColor(50, 50, 50);
-    doc.setFont("helvetica", "normal");
-    const contentLines = doc.splitTextToSize(
-      note.content || "",
-      contentWidth,
-    ) as string[];
-
-    contentLines.forEach((line: string) => {
-      // Check if we need a new page
-      if (yPosition + 5 > pageHeight - margin) {
+    const ensureSpace = (neededHeight: number) => {
+      if (yPosition + neededHeight > pageHeight - margin) {
         doc.addPage();
         yPosition = margin;
       }
-      doc.text(line, margin, yPosition);
-      yPosition += 5;
+    };
+
+    const writeWrappedText = (
+      text: string,
+      xPosition: number,
+      maxWidth: number,
+      lineHeight = 5,
+    ) => {
+      const lines = doc.splitTextToSize(text, maxWidth) as string[];
+      lines.forEach((line: string) => {
+        ensureSpace(lineHeight);
+        doc.text(line, xPosition, yPosition);
+        yPosition += lineHeight;
+      });
+    };
+
+    const blocks = parseNoteBlocks(note.content || "");
+    if (blocks.length === 0) {
+      doc.setFontSize(11);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont("helvetica", "italic");
+      writeWrappedText("No content available for this note.", margin, contentWidth);
+    }
+
+    blocks.forEach((block) => {
+      if (block.type === "heading") {
+        yPosition += 2;
+        doc.setTextColor(30, 30, 30);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(block.level === 1 ? 15 : block.level === 2 ? 13 : 12);
+        writeWrappedText(block.text, margin, contentWidth, 6);
+        yPosition += 1;
+        return;
+      }
+
+      if (block.type === "list") {
+        doc.setTextColor(50, 50, 50);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        block.items.forEach((item, itemIndex) => {
+          const marker = block.ordered ? `${itemIndex + 1}.` : "-";
+          ensureSpace(5);
+          doc.text(marker, margin, yPosition);
+          writeWrappedText(
+            stripInlineMarkdown(item),
+            margin + 6,
+            contentWidth - 6,
+            5,
+          );
+        });
+        yPosition += 2;
+        return;
+      }
+
+      doc.setTextColor(50, 50, 50);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      writeWrappedText(stripInlineMarkdown(block.text), margin, contentWidth, 5);
+      yPosition += 2;
     });
 
     // Save the PDF
@@ -176,6 +225,7 @@ export default function NotesPage() {
   const [pinned, setPinned] = useState(false);
   const [aiTopic, setAiTopic] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiTyping, setAiTyping] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
   const selected = useMemo(
@@ -430,6 +480,8 @@ export default function NotesPage() {
 
     setAiError(null);
     setAiLoading(true);
+    setAiTyping(false);
+    setContent("Thinking...");
     try {
       const res = await fetch("/api/notes-generator", {
         method: "POST",
@@ -453,13 +505,28 @@ export default function NotesPage() {
 
       setTitle(`${topic} Notes`);
       setSubject(topic);
-      setContent(generated);
-      flashSuccess("AI notes generated. Review and save.");
+      setContent("");
+      setAiTyping(true);
+
+      let index = 0;
+      const chunkSize = 5;
+      const timer = window.setInterval(() => {
+        index += chunkSize;
+        setContent(generated.slice(0, index));
+
+        if (index >= generated.length) {
+          window.clearInterval(timer);
+          setAiTyping(false);
+          flashSuccess("AI notes generated. Review and save.");
+        }
+      }, 10);
     } catch (e) {
       const errorMsg =
         e instanceof Error ? e.message : "Failed to generate notes.";
       console.error("[generateWithAi] Error:", errorMsg);
       setAiError(errorMsg);
+      setAiTyping(false);
+      setContent("");
     } finally {
       setAiLoading(false);
     }
@@ -961,25 +1028,56 @@ export default function NotesPage() {
                       color: "var(--ui-heading)",
                       outline: "none",
                     }}
-                    disabled={!selectedId || aiLoading}
+                    disabled={!selectedId || aiLoading || aiTyping}
                   />
                   <button
                     type="button"
                     onClick={generateWithAi}
-                    disabled={!selectedId || aiLoading || !aiTopic.trim()}
+                    disabled={!selectedId || aiLoading || aiTyping || !aiTopic.trim()}
                     className="btn-primary justify-center text-xs px-4 py-2.5 whitespace-nowrap"
                     style={{
                       opacity:
-                        !selectedId || aiLoading || !aiTopic.trim() ? 0.7 : 1,
+                        !selectedId || aiLoading || aiTyping || !aiTopic.trim()
+                          ? 0.7
+                          : 1,
                       cursor:
-                        !selectedId || aiLoading || !aiTopic.trim()
+                        !selectedId || aiLoading || aiTyping || !aiTopic.trim()
                           ? "not-allowed"
                           : "pointer",
                     }}
                   >
-                    {aiLoading ? "Generating…" : "Generate with AI"}
+                    {aiLoading
+                      ? "Thinking..."
+                      : aiTyping
+                        ? "Writing notes..."
+                        : "Generate with AI"}
                   </button>
                 </div>
+                {aiLoading && (
+                  <div
+                    className="rounded-xl p-3 space-y-2"
+                    style={{
+                      background: "rgba(110,231,216,0.06)",
+                      border: "1px solid rgba(110,231,216,0.16)",
+                    }}
+                  >
+                    <p className="text-xs font-semibold" style={{ color: "#0f766e" }}>
+                      Thinking...
+                    </p>
+                    {["100%", "88%", "72%"].map((width) => (
+                      <div
+                        key={width}
+                        className="h-2.5 rounded-lg animate-pulse"
+                        style={{ width, background: "rgba(110,231,216,0.18)" }}
+                      />
+                    ))}
+                  </div>
+                )}
+                {aiTyping && (
+                  <p className="text-[11px]" style={{ color: "var(--ui-muted)" }}>
+                    Writing the generated notes into your editor...
+                  </p>
+                )}
                 {aiError && (
                   <div
                     className="rounded-xl px-3 py-2 text-sm"
@@ -1086,8 +1184,30 @@ export default function NotesPage() {
                     outline: "none",
                     lineHeight: 1.6,
                   }}
-                  disabled={!selectedId}
+                  disabled={!selectedId || aiLoading || aiTyping}
                 />
+                {aiTyping && (
+                  <p className="mt-2 text-[11px] animate-pulse" style={{ color: "#0f766e" }}>
+                    AI is typing...
+                  </p>
+                )}
+                {content.trim() && (
+                  <div
+                    className="mt-4 rounded-xl p-4"
+                    style={{
+                      background: "rgba(110,231,216,0.04)",
+                      border: "1px solid rgba(110,231,216,0.14)",
+                    }}
+                  >
+                    <p
+                      className="text-xs font-semibold uppercase tracking-widest mb-3"
+                      style={{ color: "var(--ui-muted)" }}
+                    >
+                      Formatted preview
+                    </p>
+                    <FormattedNote content={content} />
+                  </div>
+                )}
               </div>
             </>
           )}

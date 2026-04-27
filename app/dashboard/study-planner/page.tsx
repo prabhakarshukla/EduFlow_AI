@@ -209,6 +209,7 @@ export default function StudyPlannerPage() {
   const [error, setError] = useState<string | null>(null);
   const [planPrompt, setPlanPrompt] = useState("");
   const [planLoading, setPlanLoading] = useState(false);
+  const [planTyping, setPlanTyping] = useState(false);
   const [planError, setPlanError] = useState<string | null>(null);
   const [generatedPlan, setGeneratedPlan] = useState<string | null>(null);
 
@@ -496,8 +497,9 @@ export default function StudyPlannerPage() {
     if (!prompt) return;
 
     setPlanLoading(true);
+    setPlanTyping(false);
     setPlanError(null);
-    setGeneratedPlan(null);
+    setGeneratedPlan("Thinking...");
 
     try {
       const context = {
@@ -537,11 +539,27 @@ export default function StudyPlannerPage() {
         throw new Error("AI returned an empty study plan.");
       }
 
-      setGeneratedPlan(data.answer.trim());
+      const plan = data.answer.trim();
+      setGeneratedPlan("");
+      setPlanTyping(true);
+
+      let index = 0;
+      const chunkSize = 5;
+      const timer = window.setInterval(() => {
+        index += chunkSize;
+        setGeneratedPlan(plan.slice(0, index));
+
+        if (index >= plan.length) {
+          window.clearInterval(timer);
+          setPlanTyping(false);
+        }
+      }, 10);
     } catch (e) {
       setPlanError(
         e instanceof Error ? e.message : "Failed to generate study plan.",
       );
+      setGeneratedPlan(null);
+      setPlanTyping(false);
     } finally {
       setPlanLoading(false);
     }
@@ -638,7 +656,10 @@ export default function StudyPlannerPage() {
           <input
             type="text"
             value={planPrompt}
-            onChange={(e) => setPlanPrompt(e.target.value)}
+            onChange={(e) => {
+              setPlanPrompt(e.target.value);
+              if (planError) setPlanError(null);
+            }}
             placeholder="Ask AI to generate your study plan..."
             className="w-full"
             style={{
@@ -650,32 +671,60 @@ export default function StudyPlannerPage() {
               padding: "0.625rem 0.875rem",
               fontSize: "0.875rem",
             }}
+            disabled={planLoading || planTyping}
           />
 
           <button
             type="button"
             onClick={generateAiPlan}
-            disabled={planLoading || !planPrompt.trim()}
+            disabled={planLoading || planTyping || !planPrompt.trim()}
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
             style={{
               background:
-                !planLoading && planPrompt.trim()
+                !planLoading && !planTyping && planPrompt.trim()
                   ? "linear-gradient(135deg,#6EE7D8,#14B8A6)"
                   : "rgba(255,255,255,0.06)",
               color:
-                !planLoading && planPrompt.trim()
+                !planLoading && !planTyping && planPrompt.trim()
                   ? "#111827"
                   : "var(--ui-subtle)",
               boxShadow:
-                !planLoading && planPrompt.trim()
+                !planLoading && !planTyping && planPrompt.trim()
                   ? "0 4px 16px rgba(110,231,216,0.28)"
                   : "none",
               cursor:
-                !planLoading && planPrompt.trim() ? "pointer" : "not-allowed",
+                !planLoading && !planTyping && planPrompt.trim()
+                  ? "pointer"
+                  : "not-allowed",
             }}
           >
-            {planLoading ? "Generating..." : "Generate Plan"}
+            {planLoading
+              ? "Thinking..."
+              : planTyping
+                ? "Typing plan..."
+                : "Generate Plan"}
           </button>
+
+          {planLoading && (
+            <div
+              className="rounded-xl p-4 space-y-2"
+              style={{
+                background: "rgba(110,231,216,0.06)",
+                border: "1px solid rgba(110,231,216,0.18)",
+              }}
+            >
+              <p className="text-xs font-semibold" style={{ color: "#0f766e" }}>
+                Thinking...
+              </p>
+              {["100%", "90%", "74%", "56%"].map((width) => (
+                <div
+                  key={width}
+                  className="h-2.5 rounded-lg animate-pulse"
+                  style={{ width, background: "rgba(110,231,216,0.18)" }}
+                />
+              ))}
+            </div>
+          )}
 
           {planError && (
             <div
@@ -710,6 +759,7 @@ export default function StudyPlannerPage() {
                 style={{ color: "var(--ui-heading)" }}
               >
                 {generatedPlan}
+                {planTyping && <span className="animate-pulse">|</span>}
               </p>
             </div>
           )}

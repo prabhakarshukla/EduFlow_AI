@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { FormattedNote } from "@/components/notes/formatted-note";
 
 type SharedNote = {
   id: string;
@@ -184,21 +185,10 @@ function PrivacyPageContent() {
               border: "1px solid var(--ui-border)",
             }}
           >
-            <div
-              style={{
-                color: "var(--ui-text)",
-                lineHeight: 1.8,
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-                fontSize: "0.95rem",
-              }}
-            >
-              {note.content || (
-                <span style={{ color: "var(--ui-muted)", fontStyle: "italic" }}>
-                  No content available for this note.
-                </span>
-              )}
-            </div>
+            <FormattedNote
+              content={note.content}
+              emptyText="No content available for this note."
+            />
           </div>
 
           {/* Footer info */}
