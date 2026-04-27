@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useState } from 'react';
-import { supabase } from '../../../lib/supabase';
+import { useEffect, useMemo, useState } from "react";
+import jsPDF from "jspdf";
+import { supabase } from "../../../lib/supabase";
 
 type NoteRow = {
   id: string;
@@ -13,11 +14,20 @@ type NoteRow = {
   updated_at: string;
 };
 
-function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+function Card({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div
       className={`rounded-2xl p-6 transition-all duration-200 ${className}`}
-      style={{ background: 'var(--ui-surface)', border: '1px solid var(--ui-border)' }}
+      style={{
+        background: "var(--ui-surface)",
+        border: "1px solid var(--ui-border)",
+      }}
     >
       {children}
     </div>
@@ -28,7 +38,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <p
       className="text-[10px] font-semibold uppercase tracking-widest mb-4"
-      style={{ color: 'var(--ui-muted)' }}
+      style={{ color: "var(--ui-muted)" }}
     >
       {children}
     </p>
@@ -38,7 +48,91 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 const fmt = (iso: string) => {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleString(undefined, { month: 'short', day: 'numeric' });
+  return d.toLocaleString(undefined, { month: "short", day: "numeric" });
+};
+
+const exportNoteToPdf = (note: NoteRow) => {
+  try {
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    const contentWidth = pageWidth - 2 * margin;
+    let yPosition = margin;
+
+    // Add branding header
+    doc.setFillColor(110, 231, 216);
+    doc.rect(margin, yPosition, contentWidth, 8, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10);
+    doc.setFont(undefined, "bold");
+    doc.text("EduFlow AI", margin + 5, yPosition + 6);
+    yPosition += 12;
+
+    // Add title
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(18);
+    doc.setFont(undefined, "bold");
+    const titleLines = doc.splitTextToSize(
+      note.title || "Untitled Note",
+      contentWidth,
+    ) as string[];
+    doc.text(titleLines, margin, yPosition);
+    yPosition += titleLines.length * 8 + 4;
+
+    // Add metadata
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.setFont(undefined, "normal");
+    const createdDate = new Date(note.created_at).toLocaleDateString(
+      undefined,
+      {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      },
+    );
+    const metadataText = `Subject: ${note.subject || "General"} • Created: ${createdDate}`;
+    doc.text(metadataText, margin, yPosition);
+    yPosition += 6;
+
+    // Add divider line
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, yPosition, pageWidth - margin, yPosition);
+    yPosition += 6;
+
+    // Add content
+    doc.setFontSize(11);
+    doc.setTextColor(50, 50, 50);
+    doc.setFont(undefined, "normal");
+    const contentLines = doc.splitTextToSize(
+      note.content || "",
+      contentWidth,
+    ) as string[];
+
+    contentLines.forEach((line: string) => {
+      // Check if we need a new page
+      if (yPosition + 5 > pageHeight - margin) {
+        doc.addPage();
+        yPosition = margin;
+      }
+      doc.text(line, margin, yPosition);
+      yPosition += 5;
+    });
+
+    // Save the PDF
+    const fileName = `${note.title || "note"}`
+      .replace(/[^\w\s-]/g, "")
+      .substring(0, 50);
+    doc.save(`${fileName}.pdf`);
+  } catch (error) {
+    console.error("Failed to export note as PDF:", error);
+  }
 };
 
 export default function NotesPage() {
@@ -48,36 +142,39 @@ export default function NotesPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   // Editor state
-  const [title, setTitle] = useState('');
-  const [subject, setSubject] = useState('');
-  const [content, setContent] = useState('');
+  const [title, setTitle] = useState("");
+  const [subject, setSubject] = useState("");
+  const [content, setContent] = useState("");
   const [pinned, setPinned] = useState(false);
-  const [aiTopic, setAiTopic] = useState('');
+  const [aiTopic, setAiTopic] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
   const selected = useMemo(
-    () => notes.find(n => n.id === selectedId) ?? null,
-    [notes, selectedId]
+    () => notes.find((n) => n.id === selectedId) ?? null,
+    [notes, selectedId],
   );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const list = q
-      ? notes.filter(n =>
-          (n.title || '').toLowerCase().includes(q) ||
-          (n.subject || '').toLowerCase().includes(q) ||
-          (n.content || '').toLowerCase().includes(q)
+      ? notes.filter(
+          (n) =>
+            (n.title || "").toLowerCase().includes(q) ||
+            (n.subject || "").toLowerCase().includes(q) ||
+            (n.content || "").toLowerCase().includes(q),
         )
       : notes;
     // pinned first, then updated_at desc
     return [...list].sort((a, b) => {
       if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
-      return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      return (
+        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+      );
     });
   }, [notes, query]);
 
@@ -86,9 +183,9 @@ export default function NotesPage() {
     setLoading(true);
     try {
       const { data, error: qErr } = await supabase
-        .from('notes')
-        .select('id,title,content,subject,pinned,created_at,updated_at')
-        .order('updated_at', { ascending: false });
+        .from("notes")
+        .select("id,title,content,subject,pinned,created_at,updated_at")
+        .order("updated_at", { ascending: false });
 
       if (qErr) {
         setError(qErr.message);
@@ -98,8 +195,8 @@ export default function NotesPage() {
 
       const mapped: NoteRow[] = (data ?? []).map((r: any) => ({
         id: String(r.id),
-        title: String(r.title ?? ''),
-        content: String(r.content ?? ''),
+        title: String(r.title ?? ""),
+        content: String(r.content ?? ""),
         subject: (r.subject ?? null) as string | null,
         pinned: Boolean(r.pinned),
         created_at: String(r.created_at),
@@ -111,7 +208,7 @@ export default function NotesPage() {
         setSelectedId(mapped[0].id);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load notes.');
+      setError(e instanceof Error ? e.message : "Failed to load notes.");
       setNotes([]);
     } finally {
       setLoading(false);
@@ -137,8 +234,8 @@ export default function NotesPage() {
   useEffect(() => {
     if (!selected) return;
     setTitle(selected.title);
-    setSubject(selected.subject ?? '');
-    setContent(selected.content ?? '');
+    setSubject(selected.subject ?? "");
+    setContent(selected.content ?? "");
     setPinned(Boolean(selected.pinned));
   }, [selected?.id]); // intentionally only on selection change
 
@@ -155,43 +252,43 @@ export default function NotesPage() {
       const { data: u } = await supabase.auth.getUser();
       const user = u.user;
       if (!user) {
-        setError('You need to be logged in to create notes.');
+        setError("You need to be logged in to create notes.");
         return;
       }
 
-      const nowTitle = 'Untitled note';
+      const nowTitle = "Untitled note";
       const { data, error: insErr } = await supabase
-        .from('notes')
+        .from("notes")
         .insert({
           user_id: user.id,
           title: nowTitle,
-          content: '',
+          content: "",
           subject: null,
           pinned: false,
         })
-        .select('id,title,content,subject,pinned,created_at,updated_at')
+        .select("id,title,content,subject,pinned,created_at,updated_at")
         .single();
 
       if (insErr) {
-        setError(insErr.message ?? 'Failed to create note.');
+        setError(insErr.message ?? "Failed to create note.");
         return;
       }
 
       const created: NoteRow = {
         id: String((data as any).id),
         title: String((data as any).title ?? nowTitle),
-        content: String((data as any).content ?? ''),
+        content: String((data as any).content ?? ""),
         subject: ((data as any).subject ?? null) as string | null,
         pinned: Boolean((data as any).pinned),
         created_at: String((data as any).created_at),
         updated_at: String((data as any).updated_at),
       };
 
-      setNotes(ns => [created, ...ns]);
+      setNotes((ns) => [created, ...ns]);
       setSelectedId(created.id);
-      flashSuccess('Note created.');
+      flashSuccess("Note created.");
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to create note.');
+      setError(e instanceof Error ? e.message : "Failed to create note.");
     } finally {
       setSaving(false);
     }
@@ -204,21 +301,21 @@ export default function NotesPage() {
     setSaving(true);
     try {
       const payload = {
-        title: title.trim() || 'Untitled note',
+        title: title.trim() || "Untitled note",
         subject: subject.trim() || null,
-        content: content ?? '',
+        content: content ?? "",
         pinned,
       };
 
       const { data, error: upErr } = await supabase
-        .from('notes')
+        .from("notes")
         .update(payload)
-        .eq('id', selectedId)
-        .select('id,title,content,subject,pinned,created_at,updated_at')
+        .eq("id", selectedId)
+        .select("id,title,content,subject,pinned,created_at,updated_at")
         .single();
 
       if (upErr) {
-        setError(upErr.message ?? 'Failed to save note.');
+        setError(upErr.message ?? "Failed to save note.");
         return;
       }
 
@@ -232,10 +329,10 @@ export default function NotesPage() {
         updated_at: String((data as any).updated_at),
       };
 
-      setNotes(ns => ns.map(n => (n.id === selectedId ? updated : n)));
-      flashSuccess('Saved.');
+      setNotes((ns) => ns.map((n) => (n.id === selectedId ? updated : n)));
+      flashSuccess("Saved.");
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to save note.');
+      setError(e instanceof Error ? e.message : "Failed to save note.");
     } finally {
       setSaving(false);
     }
@@ -247,23 +344,26 @@ export default function NotesPage() {
     setSuccess(null);
     const id = selectedId;
     const prev = notes;
-    const nextNotes = notes.filter(n => n.id !== id);
+    const nextNotes = notes.filter((n) => n.id !== id);
     setNotes(nextNotes);
     setSelectedId(nextNotes[0]?.id ?? null);
     setSaving(true);
     try {
-      const { error: delErr } = await supabase.from('notes').delete().eq('id', id);
+      const { error: delErr } = await supabase
+        .from("notes")
+        .delete()
+        .eq("id", id);
       if (delErr) {
         setNotes(prev);
         setSelectedId(id);
         setError(delErr.message);
         return;
       }
-      flashSuccess('Deleted.');
+      flashSuccess("Deleted.");
     } catch (e) {
       setNotes(prev);
       setSelectedId(id);
-      setError(e instanceof Error ? e.message : 'Failed to delete note.');
+      setError(e instanceof Error ? e.message : "Failed to delete note.");
     } finally {
       setSaving(false);
     }
@@ -272,58 +372,70 @@ export default function NotesPage() {
   const togglePin = async (id: string, nextPinned: boolean) => {
     setError(null);
     const prev = notes;
-    setNotes(ns => ns.map(n => (n.id === id ? { ...n, pinned: nextPinned } : n)));
+    setNotes((ns) =>
+      ns.map((n) => (n.id === id ? { ...n, pinned: nextPinned } : n)),
+    );
     try {
-      const { error: upErr } = await supabase.from('notes').update({ pinned: nextPinned }).eq('id', id);
+      const { error: upErr } = await supabase
+        .from("notes")
+        .update({ pinned: nextPinned })
+        .eq("id", id);
       if (upErr) {
         setNotes(prev);
         setError(upErr.message);
       } else {
-        flashSuccess(nextPinned ? 'Pinned.' : 'Unpinned.');
+        flashSuccess(nextPinned ? "Pinned." : "Unpinned.");
         await loadNotes();
       }
     } catch (e) {
       setNotes(prev);
-      setError(e instanceof Error ? e.message : 'Failed to update note.');
+      setError(e instanceof Error ? e.message : "Failed to update note.");
     }
   };
 
   const generateWithAi = async () => {
     if (!selectedId) {
-      setAiError('Select or create a note first.');
+      setAiError("Select or create a note first.");
       return;
     }
     const topic = aiTopic.trim();
     if (!topic) {
-      setAiError('Enter a topic to generate notes.');
+      setAiError("Enter a topic to generate notes.");
       return;
     }
 
     setAiError(null);
     setAiLoading(true);
     try {
-      const res = await fetch('/api/notes-generator', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/notes-generator", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic }),
       });
 
       const data = (await res.json()) as { notes?: string; error?: string };
+
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to generate notes.');
+        const errorMsg = data.error || `HTTP ${res.status}`;
+        console.error("[generateWithAi] API error:", errorMsg);
+        throw new Error(errorMsg);
       }
 
-      const generated = (data.notes ?? '').trim();
+      const generated = (data.notes ?? "").trim();
       if (!generated) {
-        throw new Error('AI returned empty notes.');
+        console.error("[generateWithAi] Empty response from API");
+        throw new Error("AI returned empty notes.");
       }
 
       setTitle(`${topic} Notes`);
       setSubject(topic);
       setContent(generated);
-      flashSuccess('AI notes generated. Review and save.');
+      flashSuccess("AI notes generated. Review and save.");
     } catch (e) {
-      setAiError(e instanceof Error ? e.message : 'Failed to generate notes.');
+      const errorMsg =
+        e instanceof Error ? e.message : "Failed to generate notes.";
+      console.error("[generateWithAi] Error:", errorMsg);
+      setAiError(errorMsg);
     } finally {
       setAiLoading(false);
     }
@@ -337,21 +449,33 @@ export default function NotesPage() {
           <div
             className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full mb-3"
             style={{
-              background: 'rgba(110,231,216,0.08)',
-              color: '#6EE7D8',
-              border: '1px solid rgba(110,231,216,0.18)',
+              background: "rgba(110,231,216,0.08)",
+              color: "#6EE7D8",
+              border: "1px solid rgba(110,231,216,0.18)",
             }}
           >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
             </svg>
             Notes
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--ui-heading)' }}>
+          <h1
+            className="text-2xl sm:text-3xl font-bold"
+            style={{ color: "var(--ui-heading)" }}
+          >
             Write once. Review fast.
           </h1>
-          <p className="text-sm mt-1.5" style={{ color: 'var(--ui-muted)' }}>
+          <p className="text-sm mt-1.5" style={{ color: "var(--ui-muted)" }}>
             Keep clean, revision-ready notes — organised by subject.
           </p>
         </div>
@@ -372,13 +496,15 @@ export default function NotesPage() {
             disabled={saving || !selectedId}
             className="px-4 py-2.5 text-xs font-semibold rounded-xl transition-all duration-150"
             style={{
-              background: selectedId ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.03)',
-              border: '1px solid var(--ui-border)',
-              color: selectedId ? 'var(--ui-text)' : 'var(--ui-subtle)',
-              cursor: selectedId ? 'pointer' : 'not-allowed',
+              background: selectedId
+                ? "rgba(255,255,255,0.04)"
+                : "rgba(255,255,255,0.03)",
+              border: "1px solid var(--ui-border)",
+              color: selectedId ? "var(--ui-text)" : "var(--ui-subtle)",
+              cursor: selectedId ? "pointer" : "not-allowed",
             }}
           >
-            {saving ? 'Saving…' : 'Save'}
+            {saving ? "Saving…" : "Save"}
           </button>
           <button
             type="button"
@@ -386,14 +512,48 @@ export default function NotesPage() {
             disabled={saving || !selectedId}
             className="px-4 py-2.5 text-xs font-semibold rounded-xl transition-all duration-150"
             style={{
-              background: 'rgba(248,113,113,0.08)',
-              border: '1px solid rgba(248,113,113,0.22)',
-              color: selectedId ? '#b91c1c' : 'var(--ui-subtle)',
+              background: "rgba(248,113,113,0.08)",
+              border: "1px solid rgba(248,113,113,0.22)",
+              color: selectedId ? "#b91c1c" : "var(--ui-subtle)",
               opacity: selectedId ? 1 : 0.6,
-              cursor: selectedId ? 'pointer' : 'not-allowed',
+              cursor: selectedId ? "pointer" : "not-allowed",
             }}
           >
             Delete
+          </button>
+          <button
+            type="button"
+            onClick={() => selected && exportNoteToPdf(selected)}
+            disabled={!selectedId}
+            className="px-4 py-2.5 text-xs font-semibold rounded-xl transition-all duration-150"
+            style={{
+              background: selectedId
+                ? "rgba(110,231,216,0.08)"
+                : "rgba(110,231,216,0.04)",
+              border: selectedId
+                ? "1px solid rgba(110,231,216,0.22)"
+                : "1px solid rgba(110,231,216,0.12)",
+              color: selectedId ? "#6EE7D8" : "var(--ui-subtle)",
+              cursor: selectedId ? "pointer" : "not-allowed",
+            }}
+            onMouseEnter={(e) => {
+              if (selectedId) {
+                (e.currentTarget as HTMLElement).style.borderColor =
+                  "rgba(110,231,216,0.35)";
+                (e.currentTarget as HTMLElement).style.background =
+                  "rgba(110,231,216,0.12)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (selectedId) {
+                (e.currentTarget as HTMLElement).style.borderColor =
+                  "rgba(110,231,216,0.22)";
+                (e.currentTarget as HTMLElement).style.background =
+                  "rgba(110,231,216,0.08)";
+              }
+            }}
+          >
+            📄 Export PDF
           </button>
         </div>
       </div>
@@ -408,12 +568,18 @@ export default function NotesPage() {
               onClick={loadNotes}
               className="px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150"
               style={{
-                background: 'var(--ui-surface-2)',
-                border: '1px solid var(--ui-border)',
-                color: 'var(--ui-text)',
+                background: "var(--ui-surface-2)",
+                border: "1px solid var(--ui-border)",
+                color: "var(--ui-text)",
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.28)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.12)'; }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor =
+                  "rgba(110,231,216,0.28)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor =
+                  "rgba(110,231,216,0.12)";
+              }}
             >
               Refresh
             </button>
@@ -426,9 +592,9 @@ export default function NotesPage() {
                   className="rounded-xl px-3 py-2 text-sm"
                   role="alert"
                   style={{
-                    background: 'rgba(248,113,113,0.10)',
-                    border: '1px solid rgba(248,113,113,0.22)',
-                    color: '#b91c1c',
+                    background: "rgba(248,113,113,0.10)",
+                    border: "1px solid rgba(248,113,113,0.22)",
+                    color: "#b91c1c",
                   }}
                 >
                   {error}
@@ -439,9 +605,9 @@ export default function NotesPage() {
                   className="rounded-xl px-3 py-2 text-sm"
                   role="status"
                   style={{
-                    background: 'rgba(110,231,216,0.10)',
-                    border: '1px solid rgba(110,231,216,0.22)',
-                    color: 'var(--ui-heading)',
+                    background: "rgba(110,231,216,0.10)",
+                    border: "1px solid rgba(110,231,216,0.22)",
+                    color: "var(--ui-heading)",
                   }}
                 >
                   {success}
@@ -452,14 +618,14 @@ export default function NotesPage() {
 
           <input
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={(e) => setQuery(e.target.value)}
             placeholder="Search notes…"
             className="rounded-xl px-3 py-2.5 text-sm w-full mb-4"
             style={{
-              background: 'var(--ui-surface)',
-              border: '1px solid rgba(110,231,216,0.15)',
-              color: 'var(--ui-heading)',
-              outline: 'none',
+              background: "var(--ui-surface)",
+              border: "1px solid rgba(110,231,216,0.15)",
+              color: "var(--ui-heading)",
+              outline: "none",
             }}
           />
 
@@ -467,79 +633,163 @@ export default function NotesPage() {
             {loading && (
               <div
                 className="rounded-xl p-4"
-                style={{ background: 'var(--ui-surface-2)', border: '1px solid var(--ui-border)' }}
+                style={{
+                  background: "var(--ui-surface-2)",
+                  border: "1px solid var(--ui-border)",
+                }}
               >
-                <p className="text-sm" style={{ color: 'var(--ui-muted)' }}>Loading your notes…</p>
+                <p className="text-sm" style={{ color: "var(--ui-muted)" }}>
+                  Loading your notes…
+                </p>
               </div>
             )}
 
             {!loading && filtered.length === 0 && !error && (
               <div
                 className="rounded-xl p-5"
-                style={{ background: 'rgba(110,231,216,0.05)', border: '1px dashed rgba(110,231,216,0.18)' }}
+                style={{
+                  background: "rgba(110,231,216,0.05)",
+                  border: "1px dashed rgba(110,231,216,0.18)",
+                }}
               >
-                <p className="text-sm font-semibold" style={{ color: 'var(--ui-heading)' }}>No notes yet.</p>
-                <p className="text-[11px] mt-1" style={{ color: 'var(--ui-muted)' }}>
+                <p
+                  className="text-sm font-semibold"
+                  style={{ color: "var(--ui-heading)" }}
+                >
+                  No notes yet.
+                </p>
+                <p
+                  className="text-[11px] mt-1"
+                  style={{ color: "var(--ui-muted)" }}
+                >
                   Create your first note — keep it structured and concise.
                 </p>
               </div>
             )}
 
-            {!loading && filtered.map(n => {
-              const active = n.id === selectedId;
-              return (
-                <div
-                  key={n.id}
-                  className="group p-3.5 rounded-xl cursor-pointer transition-all duration-150"
-                  style={{
-                    background: active ? 'rgba(110,231,216,0.10)' : 'rgba(255,255,255,0.03)',
-                    border: active ? '1px solid rgba(110,231,216,0.28)' : '1px solid rgba(110,231,216,0.08)',
-                    boxShadow: active ? '0 0 12px rgba(110,231,216,0.08)' : 'none',
-                  }}
-                  onClick={() => setSelectedId(n.id)}
-                  onMouseEnter={e => {
-                    if (!active) {
-                      (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.22)';
-                      (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)';
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    if (!active) {
-                      (e.currentTarget as HTMLElement).style.borderColor = 'rgba(110,231,216,0.08)';
-                      (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)';
-                    }
-                  }}
-                >
-                  <div className="flex items-start gap-3">
-                    <button
-                      type="button"
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        togglePin(n.id, !n.pinned);
-                      }}
-                      className="mt-0.5 p-1.5 rounded-lg transition-colors duration-150"
-                      title={n.pinned ? 'Unpin' : 'Pin'}
-                      style={{ color: n.pinned ? '#fbbf24' : 'var(--ui-subtle)' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fbbf24'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = n.pinned ? '#fbbf24' : 'var(--ui-subtle)'; }}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
-                          d="M16 3l5 5-6.5 6.5v5.5l-3-2-3 2v-5.5L3 8l5-5h8z" />
-                      </svg>
-                    </button>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate" style={{ color: 'var(--ui-heading)' }}>
-                        {n.title || 'Untitled note'}
-                      </p>
-                      <p className="text-[11px] mt-0.5 truncate" style={{ color: 'var(--ui-muted)' }}>
-                        {(n.subject ?? 'General')}{' '}• updated {fmt(n.updated_at)}
-                      </p>
+            {!loading &&
+              filtered.map((n) => {
+                const active = n.id === selectedId;
+                return (
+                  <div
+                    key={n.id}
+                    className="group p-3.5 rounded-xl cursor-pointer transition-all duration-150"
+                    style={{
+                      background: active
+                        ? "rgba(110,231,216,0.10)"
+                        : "rgba(255,255,255,0.03)",
+                      border: active
+                        ? "1px solid rgba(110,231,216,0.28)"
+                        : "1px solid rgba(110,231,216,0.08)",
+                      boxShadow: active
+                        ? "0 0 12px rgba(110,231,216,0.08)"
+                        : "none",
+                    }}
+                    onClick={() => setSelectedId(n.id)}
+                    onMouseEnter={(e) => {
+                      if (!active) {
+                        (e.currentTarget as HTMLElement).style.borderColor =
+                          "rgba(110,231,216,0.22)";
+                        (e.currentTarget as HTMLElement).style.background =
+                          "rgba(255,255,255,0.05)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!active) {
+                        (e.currentTarget as HTMLElement).style.borderColor =
+                          "rgba(110,231,216,0.08)";
+                        (e.currentTarget as HTMLElement).style.background =
+                          "rgba(255,255,255,0.03)";
+                      }
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <button
+                        type="button"
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          togglePin(n.id, !n.pinned);
+                        }}
+                        className="mt-0.5 p-1.5 rounded-lg transition-colors duration-150"
+                        title={n.pinned ? "Unpin" : "Pin"}
+                        style={{
+                          color: n.pinned ? "#fbbf24" : "var(--ui-subtle)",
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLElement).style.color =
+                            "#fbbf24";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLElement).style.color =
+                            n.pinned ? "#fbbf24" : "var(--ui-subtle)";
+                        }}
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.8}
+                            d="M16 3l5 5-6.5 6.5v5.5l-3-2-3 2v-5.5L3 8l5-5h8z"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          exportNoteToPdf(n);
+                        }}
+                        className="mt-0.5 p-1.5 rounded-lg transition-colors duration-150 opacity-0 group-hover:opacity-100"
+                        title="Export as PDF"
+                        style={{
+                          color: "var(--ui-subtle)",
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLElement).style.color =
+                            "#6EE7D8";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLElement).style.color =
+                            "var(--ui-subtle)";
+                        }}
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.8}
+                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className="text-sm font-semibold truncate"
+                          style={{ color: "var(--ui-heading)" }}
+                        >
+                          {n.title || "Untitled note"}
+                        </p>
+                        <p
+                          className="text-[11px] mt-0.5 truncate"
+                          style={{ color: "var(--ui-muted)" }}
+                        >
+                          {n.subject ?? "General"} • updated {fmt(n.updated_at)}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </Card>
 
@@ -550,10 +800,21 @@ export default function NotesPage() {
           {!selectedId && !loading ? (
             <div
               className="rounded-xl p-5"
-              style={{ background: 'rgba(110,231,216,0.05)', border: '1px dashed rgba(110,231,216,0.18)' }}
+              style={{
+                background: "rgba(110,231,216,0.05)",
+                border: "1px dashed rgba(110,231,216,0.18)",
+              }}
             >
-              <p className="text-sm font-semibold" style={{ color: 'var(--ui-heading)' }}>Select a note to edit.</p>
-              <p className="text-[11px] mt-1" style={{ color: 'var(--ui-muted)' }}>
+              <p
+                className="text-sm font-semibold"
+                style={{ color: "var(--ui-heading)" }}
+              >
+                Select a note to edit.
+              </p>
+              <p
+                className="text-[11px] mt-1"
+                style={{ color: "var(--ui-muted)" }}
+              >
                 Or create a new note to start writing.
               </p>
             </div>
@@ -561,30 +822,39 @@ export default function NotesPage() {
             <>
               <div
                 className="rounded-xl p-4 space-y-3"
-                style={{ background: 'rgba(110,231,216,0.04)', border: '1px solid rgba(110,231,216,0.14)' }}
+                style={{
+                  background: "rgba(110,231,216,0.04)",
+                  border: "1px solid rgba(110,231,216,0.14)",
+                }}
               >
                 <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--ui-muted)' }}>
+                  <p
+                    className="text-xs font-semibold uppercase tracking-widest"
+                    style={{ color: "var(--ui-muted)" }}
+                  >
                     AI Notes Generator
                   </p>
-                  <span className="text-[11px]" style={{ color: 'var(--ui-muted)' }}>
+                  <span
+                    className="text-[11px]"
+                    style={{ color: "var(--ui-muted)" }}
+                  >
                     Auto-fills this editor
                   </span>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     value={aiTopic}
-                    onChange={e => {
+                    onChange={(e) => {
                       setAiTopic(e.target.value);
                       if (aiError) setAiError(null);
                     }}
                     placeholder="Enter topic (e.g. Electromagnetic Induction)"
                     className="rounded-xl px-3 py-2.5 text-sm w-full"
                     style={{
-                      background: 'var(--ui-surface)',
-                      border: '1px solid rgba(110,231,216,0.15)',
-                      color: 'var(--ui-heading)',
-                      outline: 'none',
+                      background: "var(--ui-surface)",
+                      border: "1px solid rgba(110,231,216,0.15)",
+                      color: "var(--ui-heading)",
+                      outline: "none",
                     }}
                     disabled={!selectedId || aiLoading}
                   />
@@ -594,11 +864,15 @@ export default function NotesPage() {
                     disabled={!selectedId || aiLoading || !aiTopic.trim()}
                     className="btn-primary justify-center text-xs px-4 py-2.5 whitespace-nowrap"
                     style={{
-                      opacity: !selectedId || aiLoading || !aiTopic.trim() ? 0.7 : 1,
-                      cursor: !selectedId || aiLoading || !aiTopic.trim() ? 'not-allowed' : 'pointer',
+                      opacity:
+                        !selectedId || aiLoading || !aiTopic.trim() ? 0.7 : 1,
+                      cursor:
+                        !selectedId || aiLoading || !aiTopic.trim()
+                          ? "not-allowed"
+                          : "pointer",
                     }}
                   >
-                    {aiLoading ? 'Generating…' : 'Generate with AI'}
+                    {aiLoading ? "Generating…" : "Generate with AI"}
                   </button>
                 </div>
                 {aiError && (
@@ -606,9 +880,9 @@ export default function NotesPage() {
                     className="rounded-xl px-3 py-2 text-sm"
                     role="alert"
                     style={{
-                      background: 'rgba(248,113,113,0.10)',
-                      border: '1px solid rgba(248,113,113,0.22)',
-                      color: '#b91c1c',
+                      background: "rgba(248,113,113,0.10)",
+                      border: "1px solid rgba(248,113,113,0.22)",
+                      color: "#b91c1c",
                     }}
                   >
                     {aiError}
@@ -618,37 +892,43 @@ export default function NotesPage() {
 
               <div className="grid sm:grid-cols-3 gap-3">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--ui-heading)' }}>
+                  <label
+                    className="block text-xs font-medium mb-1.5"
+                    style={{ color: "var(--ui-heading)" }}
+                  >
                     Title
                   </label>
                   <input
                     value={title}
-                    onChange={e => setTitle(e.target.value)}
+                    onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g. Chapter 4 — Thermodynamics"
                     className="rounded-xl px-3 py-2.5 text-sm w-full"
                     style={{
-                      background: 'var(--ui-surface)',
-                      border: '1px solid rgba(110,231,216,0.15)',
-                      color: 'var(--ui-heading)',
-                      outline: 'none',
+                      background: "var(--ui-surface)",
+                      border: "1px solid rgba(110,231,216,0.15)",
+                      color: "var(--ui-heading)",
+                      outline: "none",
                     }}
                     disabled={!selectedId}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--ui-heading)' }}>
+                  <label
+                    className="block text-xs font-medium mb-1.5"
+                    style={{ color: "var(--ui-heading)" }}
+                  >
                     Subject
                   </label>
                   <input
                     value={subject}
-                    onChange={e => setSubject(e.target.value)}
+                    onChange={(e) => setSubject(e.target.value)}
                     placeholder="e.g. Physics"
                     className="rounded-xl px-3 py-2.5 text-sm w-full"
                     style={{
-                      background: 'var(--ui-surface)',
-                      border: '1px solid rgba(110,231,216,0.15)',
-                      color: 'var(--ui-heading)',
-                      outline: 'none',
+                      background: "var(--ui-surface)",
+                      border: "1px solid rgba(110,231,216,0.15)",
+                      color: "var(--ui-heading)",
+                      outline: "none",
                     }}
                     disabled={!selectedId}
                   />
@@ -658,39 +938,47 @@ export default function NotesPage() {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setPinned(p => !p)}
+                  onClick={() => setPinned((p) => !p)}
                   disabled={!selectedId}
                   className="px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150"
                   style={{
-                    background: pinned ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.04)',
-                    border: `1px solid ${pinned ? 'rgba(245,158,11,0.35)' : 'rgba(110,231,216,0.12)'}`,
-                    color: pinned ? '#fbbf24' : 'rgba(255,255,255,0.55)',
-                    cursor: selectedId ? 'pointer' : 'not-allowed',
+                    background: pinned
+                      ? "rgba(245,158,11,0.12)"
+                      : "rgba(255,255,255,0.04)",
+                    border: `1px solid ${pinned ? "rgba(245,158,11,0.35)" : "rgba(110,231,216,0.12)"}`,
+                    color: pinned ? "#fbbf24" : "rgba(255,255,255,0.55)",
+                    cursor: selectedId ? "pointer" : "not-allowed",
                   }}
                 >
-                  {pinned ? 'Pinned' : 'Pin'}
+                  {pinned ? "Pinned" : "Pin"}
                 </button>
-                <span className="text-[11px]" style={{ color: 'var(--ui-muted)' }}>
-                  {selected ? `Last updated ${fmt(selected.updated_at)}` : ' '}
+                <span
+                  className="text-[11px]"
+                  style={{ color: "var(--ui-muted)" }}
+                >
+                  {selected ? `Last updated ${fmt(selected.updated_at)}` : " "}
                 </span>
               </div>
 
               <div className="flex-1 flex flex-col">
-                <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--ui-heading)' }}>
+                <label
+                  className="block text-xs font-medium mb-1.5"
+                  style={{ color: "var(--ui-heading)" }}
+                >
                   Content
                 </label>
                 <textarea
                   value={content}
-                  onChange={e => setContent(e.target.value)}
+                  onChange={(e) => setContent(e.target.value)}
                   placeholder="Write clean notes here… Use headings, bullet points, examples."
                   className="rounded-xl px-3 py-3 text-sm w-full flex-1"
                   style={{
-                    minHeight: '360px',
-                    resize: 'none',
-                    background: 'var(--ui-surface)',
-                    border: '1px solid rgba(110,231,216,0.15)',
-                    color: 'var(--ui-heading)',
-                    outline: 'none',
+                    minHeight: "360px",
+                    resize: "none",
+                    background: "var(--ui-surface)",
+                    border: "1px solid rgba(110,231,216,0.15)",
+                    color: "var(--ui-heading)",
+                    outline: "none",
                     lineHeight: 1.6,
                   }}
                   disabled={!selectedId}

@@ -23,7 +23,8 @@ const DEFAULT_BASE_URL =
   process.env.OPENAI_BASE_URL ||
   process.env.OPENROUTER_BASE_URL ||
   "https://openrouter.ai/api/v1";
-const DEFAULT_REFERER = process.env.OPENAI_HTTP_REFERER || "http://localhost:3000";
+const DEFAULT_REFERER =
+  process.env.OPENAI_HTTP_REFERER || "http://localhost:3000";
 const DEFAULT_TITLE = process.env.OPENAI_APP_TITLE || "EduFlow AI";
 
 function resolveChatCompletionsUrl(baseUrl: string) {
@@ -94,27 +95,54 @@ export async function runAgentCompletion({
 
   messages.push({ role: "user", content: prompt });
 
-  const response = await fetch(resolveChatCompletionsUrl(DEFAULT_BASE_URL), {
-    method: "POST",
-    headers: buildHeaders(),
-    body: JSON.stringify({
-      model: DEFAULT_MODEL,
-      messages,
-      temperature,
-      max_tokens: maxTokens,
-    }),
+  const url = resolveChatCompletionsUrl(DEFAULT_BASE_URL);
+  const headers = buildHeaders();
+  const body = JSON.stringify({
+    model: DEFAULT_MODEL,
+    messages,
+    temperature,
+    max_tokens: maxTokens,
   });
 
-  const data = (await response.json()) as ChatCompletionResponse;
+  console.log("[runAgentCompletion] Request details:", {
+    url,
+    model: DEFAULT_MODEL,
+    messageCount: messages.length,
+  });
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers,
+      body,
+    });
+  } catch (fetchError) {
+    const errorMsg =
+      fetchError instanceof Error ? fetchError.message : "Network error";
+    console.error("[runAgentCompletion] Fetch error:", errorMsg);
+    throw new Error(`Network error: ${errorMsg}`);
+  }
+
+  let data: ChatCompletionResponse;
+  try {
+    data = (await response.json()) as ChatCompletionResponse;
+  } catch (parseError) {
+    const errorMsg =
+      parseError instanceof Error ? parseError.message : "JSON parse error";
+    console.error("[runAgentCompletion] JSON parse error:", errorMsg);
+    throw new Error(`Failed to parse response: ${errorMsg}`);
+  }
 
   if (!response.ok) {
-    throw new Error(
-      data?.error?.message || "AI provider request failed."
-    );
+    const errorMsg = data?.error?.message || `HTTP ${response.status}`;
+    console.error("[runAgentCompletion] API error:", errorMsg);
+    throw new Error(`AI provider returned error: ${errorMsg}`);
   }
 
   const content = data.choices?.[0]?.message?.content?.trim();
   if (!content) {
+    console.error("[runAgentCompletion] Empty response from AI");
     throw new Error("AI returned an empty response.");
   }
 

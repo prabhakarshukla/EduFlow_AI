@@ -6,23 +6,41 @@ export async function POST(req: Request) {
     const { topic } = await req.json();
 
     if (!topic || !topic.trim()) {
+      return NextResponse.json({ error: "Topic is required" }, { status: 400 });
+    }
+
+    let notes: string;
+    try {
+      notes = await routeAgent({
+        agentType: "notes",
+        userMessage: topic,
+        context: { source: "notes-generator", topic },
+      });
+    } catch (agentError) {
+      const errorMessage =
+        agentError instanceof Error ? agentError.message : "Unknown error";
+      console.error("[notes-generator] Agent error:", errorMessage);
       return NextResponse.json(
-        { error: "Topic is required" },
-        { status: 400 }
+        { error: `AI generation failed: ${errorMessage}` },
+        { status: 500 },
       );
     }
 
-    const notes = await routeAgent({
-      agentType: "notes",
-      userMessage: topic,
-      context: { source: "notes-generator", topic },
-    });
+    if (!notes || !notes.trim()) {
+      return NextResponse.json(
+        { error: "AI returned empty notes. Please try again." },
+        { status: 500 },
+      );
+    }
 
     return NextResponse.json({ notes });
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    console.error("[notes-generator] Request error:", errorMessage);
     return NextResponse.json(
-      { error: "Something went wrong while generating notes." },
-      { status: 500 }
+      { error: `Failed to process request: ${errorMessage}` },
+      { status: 500 },
     );
   }
 }
