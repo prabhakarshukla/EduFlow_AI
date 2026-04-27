@@ -2,6 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../../../lib/supabase";
+import {
+  formatLastActiveDate,
+  getStreak,
+  type Streak,
+  updateStreakOnTaskComplete,
+} from "../../../lib/streaks";
 
 /* ── Types ─────────────────────────────────────────────────────── */
 type Priority = "high" | "medium" | "low";
@@ -197,6 +203,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 /* ── Page ───────────────────────────────────────────────────────── */
 export default function StudyPlannerPage() {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [streak, setStreak] = useState<Streak | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -215,6 +222,9 @@ export default function StudyPlannerPage() {
   const done = tasks.filter((t) => t.status === "done").length;
   const pending = tasks.length - done;
   const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+  const currentStreak = streak?.current_streak ?? 0;
+  const longestStreak = streak?.longest_streak ?? 0;
+  const lastActiveLabel = formatLastActiveDate(streak?.last_active_date ?? null);
 
   const priorityToDb = (p: Priority) =>
     p === "high" ? 3 : p === "medium" ? 2 : 1;
@@ -287,8 +297,13 @@ export default function StudyPlannerPage() {
       const { data, error: uErr } = await supabase.auth.getUser();
       if (!alive) return;
       if (uErr) setError(uErr.message);
-      if (data.user) await loadTasks();
-      else setLoading(false);
+      if (data.user) {
+        await loadTasks();
+        const streakData = await getStreak(supabase, data.user.id);
+        if (alive) setStreak(streakData);
+      } else {
+        setLoading(false);
+      }
     })();
     return () => {
       alive = false;
@@ -362,6 +377,16 @@ export default function StudyPlannerPage() {
           ts.map((t) => (t.id === id ? { ...t, status: current.status } : t)),
         );
         setError(upErr.message);
+      } else if (nextStatus === "done") {
+        // Update streak when task is marked as done
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData.user?.id) {
+          const updatedStreak = await updateStreakOnTaskComplete(
+            supabase,
+            userData.user.id,
+          );
+          if (updatedStreak) setStreak(updatedStreak);
+        }
       }
     } catch (e) {
       setTasks((ts) =>
@@ -499,7 +524,10 @@ export default function StudyPlannerPage() {
         }),
       });
 
-      const data = (await response.json()) as { answer?: string; error?: string };
+      const data = (await response.json()) as {
+        answer?: string;
+        error?: string;
+      };
 
       if (!response.ok) {
         throw new Error(data.error || "Failed to generate study plan.");
@@ -511,7 +539,9 @@ export default function StudyPlannerPage() {
 
       setGeneratedPlan(data.answer.trim());
     } catch (e) {
-      setPlanError(e instanceof Error ? e.message : "Failed to generate study plan.");
+      setPlanError(
+        e instanceof Error ? e.message : "Failed to generate study plan.",
+      );
     } finally {
       setPlanLoading(false);
     }
@@ -632,12 +662,16 @@ export default function StudyPlannerPage() {
                 !planLoading && planPrompt.trim()
                   ? "linear-gradient(135deg,#6EE7D8,#14B8A6)"
                   : "rgba(255,255,255,0.06)",
-              color: !planLoading && planPrompt.trim() ? "#111827" : "var(--ui-subtle)",
+              color:
+                !planLoading && planPrompt.trim()
+                  ? "#111827"
+                  : "var(--ui-subtle)",
               boxShadow:
                 !planLoading && planPrompt.trim()
                   ? "0 4px 16px rgba(110,231,216,0.28)"
                   : "none",
-              cursor: !planLoading && planPrompt.trim() ? "pointer" : "not-allowed",
+              cursor:
+                !planLoading && planPrompt.trim() ? "pointer" : "not-allowed",
             }}
           >
             {planLoading ? "Generating..." : "Generate Plan"}
@@ -665,7 +699,10 @@ export default function StudyPlannerPage() {
                 border: "1px solid rgba(110,231,216,0.22)",
               }}
             >
-              <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: "#0f766e" }}>
+              <p
+                className="text-xs font-semibold uppercase tracking-wide mb-2"
+                style={{ color: "#0f766e" }}
+              >
                 Generated Plan
               </p>
               <p
@@ -761,16 +798,42 @@ export default function StudyPlannerPage() {
               border: "1px solid var(--ui-border)",
             }}
           >
-            <span className="text-xl">🔥</span>
+            <span
+              className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{
+                background: "linear-gradient(135deg,#6EE7D8,#14B8A6)",
+                color: "#0d2420",
+              }}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.9}
+                  d="M12 3c1.4 2.7.9 4.8-.6 6.3-1.1 1.1-1.7 2.3-1.7 3.8a3.3 3.3 0 106.6 0c0-2.1-1.1-3.9-3.3-5.4m-1-4.7C7.6 5.8 5 9.5 5 13.4a7 7 0 0014 0c0-3.5-1.8-6.6-5.3-9.4"
+                />
+              </svg>
+            </span>
             <div>
               <p
                 className="text-sm font-semibold"
                 style={{ color: "var(--ui-heading)" }}
               >
-                7-day streak
+                {loading
+                  ? "Loading streak"
+                  : currentStreak
+                    ? `${currentStreak}-day streak`
+                    : "Start your streak"}
               </p>
               <p className="text-[11px]" style={{ color: "var(--ui-muted)" }}>
-                Keep going — you&apos;re on fire!
+                {currentStreak
+                  ? `Best ${longestStreak} days. Last active: ${lastActiveLabel}.`
+                  : "Mark one study task done to count today."}
               </p>
             </div>
           </div>
