@@ -75,7 +75,7 @@ const WeeklyProgressChart = memo(function WeeklyProgressChart({
         style={{
           background: "rgba(248,113,113,0.10)",
           border: "1px solid rgba(248,113,113,0.18)",
-          color: "#b91c1c",
+          color: "var(--dash-danger)",
         }}
       >
         Weekly progress is unavailable.
@@ -88,8 +88,8 @@ const WeeklyProgressChart = memo(function WeeklyProgressChart({
       <div
         className="flex min-h-44 items-center justify-center rounded-xl px-4 text-center"
         style={{
-          background: "rgba(110,231,216,0.07)",
-          border: "1px dashed rgba(20,184,166,0.22)",
+          background: "var(--dash-empty-bg)",
+          border: "1px dashed var(--dash-empty-border)",
         }}
       >
         <p className="text-sm" style={{ color: "var(--ui-muted)" }}>
@@ -114,7 +114,11 @@ const WeeklyProgressChart = memo(function WeeklyProgressChart({
           >
             <span
               className="text-[10px] sm:text-xs font-bold"
-              style={{ color: day.count ? "#0f766e" : "var(--ui-subtle)" }}
+              style={{
+                color: day.count
+                  ? "var(--dash-teal-strong)"
+                  : "var(--ui-subtle)",
+              }}
             >
               {day.count}
             </span>
@@ -949,13 +953,13 @@ export default function DashboardPage() {
   );
   const handleTextLinkEnter = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
-      e.currentTarget.style.color = "#115e59";
+      e.currentTarget.style.color = "var(--dash-link-hover)";
     },
     [],
   );
   const handleTextLinkLeave = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
-      e.currentTarget.style.color = "#0d9488";
+      e.currentTarget.style.color = "var(--dash-link)";
     },
     [],
   );
@@ -981,7 +985,7 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="px-6 sm:px-8 py-8 max-w-[1280px] mx-auto space-y-8">
+    <div className="px-6 sm:px-8 py-8 max-w-[1280px] mx-auto space-y-8 [--dash-danger:#b91c1c] [--dash-empty-bg:rgba(110,231,216,0.07)] [--dash-empty-border:rgba(20,184,166,0.22)] [--dash-link:#0d9488] [--dash-link-hover:#115e59] [--dash-panel-shadow:0_12px_32px_rgba(15,118,110,0.08),inset_0_1px_0_rgba(255,255,255,0.55)] [--dash-streak-metric-bg:rgba(255,255,255,0.68)] [--dash-streak-metric-border:rgba(20,184,166,0.15)] [--dash-streak-metric-shadow:0_8px_20px_rgba(15,118,110,0.08)] [--dash-teal-strong:#0f766e] dark:[--dash-danger:#fca5a5] dark:[--dash-empty-bg:rgba(15,23,42,0.62)] dark:[--dash-empty-border:rgba(94,234,212,0.24)] dark:[--dash-link:#5eead4] dark:[--dash-link-hover:#99f6e4] dark:[--dash-panel-shadow:0_14px_34px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(94,234,212,0.08)] dark:[--dash-streak-metric-bg:rgba(15,23,42,0.72)] dark:[--dash-streak-metric-border:rgba(94,234,212,0.18)] dark:[--dash-streak-metric-shadow:0_10px_24px_rgba(0,0,0,0.22)] dark:[--dash-teal-strong:#5eead4]">
       {/* ── Welcome header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
@@ -1143,14 +1147,7 @@ export default function DashboardPage() {
 
       {/* Streak */}
       <section
-        className="relative rounded-2xl p-5 sm:p-6 overflow-hidden"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(240,253,250,0.98) 0%, rgba(204,251,241,0.78) 42%, rgba(255,255,255,0.94) 100%)",
-          border: "1px solid rgba(20,184,166,0.18)",
-          boxShadow:
-            "0 18px 46px rgba(15,118,110,0.14), inset 0 1px 0 rgba(255,255,255,0.78)",
-        }}
+        className="relative overflow-hidden rounded-2xl border border-teal-700/20 bg-[linear-gradient(135deg,rgba(240,253,250,0.98)_0%,rgba(204,251,241,0.78)_42%,rgba(255,255,255,0.94)_100%)] p-5 shadow-[0_18px_46px_rgba(15,118,110,0.14),inset_0_1px_0_rgba(255,255,255,0.78)] transition-colors duration-300 sm:p-6 dark:border-teal-200/20 dark:bg-[linear-gradient(135deg,rgba(15,23,42,0.98)_0%,rgba(17,24,39,0.96)_48%,rgba(20,83,78,0.42)_100%)] dark:shadow-[0_18px_46px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(94,234,212,0.10)]"
       >
         <div
           className="absolute inset-x-6 top-0 h-px"
@@ -1194,7 +1191,7 @@ export default function DashboardPage() {
               <div className="flex flex-wrap items-center gap-2">
                 <p
                   className="text-[10px] font-bold uppercase tracking-[0.12em]"
-                  style={{ color: "#0f766e" }}
+                  style={{ color: "var(--dash-teal-strong)" }}
                 >
                   Study Streak
                 </p>
@@ -1247,14 +1244,14 @@ export default function DashboardPage() {
                 key={label}
                 className="rounded-xl px-3 py-3 min-w-0 transition-transform duration-200 hover:-translate-y-0.5"
                 style={{
-                  background: "rgba(255,255,255,0.68)",
-                  border: "1px solid rgba(20,184,166,0.15)",
-                  boxShadow: "0 8px 20px rgba(15,118,110,0.08)",
+                  background: "var(--dash-streak-metric-bg)",
+                  border: "1px solid var(--dash-streak-metric-border)",
+                  boxShadow: "var(--dash-streak-metric-shadow)",
                 }}
               >
                 <p
                   className="text-[10px] font-semibold uppercase tracking-wide truncate"
-                  style={{ color: "#0f766e" }}
+                  style={{ color: "var(--dash-teal-strong)" }}
                 >
                   {label}
                 </p>
@@ -1272,19 +1269,18 @@ export default function DashboardPage() {
       </section>
 
       <section
-        className="rounded-2xl p-5 sm:p-6"
+        className="rounded-2xl p-5 transition-colors duration-300 sm:p-6"
         style={{
           background: "var(--ui-surface)",
           border: "1px solid var(--ui-border)",
-          boxShadow:
-            "0 12px 32px rgba(15,118,110,0.08), inset 0 1px 0 rgba(255,255,255,0.55)",
+          boxShadow: "var(--dash-panel-shadow)",
         }}
       >
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-6">
           <div>
             <p
               className="text-[10px] font-bold uppercase tracking-[0.12em]"
-              style={{ color: "#0f766e" }}
+              style={{ color: "var(--dash-teal-strong)" }}
             >
               Weekly Progress
             </p>
@@ -1303,7 +1299,7 @@ export default function DashboardPage() {
             style={{
               background: "rgba(110,231,216,0.12)",
               border: "1px solid rgba(20,184,166,0.18)",
-              color: "#0f766e",
+              color: "var(--dash-teal-strong)",
             }}
           >
             <span
@@ -1320,12 +1316,7 @@ export default function DashboardPage() {
         </div>
 
         <div
-          className="rounded-2xl p-4 sm:p-5"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(240,253,250,0.62), rgba(255,255,255,0.72))",
-            border: "1px solid rgba(20,184,166,0.12)",
-          }}
+          className="rounded-2xl border border-teal-700/15 bg-[linear-gradient(180deg,rgba(240,253,250,0.62),rgba(255,255,255,0.72))] p-4 transition-colors duration-300 sm:p-5 dark:border-teal-200/15 dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.70),rgba(17,24,39,0.88))]"
         >
           <WeeklyProgressChart
             loading={loading}

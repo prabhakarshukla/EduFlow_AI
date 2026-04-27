@@ -17,12 +17,20 @@ Behavior rules:
 - Keep the response focused on the student's question.
 - Avoid overly technical language unless the student asks for it.
 - If the question is ambiguous, make a reasonable assumption and state it briefly.
+- Use clean Markdown only for structure: # or ## headings, - bullets, and **bold** key terms.
+- Avoid raw LaTeX unless absolutely required.
+- Write formulas in student-friendly plain text.
+- Prefer words like "change in", "divided by", "multiplied by", and "square root of" instead of LaTeX commands.
+- Example: write "E = -N x (change in magnetic flux / change in time)" instead of "E = -N \\frac{\\Delta \\Phi}{\\Delta t}".
+- After a formula, briefly explain what each important symbol means.
+- Use short paragraphs, clear headings, bullets, and simple explanations.
 
 Recommended output style:
-- Short intro
-- Step-by-step explanation
-- Simple example
-- Quick recap
+- # Direct Answer
+- ## Explanation
+- ## Formula in Plain English, when useful
+- ## Example
+- ## Quick Recap
 `;
 
 export async function runAgent({ userMessage, context }: AgentRunInput) {

@@ -2,6 +2,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormattedNote } from '@/components/notes/formatted-note';
 
 type SolverStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -286,10 +287,14 @@ export default function DoubtSolverPage() {
           <div className="space-y-4">
             {/* Mint top accent line */}
             <div className="h-px w-full mb-4" style={{ background: 'linear-gradient(90deg, #6EE7D8, transparent)' }} />
-            <p className="text-sm leading-[1.85] whitespace-pre-wrap" style={{ color: 'var(--ui-heading)' }}>
-              {displayedAnswer}
-              {isTyping && <span className="animate-pulse">|</span>}
-            </p>
+            <div className="relative">
+              <FormattedNote content={displayedAnswer} emptyText="" />
+              {isTyping && (
+                <span className="ml-1 animate-pulse text-sm" style={{ color: 'var(--ui-heading)' }}>
+                  |
+                </span>
+              )}
+            </div>
             {result.source && (
               <span
                 className="inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full"
