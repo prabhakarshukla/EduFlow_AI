@@ -97,7 +97,16 @@ export default function ProductivityPage() {
         .order("created_at", { ascending: false });
 
       if (qErr) {
-        console.error("Error loading tasks:", qErr);
+        console.warn(
+          "Could not load study tasks for productivity insights:",
+          qErr?.message || qErr,
+        );
+        setTaskStats({
+          totalTasks: 0,
+          completedTasks: 0,
+          pendingTasks: 0,
+          upcomingDeadlines: [],
+        });
         return;
       }
 
@@ -133,7 +142,16 @@ export default function ProductivityPage() {
         upcomingDeadlines,
       });
     } catch (e) {
-      console.error("Error processing tasks:", e);
+      console.warn(
+        "Could not load study tasks for productivity insights:",
+        e instanceof Error ? e.message : e,
+      );
+      setTaskStats({
+        totalTasks: 0,
+        completedTasks: 0,
+        pendingTasks: 0,
+        upcomingDeadlines: [],
+      });
     }
   };
 

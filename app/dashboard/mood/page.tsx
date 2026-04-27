@@ -250,36 +250,45 @@ export default function MoodTrackerPage() {
     setSuggestionsLoading(true);
     try {
       const res = await fetch("/api/doubt-solver", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-        agentType: "mood",
-        userMessage: "Give study advice based on my current mood",
-        context: {
-          mood: suggestionMood,
-         recentTasks: entries
-        .filter((e) => {
-        const d = new Date(e.occurred_at);
-        const today = new Date();
-        return d.toDateString() === today.toDateString();
-      })
-      .slice(0, 2)
-      .map((e) => e.note)
-      .filter((n): n is string => !!n),
-  },
-}),
+          agentType: "mood",
+          userMessage: "Give study advice based on my current mood",
+          context: {
+            mood: suggestionMood,
+            recentTasks: entries
+              .filter((e) => {
+                const d = new Date(e.occurred_at);
+                const today = new Date();
+                return d.toDateString() === today.toDateString();
+              })
+              .slice(0, 2)
+              .map((e) => e.note)
+              .filter((n): n is string => !!n),
+          },
+        }),
       });
 
-      const data = (await res.json()) as { suggestion?: string; error?: string };
+      const data = (await res.json()) as {
+        response?: string;
+        suggestion?: string;
+        answer?: string;
+        error?: string;
+      };
 
       if (!res.ok) {
-        setSuggestionsError(data?.error || 'Failed to get suggestions.');
+        setSuggestionsError(data?.error || "Failed to get suggestions.");
         return;
       }
 
-      setSuggestion(data.suggestion || null);
+      const aiResponse =
+        data.response || data.suggestion || data.answer || null;
+      setSuggestion(aiResponse);
     } catch (e) {
-      setSuggestionsError(e instanceof Error ? e.message : 'Failed to get suggestions.');
+      setSuggestionsError(
+        e instanceof Error ? e.message : "Failed to get suggestions.",
+      );
     } finally {
       setSuggestionsLoading(false);
     }
@@ -684,7 +693,10 @@ export default function MoodTrackerPage() {
 
           <div className="space-y-4">
             <div>
-              <p className="text-xs font-semibold mb-2.5" style={{ color: "var(--ui-heading)" }}>
+              <p
+                className="text-xs font-semibold mb-2.5"
+                style={{ color: "var(--ui-heading)" }}
+              >
                 How are you feeling?
               </p>
               <div className="grid grid-cols-3 gap-2">
@@ -704,7 +716,9 @@ export default function MoodTrackerPage() {
                     <button
                       key={m}
                       type="button"
-                      onClick={() => setSuggestionMood(m as typeof suggestionMood)}
+                      onClick={() =>
+                        setSuggestionMood(m as typeof suggestionMood)
+                      }
                       className="rounded-xl px-2.5 py-2.5 text-center transition-all duration-200 text-sm font-semibold capitalize"
                       style={{
                         background: active
@@ -712,7 +726,9 @@ export default function MoodTrackerPage() {
                           : "rgba(255,255,255,0.03)",
                         border: `1px solid ${active ? `${moodColors[m]}40` : "rgba(110,231,216,0.14)"}`,
                         color: active ? moodColors[m] : "var(--ui-muted)",
-                        boxShadow: active ? `0 0 12px ${moodColors[m]}20` : "none",
+                        boxShadow: active
+                          ? `0 0 12px ${moodColors[m]}20`
+                          : "none",
                         transition: uiTransition,
                       }}
                       aria-pressed={active}
@@ -735,7 +751,9 @@ export default function MoodTrackerPage() {
                   ? "rgba(255,255,255,0.06)"
                   : "linear-gradient(135deg,#6EE7D8,#14B8A6)",
                 color: suggestionsLoading ? "var(--ui-subtle)" : "#111827",
-                boxShadow: suggestionsLoading ? "none" : "0 4px 16px rgba(110,231,216,0.28)",
+                boxShadow: suggestionsLoading
+                  ? "none"
+                  : "0 4px 16px rgba(110,231,216,0.28)",
                 opacity: suggestionsLoading ? 0.85 : 1,
                 cursor: suggestionsLoading ? "not-allowed" : "pointer",
                 transition: uiTransition,
@@ -746,13 +764,15 @@ export default function MoodTrackerPage() {
                     "0 6px 20px rgba(110,231,216,0.34)";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.boxShadow = suggestionsLoading
-                  ? "none"
-                  : "0 4px 16px rgba(110,231,216,0.28)";
+                (e.currentTarget as HTMLElement).style.boxShadow =
+                  suggestionsLoading
+                    ? "none"
+                    : "0 4px 16px rgba(110,231,216,0.28)";
               }}
               onMouseDown={(e) => {
                 if (!suggestionsLoading)
-                  (e.currentTarget as HTMLElement).style.transform = "scale(0.99)";
+                  (e.currentTarget as HTMLElement).style.transform =
+                    "scale(0.99)";
               }}
               onMouseUp={(e) => {
                 if (!suggestionsLoading)
@@ -761,7 +781,11 @@ export default function MoodTrackerPage() {
             >
               {suggestionsLoading ? (
                 <>
-                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <svg
+                    className="w-4 h-4 animate-spin"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
                     <circle
                       className="opacity-25"
                       cx="12"
@@ -808,7 +832,10 @@ export default function MoodTrackerPage() {
                   lineHeight: "1.6",
                 }}
               >
-                <p className="font-semibold mb-2" style={{ color: "var(--ui-heading)" }}>
+                <p
+                  className="font-semibold mb-2"
+                  style={{ color: "var(--ui-heading)" }}
+                >
                   ✨ Your personalized suggestion:
                 </p>
                 <p>{suggestion}</p>

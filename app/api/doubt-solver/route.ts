@@ -63,10 +63,18 @@ export async function POST(req: Request) {
       context: body.context ?? { source: "doubt-solver" },
     });
 
-    return NextResponse.json({
-      response: answer,
-      success: { response: answer },
-    });
+    if (!answer || !answer.trim()) {
+  return NextResponse.json(
+    { error: "AI returned an empty answer." },
+    { status: 502 }
+  );
+}
+
+return NextResponse.json({
+  answer,
+  response: answer,
+  success: true,
+});
   } catch (err) {
     return NextResponse.json(
       {
