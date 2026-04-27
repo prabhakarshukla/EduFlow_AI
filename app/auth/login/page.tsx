@@ -1,23 +1,24 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { supabase } from '../../../lib/supabase';
+import { Suspense } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { supabase } from "../../../lib/supabase";
 
-export default function LoginPage() {
-  const [email,    setEmail]    = useState('');
-  const [password, setPassword] = useState('');
-  const [loading,  setLoading]  = useState(false);
-  const [error,    setError]    = useState<string | null>(null);
-  const router       = useRouter();
+function LoginPageContent() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const nextPath = useMemo(() => {
-    const raw = searchParams.get('next');
-    if (!raw) return '/dashboard';
-    const decoded = raw.startsWith('%2F') ? decodeURIComponent(raw) : raw;
-    return decoded.startsWith('/') ? decoded : '/dashboard';
+    const raw = searchParams.get("next");
+    if (!raw) return "/dashboard";
+    const decoded = raw.startsWith("%2F") ? decodeURIComponent(raw) : raw;
+    return decoded.startsWith("/") ? decoded : "/dashboard";
   }, [searchParams]);
 
   useEffect(() => {
@@ -26,7 +27,9 @@ export default function LoginPage() {
       const { data } = await supabase.auth.getSession();
       if (mounted && data.session) router.replace(nextPath);
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [router, nextPath]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,47 +54,55 @@ export default function LoginPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4 py-16 relative overflow-hidden"
-      style={{ background: '#222022' }}
+      style={{ background: "#222022" }}
     >
       {/* Ambient blobs */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+      <div
+        className="pointer-events-none fixed inset-0 overflow-hidden"
+        aria-hidden="true"
+      >
         <div
           className="absolute -top-48 -right-48 w-[520px] h-[520px] rounded-full blur-3xl"
-          style={{ background: '#6EE7D8', opacity: 0.055 }}
+          style={{ background: "#6EE7D8", opacity: 0.055 }}
         />
         <div
           className="absolute -bottom-48 -left-48 w-[440px] h-[440px] rounded-full blur-3xl"
-          style={{ background: '#14B8A6', opacity: 0.055 }}
+          style={{ background: "#14B8A6", opacity: 0.055 }}
         />
         {/* Subtle dot grid */}
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: 'radial-gradient(circle, rgba(110,231,216,0.07) 1px, transparent 1px)',
-            backgroundSize: '32px 32px',
+            backgroundImage:
+              "radial-gradient(circle, rgba(110,231,216,0.07) 1px, transparent 1px)",
+            backgroundSize: "32px 32px",
             opacity: 0.5,
           }}
         />
       </div>
 
       <div className="relative w-full max-w-[400px]">
-
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <Link
             href="/"
             className="inline-flex transition-all duration-200"
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.transform = 'scale(1.05)';
-              (e.currentTarget as HTMLElement).style.filter = 'drop-shadow(0 0 16px rgba(110,231,216,0.45))';
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.transform = "scale(1.05)";
+              (e.currentTarget as HTMLElement).style.filter =
+                "drop-shadow(0 0 16px rgba(110,231,216,0.45))";
             }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
-              (e.currentTarget as HTMLElement).style.filter = 'none';
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+              (e.currentTarget as HTMLElement).style.filter = "none";
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo.png" alt="EduFlow AI" style={{ height: '72px', width: 'auto', display: 'block' }} />
+            <img
+              src="/images/logo.png"
+              alt="EduFlow AI"
+              style={{ height: "72px", width: "auto", display: "block" }}
+            />
           </Link>
         </div>
 
@@ -99,23 +110,30 @@ export default function LoginPage() {
         <div
           className="rounded-2xl overflow-hidden"
           style={{
-            background: '#2a282a',
-            border: '1px solid rgba(110,231,216,0.15)',
-            boxShadow: '0 4px 24px rgba(0,0,0,0.40), 0 32px 64px rgba(0,0,0,0.28)',
+            background: "#2a282a",
+            border: "1px solid rgba(110,231,216,0.15)",
+            boxShadow:
+              "0 4px 24px rgba(0,0,0,0.40), 0 32px 64px rgba(0,0,0,0.28)",
           }}
         >
           {/* Mint top accent line */}
           <div
             className="h-[2px] w-full"
-            style={{ background: 'linear-gradient(90deg, #6EE7D8, #14B8A6, transparent)' }}
+            style={{
+              background:
+                "linear-gradient(90deg, #6EE7D8, #14B8A6, transparent)",
+            }}
           />
 
           <div className="px-8 py-8">
             <div className="mb-7">
-              <h1 className="text-[22px] font-bold tracking-tight mb-1.5" style={{ color: '#e2fdf9' }}>
+              <h1
+                className="text-[22px] font-bold tracking-tight mb-1.5"
+                style={{ color: "#e2fdf9" }}
+              >
                 Welcome back
               </h1>
-              <p className="text-sm" style={{ color: '#7ca8a3' }}>
+              <p className="text-sm" style={{ color: "#7ca8a3" }}>
                 Log in to continue your learning journey.
               </p>
             </div>
@@ -126,13 +144,23 @@ export default function LoginPage() {
                   className="flex items-start gap-2.5 rounded-xl px-3.5 py-3 text-sm"
                   role="alert"
                   style={{
-                    background: 'rgba(248,113,113,0.08)',
-                    border: '1px solid rgba(248,113,113,0.22)',
-                    color: '#fca5a5',
+                    background: "rgba(248,113,113,0.08)",
+                    border: "1px solid rgba(248,113,113,0.22)",
+                    color: "#fca5a5",
                   }}
                 >
-                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-4 h-4 mt-0.5 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                   {error}
                 </div>
@@ -140,14 +168,17 @@ export default function LoginPage() {
 
               {/* Email */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold" style={{ color: 'rgba(209,250,245,0.75)' }}>
+                <label
+                  className="block text-xs font-semibold"
+                  style={{ color: "rgba(209,250,245,0.75)" }}
+                >
                   Email address
                 </label>
                 <input
                   type="email"
                   placeholder="you@university.edu"
                   value={email}
-                  onChange={e => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   className="input"
                   autoComplete="email"
@@ -157,15 +188,23 @@ export default function LoginPage() {
               {/* Password */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold" style={{ color: 'rgba(209,250,245,0.75)' }}>
+                  <label
+                    className="text-xs font-semibold"
+                    style={{ color: "rgba(209,250,245,0.75)" }}
+                  >
                     Password
                   </label>
                   <Link
                     href="/auth/forgot-password"
                     className="text-xs font-medium transition-colors duration-150"
-                    style={{ color: 'rgba(110,231,216,0.60)' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#6EE7D8'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(110,231,216,0.60)'; }}
+                    style={{ color: "rgba(110,231,216,0.60)" }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLElement).style.color = "#6EE7D8";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.color =
+                        "rgba(110,231,216,0.60)";
+                    }}
                   >
                     Forgot password?
                   </Link>
@@ -174,7 +213,7 @@ export default function LoginPage() {
                   type="password"
                   placeholder="••••••••"
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                   className="input"
                   autoComplete="current-password"
@@ -188,50 +227,88 @@ export default function LoginPage() {
                 className="w-full flex items-center justify-center gap-2 mt-1 py-3 rounded-xl text-sm font-bold transition-all duration-200"
                 style={{
                   background: loading
-                    ? 'rgba(110,231,216,0.35)'
-                    : 'linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)',
-                  color: '#0d2420',
-                  boxShadow: loading ? 'none' : '0 4px 16px rgba(110,231,216,0.30)',
-                  cursor: loading ? 'not-allowed' : 'pointer',
+                    ? "rgba(110,231,216,0.35)"
+                    : "linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)",
+                  color: "#0d2420",
+                  boxShadow: loading
+                    ? "none"
+                    : "0 4px 16px rgba(110,231,216,0.30)",
+                  cursor: loading ? "not-allowed" : "pointer",
                 }}
-                onMouseEnter={e => {
+                onMouseEnter={(e) => {
                   if (!loading) {
-                    (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 22px rgba(110,231,216,0.46)';
-                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
+                    (e.currentTarget as HTMLElement).style.boxShadow =
+                      "0 6px 22px rgba(110,231,216,0.46)";
+                    (e.currentTarget as HTMLElement).style.transform =
+                      "translateY(-1px)";
                   }
                 }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 16px rgba(110,231,216,0.30)';
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.boxShadow =
+                    "0 4px 16px rgba(110,231,216,0.30)";
+                  (e.currentTarget as HTMLElement).style.transform =
+                    "translateY(0)";
                 }}
               >
                 {loading ? (
                   <>
-                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    <svg
+                      className="w-4 h-4 animate-spin"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8H4z"
+                      />
                     </svg>
                     Logging in…
                   </>
-                ) : 'Log in'}
+                ) : (
+                  "Log in"
+                )}
               </button>
             </form>
 
             {/* Divider */}
             <div className="flex items-center gap-3 my-6">
-              <div className="flex-1 h-px" style={{ background: 'rgba(110,231,216,0.09)' }} />
-              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.22)' }}>or</span>
-              <div className="flex-1 h-px" style={{ background: 'rgba(110,231,216,0.09)' }} />
+              <div
+                className="flex-1 h-px"
+                style={{ background: "rgba(110,231,216,0.09)" }}
+              />
+              <span
+                className="text-[11px] font-medium"
+                style={{ color: "rgba(255,255,255,0.22)" }}
+              >
+                or
+              </span>
+              <div
+                className="flex-1 h-px"
+                style={{ background: "rgba(110,231,216,0.09)" }}
+              />
             </div>
 
-            <p className="text-center text-sm" style={{ color: '#7ca8a3' }}>
-              Don&apos;t have an account?{' '}
+            <p className="text-center text-sm" style={{ color: "#7ca8a3" }}>
+              Don&apos;t have an account?{" "}
               <Link
                 href="/auth/signup"
                 className="font-semibold transition-colors duration-150"
-                style={{ color: '#6EE7D8' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#5EEAD4'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#6EE7D8'; }}
+                style={{ color: "#6EE7D8" }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = "#5EEAD4";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = "#6EE7D8";
+                }}
               >
                 Sign up free →
               </Link>
@@ -239,10 +316,30 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="text-center text-[11px] mt-5" style={{ color: 'rgba(255,255,255,0.20)' }}>
+        <p
+          className="text-center text-[11px] mt-5"
+          style={{ color: "rgba(255,255,255,0.20)" }}
+        >
           © {new Date().getFullYear()} EduFlow AI — All rights reserved.
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          className="min-h-screen flex items-center justify-center"
+          style={{ background: "#222022" }}
+        >
+          <div style={{ color: "#7ca8a3" }}>Loading…</div>
+        </div>
+      }
+    >
+      <LoginPageContent />
+    </Suspense>
   );
 }

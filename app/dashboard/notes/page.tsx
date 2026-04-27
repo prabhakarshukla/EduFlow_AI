@@ -70,14 +70,14 @@ const exportNoteToPdf = (note: NoteRow) => {
     doc.rect(margin, yPosition, contentWidth, 8, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(10);
-    doc.setFont(undefined, "bold");
+    doc.setFont("helvetica", "bold");
     doc.text("EduFlow AI", margin + 5, yPosition + 6);
     yPosition += 12;
 
     // Add title
     doc.setTextColor(30, 30, 30);
     doc.setFontSize(18);
-    doc.setFont(undefined, "bold");
+    doc.setFont("helvetica", "bold");
     const titleLines = doc.splitTextToSize(
       note.title || "Untitled Note",
       contentWidth,
@@ -88,7 +88,7 @@ const exportNoteToPdf = (note: NoteRow) => {
     // Add metadata
     doc.setFontSize(10);
     doc.setTextColor(100, 100, 100);
-    doc.setFont(undefined, "normal");
+    doc.setFont("helvetica", "normal");
     const createdDate = new Date(note.created_at).toLocaleDateString(
       undefined,
       {
@@ -109,7 +109,7 @@ const exportNoteToPdf = (note: NoteRow) => {
     // Add content
     doc.setFontSize(11);
     doc.setTextColor(50, 50, 50);
-    doc.setFont(undefined, "normal");
+    doc.setFont("helvetica", "normal");
     const contentLines = doc.splitTextToSize(
       note.content || "",
       contentWidth,
@@ -132,6 +132,30 @@ const exportNoteToPdf = (note: NoteRow) => {
     doc.save(`${fileName}.pdf`);
   } catch (error) {
     console.error("Failed to export note as PDF:", error);
+  }
+};
+
+const copyShareLink = async (noteId: string, notificationFn: (msg: string) => void) => {
+  try {
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+    const shareUrl = `${baseUrl}/privacy?id=${noteId}`;
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(shareUrl);
+      notificationFn("Share link copied!");
+    } else {
+      // Fallback for older browsers
+      const textarea = document.createElement("textarea");
+      textarea.value = shareUrl;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      notificationFn("Share link copied!");
+    }
+  } catch (error) {
+    console.error("Failed to copy share link:", error);
+    throw new Error("Failed to copy share link to clipboard.");
   }
 };
 
@@ -555,6 +579,47 @@ export default function NotesPage() {
           >
             📄 Export PDF
           </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (selectedId) {
+                copyShareLink(selectedId, flashSuccess).catch((e) => {
+                  const msg = e instanceof Error ? e.message : "Failed to copy link.";
+                  setError(msg);
+                });
+              }
+            }}
+            disabled={!selectedId}
+            className="px-4 py-2.5 text-xs font-semibold rounded-xl transition-all duration-150"
+            style={{
+              background: selectedId
+                ? "rgba(110,231,216,0.08)"
+                : "rgba(110,231,216,0.04)",
+              border: selectedId
+                ? "1px solid rgba(110,231,216,0.22)"
+                : "1px solid rgba(110,231,216,0.12)",
+              color: selectedId ? "#6EE7D8" : "var(--ui-subtle)",
+              cursor: selectedId ? "pointer" : "not-allowed",
+            }}
+            onMouseEnter={(e) => {
+              if (selectedId) {
+                (e.currentTarget as HTMLElement).style.borderColor =
+                  "rgba(110,231,216,0.35)";
+                (e.currentTarget as HTMLElement).style.background =
+                  "rgba(110,231,216,0.12)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (selectedId) {
+                (e.currentTarget as HTMLElement).style.borderColor =
+                  "rgba(110,231,216,0.22)";
+                (e.currentTarget as HTMLElement).style.background =
+                  "rgba(110,231,216,0.08)";
+              }
+            }}
+          >
+            🔗 Share
+          </button>
         </div>
       </div>
 
@@ -769,6 +834,46 @@ export default function NotesPage() {
                             strokeLinejoin="round"
                             strokeWidth={1.8}
                             d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          copyShareLink(n.id, flashSuccess).catch((e) => {
+                            const msg =
+                              e instanceof Error
+                                ? e.message
+                                : "Failed to copy link.";
+                            setError(msg);
+                          });
+                        }}
+                        className="mt-0.5 p-1.5 rounded-lg transition-colors duration-150 opacity-0 group-hover:opacity-100"
+                        title="Share note"
+                        style={{
+                          color: "var(--ui-subtle)",
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLElement).style.color =
+                            "#6EE7D8";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLElement).style.color =
+                            "var(--ui-subtle)";
+                        }}
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.8}
+                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.658 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
                           />
                         </svg>
                       </button>

@@ -1,8 +1,225 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
-export default function PrivacyPage() {
+type SharedNote = {
+  id: string;
+  title: string;
+  content: string;
+  subject: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+function PrivacyPageContent() {
+  const searchParams = useSearchParams();
+  const noteId = searchParams.get("id");
+  const [note, setNote] = useState<SharedNote | null>(null);
+  const [loading, setLoading] = useState(!!noteId);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!noteId) return;
+
+    const fetchNote = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // TODO: If Supabase Row Level Security (RLS) is enabled on the notes table,
+        // public reads may be blocked. If so, add a policy like:
+        // CREATE POLICY 'Allow public read for shared notes' ON notes
+        // FOR SELECT USING (true);
+        // Or use an authenticated client with appropriate permissions.
+        const { data, error: queryError } = await supabase
+          .from("notes")
+          .select("id,title,content,subject,created_at,updated_at")
+          .eq("id", noteId)
+          .single();
+
+        if (queryError || !data) {
+          console.error("[shared-note] Query error:", queryError?.message);
+          setError("Note not found or has been deleted.");
+          return;
+        }
+
+        const sharedNote: SharedNote = {
+          id: String(data.id),
+          title: String(data.title ?? ""),
+          content: String(data.content ?? ""),
+          subject: (data.subject ?? null) as string | null,
+          created_at: String(data.created_at),
+          updated_at: String(data.updated_at),
+        };
+
+        setNote(sharedNote);
+      } catch (e) {
+        const errorMsg =
+          e instanceof Error ? e.message : "Failed to load note.";
+        console.error("[shared-note] Error:", errorMsg);
+        setError(errorMsg);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNote();
+  }, [noteId]);
+
+  // If viewing a shared note
+  if (noteId) {
+    if (loading) {
+      return (
+        <div className="min-h-screen flex items-center justify-center px-4 py-8">
+          <div className="max-w-2xl w-full">
+            <div
+              className="rounded-2xl p-8 text-center"
+              style={{
+                background: "rgba(110,231,216,0.05)",
+                border: "1px solid rgba(110,231,216,0.15)",
+              }}
+            >
+              <p style={{ color: "var(--ui-muted)" }}>Loading note…</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (error || !note) {
+      return (
+        <div className="min-h-screen flex items-center justify-center px-4 py-8">
+          <div className="max-w-2xl w-full">
+            <div
+              className="rounded-2xl p-8 text-center"
+              style={{
+                background: "rgba(248,113,113,0.10)",
+                border: "1px solid rgba(248,113,113,0.22)",
+              }}
+            >
+              <p style={{ color: "#b91c1c", fontWeight: "600" }}>
+                {error || "Note not found."}
+              </p>
+              <p
+                style={{ color: "var(--ui-muted)", marginTop: "0.5rem" }}
+                className="text-sm"
+              >
+                The note you're looking for doesn't exist or has been deleted.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const fmt = (iso: string) => {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return iso;
+      return d.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    };
+
+    return (
+      <div
+        className="min-h-screen px-4 py-8"
+        style={{ background: "var(--ui-bg)" }}
+      >
+        <div className="max-w-3xl mx-auto space-y-6">
+          {/* Header with branding */}
+          <div>
+            <div
+              className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full mb-4"
+              style={{
+                background: "rgba(110,231,216,0.08)",
+                color: "#6EE7D8",
+                border: "1px solid rgba(110,231,216,0.18)",
+              }}
+            >
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+              EduFlow AI Notes
+            </div>
+            <h1
+              className="text-3xl sm:text-4xl font-bold"
+              style={{ color: "var(--ui-heading)" }}
+            >
+              {note.title || "Untitled Note"}
+            </h1>
+            <p className="text-sm mt-2" style={{ color: "var(--ui-muted)" }}>
+              {note.subject ? (
+                <>
+                  <span>Subject: {note.subject}</span> •{" "}
+                  <span>Updated {fmt(note.updated_at)}</span>
+                </>
+              ) : (
+                <span>Updated {fmt(note.updated_at)}</span>
+              )}
+            </p>
+          </div>
+
+          {/* Content card */}
+          <div
+            className="rounded-2xl p-6 sm:p-8"
+            style={{
+              background: "var(--ui-surface)",
+              border: "1px solid var(--ui-border)",
+            }}
+          >
+            <div
+              style={{
+                color: "var(--ui-text)",
+                lineHeight: 1.8,
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+                fontSize: "0.95rem",
+              }}
+            >
+              {note.content || (
+                <span style={{ color: "var(--ui-muted)", fontStyle: "italic" }}>
+                  No content available for this note.
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Footer info */}
+          <div
+            className="rounded-xl p-4"
+            style={{
+              background: "rgba(110,231,216,0.04)",
+              border: "1px solid rgba(110,231,216,0.14)",
+            }}
+          >
+            <p className="text-xs" style={{ color: "var(--ui-muted)" }}>
+              📌 This is a shared read-only view of a note created in EduFlow
+              AI.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Default Privacy Policy
   return (
     <div
       style={{
@@ -317,5 +534,22 @@ export default function PrivacyPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PrivacyPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          className="min-h-screen flex items-center justify-center"
+          style={{ background: "#fcfcf9" }}
+        >
+          <div style={{ color: "#6b7280" }}>Loading…</div>
+        </div>
+      }
+    >
+      <PrivacyPageContent />
+    </Suspense>
   );
 }
