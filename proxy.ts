@@ -13,7 +13,7 @@ function redirectTo(request: NextRequest, pathname: string, searchParams?: Recor
   return NextResponse.redirect(url);
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   // We only match the routes below via config.matcher, but keep logic explicit.
