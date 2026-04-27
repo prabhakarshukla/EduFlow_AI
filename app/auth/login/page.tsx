@@ -6,6 +6,24 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 
+function getAuthErrorMessage(message: string) {
+  const lower = message.toLowerCase();
+
+  if (lower.includes("email not confirmed")) {
+    return "Please confirm your email address before logging in. Check your inbox for the Supabase confirmation link.";
+  }
+
+  if (lower.includes("invalid login credentials")) {
+    return "Invalid email or password. Please check your details and try again.";
+  }
+
+  if (lower.includes("expired")) {
+    return "This sign-in or confirmation link has expired. Please request a new one.";
+  }
+
+  return message;
+}
+
 function LoginPageContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,6 +37,14 @@ function LoginPageContent() {
     if (!raw) return "/dashboard";
     const decoded = raw.startsWith("%2F") ? decodeURIComponent(raw) : raw;
     return decoded.startsWith("/") ? decoded : "/dashboard";
+  }, [searchParams]);
+
+  useEffect(() => {
+    const authMessage =
+      searchParams.get("authError") ||
+      searchParams.get("error_description") ||
+      searchParams.get("error");
+    if (authMessage) setError(getAuthErrorMessage(authMessage));
   }, [searchParams]);
 
   useEffect(() => {
@@ -42,10 +68,17 @@ function LoginPageContent() {
         password,
       });
       if (signInError) {
-        setError(signInError.message);
+        setError(getAuthErrorMessage(signInError.message));
         return;
       }
       router.replace(nextPath);
+      router.refresh();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? getAuthErrorMessage(err.message)
+          : "Could not log in. Please try again.",
+      );
     } finally {
       setLoading(false);
     }

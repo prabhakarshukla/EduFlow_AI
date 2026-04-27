@@ -5,6 +5,27 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
 
+function getAuthCallbackUrl() {
+  const origin = window.location.origin;
+  const url = new URL('/auth/callback', origin);
+  url.searchParams.set('next', '/dashboard');
+  return url.toString();
+}
+
+function getAuthErrorMessage(message: string) {
+  const lower = message.toLowerCase();
+
+  if (lower.includes('already registered') || lower.includes('already exists')) {
+    return 'An account already exists for this email. Please log in instead.';
+  }
+
+  if (lower.includes('password')) {
+    return 'Please use a stronger password. It should be at least 8 characters.';
+  }
+
+  return message;
+}
+
 export default function SignupPage() {
   const [name,     setName]     = useState('');
   const [email,    setEmail]    = useState('');
@@ -33,21 +54,29 @@ export default function SignupPage() {
         email: email.trim(),
         password,
         options: {
+          emailRedirectTo: getAuthCallbackUrl(),
           data: { full_name: name.trim() },
         },
       });
 
       if (signUpError) {
-        setError(signUpError.message);
+        setError(getAuthErrorMessage(signUpError.message));
         return;
       }
 
       if (data.session) {
         router.replace('/dashboard');
+        router.refresh();
         return;
       }
 
-      setSuccess('Account created. Please check your email to confirm your address, then log in.');
+      setSuccess('Account created. Please check your email to confirm your address. The confirmation link will bring you back to EduFlow AI.');
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Could not create your account. Please try again.',
+      );
     } finally {
       setLoading(false);
     }

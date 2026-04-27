@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { getSupabaseConfig } from './lib/supabase-config';
 
 function redirectTo(request: NextRequest, pathname: string, searchParams?: Record<string, string>) {
   const url = request.nextUrl.clone();
@@ -15,6 +16,7 @@ function redirectTo(request: NextRequest, pathname: string, searchParams?: Recor
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+  const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig();
 
   // We only match the routes below via config.matcher, but keep logic explicit.
   const isDashboardRoute = pathname === '/dashboard' || pathname.startsWith('/dashboard/');
@@ -27,8 +29,8 @@ export async function proxy(request: NextRequest) {
   });
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {

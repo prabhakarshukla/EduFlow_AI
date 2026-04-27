@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabase";
 
@@ -13,6 +14,7 @@ const navLinks = [
 ];
 
 export default function Navbar() {
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -46,7 +48,10 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    setUser(null);
     setMobileOpen(false);
+    router.replace("/auth/login");
+    router.refresh();
   };
 
   return (
