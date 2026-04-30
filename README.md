@@ -86,7 +86,7 @@ The project includes a multi-agent AI approach, allowing different AI workflows 
 
 ### AI & APIs
 
-- OpenRouter / LLM APIs
+- Google Gemini API
 - AI-powered notes generation
 - AI-powered doubt solving
 
