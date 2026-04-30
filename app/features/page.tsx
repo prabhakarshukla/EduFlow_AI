@@ -50,7 +50,6 @@ export default function FeaturesPage() {
         color: "#1f2937",
       }}
     >
-      {/* Header */}
       <div
         style={{
           background:
@@ -95,7 +94,6 @@ export default function FeaturesPage() {
         </div>
       </div>
 
-      {/* Features Grid */}
       <div
         style={{ maxWidth: "1200px", margin: "0 auto", padding: "3rem 1rem" }}
       >
@@ -160,7 +158,6 @@ export default function FeaturesPage() {
         </div>
       </div>
 
-      {/* CTA Section */}
       <div
         style={{
           background:
@@ -228,7 +225,6 @@ export default function FeaturesPage() {
         </div>
       </div>
 
-      {/* Footer Info */}
       <div
         style={{
           maxWidth: "1200px",

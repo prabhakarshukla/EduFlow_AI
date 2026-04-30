@@ -30,11 +30,6 @@ function PrivacyPageContent() {
       setLoading(true);
       setError(null);
       try {
-        // TODO: If Supabase Row Level Security (RLS) is enabled on the notes table,
-        // public reads may be blocked. If so, add a policy like:
-        // CREATE POLICY 'Allow public read for shared notes' ON notes
-        // FOR SELECT USING (true);
-        // Or use an authenticated client with appropriate permissions.
         const { data, error: queryError } = await supabase
           .from("notes")
           .select("id,title,content,subject,created_at,updated_at")
@@ -70,7 +65,6 @@ function PrivacyPageContent() {
     fetchNote();
   }, [noteId]);
 
-  // If viewing a shared note
   if (noteId) {
     if (loading) {
       return (
@@ -134,7 +128,6 @@ function PrivacyPageContent() {
         style={{ background: "var(--ui-bg)" }}
       >
         <div className="max-w-3xl mx-auto space-y-6">
-          {/* Header with branding */}
           <div>
             <div
               className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full mb-4"
@@ -177,7 +170,6 @@ function PrivacyPageContent() {
             </p>
           </div>
 
-          {/* Content card */}
           <div
             className="rounded-2xl p-6 sm:p-8"
             style={{
@@ -191,7 +183,6 @@ function PrivacyPageContent() {
             />
           </div>
 
-          {/* Footer info */}
           <div
             className="rounded-xl p-4"
             style={{
@@ -209,7 +200,6 @@ function PrivacyPageContent() {
     );
   }
 
-  // Default Privacy Policy
   return (
     <div
       style={{
@@ -220,7 +210,6 @@ function PrivacyPageContent() {
       }}
     >
       <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-        {/* Back Link */}
         <Link
           href="/"
           style={{
@@ -234,7 +223,6 @@ function PrivacyPageContent() {
           ← Back to Home
         </Link>
 
-        {/* Header */}
         <h1
           style={{
             fontSize: "2.25rem",
@@ -250,7 +238,6 @@ function PrivacyPageContent() {
           <strong>Last Updated:</strong> April 2026
         </p>
 
-        {/* Intro */}
         <div
           style={{
             backgroundColor: "white",
@@ -265,11 +252,9 @@ function PrivacyPageContent() {
           </p>
         </div>
 
-        {/* Content Sections */}
         <div
           style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
         >
-          {/* Section 1: Information We Collect */}
           <section
             style={{
               backgroundColor: "white",
@@ -305,7 +290,6 @@ function PrivacyPageContent() {
             </ul>
           </section>
 
-          {/* Section 2: How We Use Your Information */}
           <section
             style={{
               backgroundColor: "white",
@@ -341,7 +325,6 @@ function PrivacyPageContent() {
             </ul>
           </section>
 
-          {/* Section 3: Data Storage */}
           <section
             style={{
               backgroundColor: "white",
@@ -366,7 +349,6 @@ function PrivacyPageContent() {
             </p>
           </section>
 
-          {/* Section 4: Data Sharing */}
           <section
             style={{
               backgroundColor: "white",
@@ -392,7 +374,6 @@ function PrivacyPageContent() {
             </p>
           </section>
 
-          {/* Section 5: Security */}
           <section
             style={{
               backgroundColor: "white",
@@ -417,7 +398,6 @@ function PrivacyPageContent() {
             </p>
           </section>
 
-          {/* Section 6: User Rights */}
           <section
             style={{
               backgroundColor: "white",
@@ -452,7 +432,6 @@ function PrivacyPageContent() {
             </ul>
           </section>
 
-          {/* Section 7: Changes to Policy */}
           <section
             style={{
               backgroundColor: "white",
@@ -476,7 +455,6 @@ function PrivacyPageContent() {
             </p>
           </section>
 
-          {/* Section 8: Contact */}
           <section
             style={{
               backgroundColor: "white",

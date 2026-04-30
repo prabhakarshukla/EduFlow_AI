@@ -55,7 +55,6 @@ export default function SettingsPage() {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const NOTIFICATIONS_KEY = "notificationsEnabled";
   const REMINDERS_KEY = "remindersEnabled";
-  // Load current user email on mount
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -70,7 +69,6 @@ export default function SettingsPage() {
     loadUser();
   }, []);
 
-  // Load persisted preference toggles on mount
   useEffect(() => {
     try {
       const savedNotifications = localStorage.getItem(NOTIFICATIONS_KEY);
@@ -111,7 +109,6 @@ export default function SettingsPage() {
     setNotificationStatusMessage(null);
   }, [notificationsEnabled, preferencesHydrated]);
 
-  // Persist preference toggles after initial hydration
   useEffect(() => {
     if (!preferencesHydrated) return;
 
@@ -169,7 +166,6 @@ export default function SettingsPage() {
   };
 
   const handleSave = async () => {
-    // Validate name
     if (!name.trim()) {
       setMessage({ type: "error", text: "Name cannot be empty" });
       setTimeout(() => setMessage(null), 3000);
@@ -178,7 +174,6 @@ export default function SettingsPage() {
 
     setSaving(true);
     try {
-      // Simulate save delay for UX feedback
       await new Promise(resolve => setTimeout(resolve, 500));
       
       setMessage({ type: "success", text: "Settings saved successfully" });
@@ -192,7 +187,6 @@ export default function SettingsPage() {
   };
   return (
     <div className="px-6 sm:px-8 py-8 max-w-[1280px] mx-auto space-y-8">
-      {/* Header */}
       <div className="space-y-2">
         <h1
           className="text-2xl sm:text-[28px] font-bold tracking-tight"
@@ -205,7 +199,6 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      {/* Status Message */}
       {message && (
         <div
           className="px-4 py-3 rounded-lg text-sm font-medium"
@@ -225,9 +218,7 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* Settings Cards Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Account Card */}
         <Card>
           <div className="space-y-4">
             <div>
@@ -324,7 +315,6 @@ export default function SettingsPage() {
           </div>
         </Card>
 
-        {/* Preferences Card */}
         <Card>
           <div className="space-y-4">
             <div>
@@ -453,7 +443,6 @@ export default function SettingsPage() {
           </div>
         </Card>
 
-        {/* Data & Privacy Card */}
         <Card>
           <div className="space-y-4">
             <div>
@@ -531,7 +520,6 @@ export default function SettingsPage() {
         </Card>
       </div>
 
-      {/* Footer info */}
       <div
         className="px-6 py-4 rounded-lg text-xs text-center"
         style={{

@@ -36,7 +36,6 @@ export default function Cta() {
         aria-hidden="true"
       />
 
-      {/* Dot grid */}
       <div
         className="absolute inset-0 pointer-events-none"
         aria-hidden="true"

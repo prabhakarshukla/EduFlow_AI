@@ -13,7 +13,6 @@ export default function TermsPage() {
       }}
     >
       <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-        {/* Back Link */}
         <Link
           href="/"
           style={{
@@ -27,7 +26,6 @@ export default function TermsPage() {
           ← Back to Home
         </Link>
 
-        {/* Header */}
         <h1
           style={{
             fontSize: "2.25rem",
@@ -43,7 +41,6 @@ export default function TermsPage() {
           <strong>Last Updated:</strong> April 2026
         </p>
 
-        {/* Intro */}
         <div
           style={{
             backgroundColor: "white",
@@ -61,11 +58,9 @@ export default function TermsPage() {
           </p>
         </div>
 
-        {/* Content Sections */}
         <div
           style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
         >
-          {/* Section 1: Use of Service */}
           <section
             style={{
               backgroundColor: "white",
@@ -104,7 +99,6 @@ export default function TermsPage() {
             </ul>
           </section>
 
-          {/* Section 2: User Accounts */}
           <section
             style={{
               backgroundColor: "white",
@@ -141,7 +135,6 @@ export default function TermsPage() {
             </ul>
           </section>
 
-          {/* Section 3: Intellectual Property */}
           <section
             style={{
               backgroundColor: "white",
@@ -166,7 +159,6 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* Section 4: Limitation of Liability */}
           <section
             style={{
               backgroundColor: "white",
@@ -201,7 +193,6 @@ export default function TermsPage() {
             </ul>
           </section>
 
-          {/* Section 5: Termination */}
           <section
             style={{
               backgroundColor: "white",
@@ -226,7 +217,6 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* Section 6: Changes to Terms */}
           <section
             style={{
               backgroundColor: "white",
@@ -250,7 +240,6 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* Section 7: Contact */}
           <section
             style={{
               backgroundColor: "white",

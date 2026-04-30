@@ -5,7 +5,6 @@ import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatLastActiveDate, getStreak, type Streak } from "@/lib/streaks";
 
-/* ── Types ── */
 type OverviewCard = {
   title: string;
   value: string;
@@ -273,7 +272,6 @@ const quickActions: QuickAction[] = [
   },
 ];
 
-/* ── Helpers ── */
 const priorityStyle = (p: string) => ({
   background:
     p === "high"
@@ -383,7 +381,6 @@ const resolveDisplayName = (
   return fullName || name || emailPrefix || "Student";
 };
 
-/* ── Dashboard page ── */
 export default function DashboardPage() {
   const now = useMemo(() => new Date(), []);
   const greeting = "Welcome back";
@@ -986,7 +983,6 @@ export default function DashboardPage() {
 
   return (
     <div className="px-6 sm:px-8 py-8 max-w-[1280px] mx-auto space-y-8 [--dash-danger:#b91c1c] [--dash-empty-bg:rgba(110,231,216,0.07)] [--dash-empty-border:rgba(20,184,166,0.22)] [--dash-link:#0d9488] [--dash-link-hover:#115e59] [--dash-panel-shadow:0_12px_32px_rgba(15,118,110,0.08),inset_0_1px_0_rgba(255,255,255,0.55)] [--dash-streak-metric-bg:rgba(255,255,255,0.68)] [--dash-streak-metric-border:rgba(20,184,166,0.15)] [--dash-streak-metric-shadow:0_8px_20px_rgba(15,118,110,0.08)] [--dash-teal-strong:#0f766e] dark:[--dash-danger:#fca5a5] dark:[--dash-empty-bg:rgba(15,23,42,0.62)] dark:[--dash-empty-border:rgba(94,234,212,0.24)] dark:[--dash-link:#5eead4] dark:[--dash-link-hover:#99f6e4] dark:[--dash-panel-shadow:0_14px_34px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(94,234,212,0.08)] dark:[--dash-streak-metric-bg:rgba(15,23,42,0.72)] dark:[--dash-streak-metric-border:rgba(94,234,212,0.18)] dark:[--dash-streak-metric-shadow:0_10px_24px_rgba(0,0,0,0.22)] dark:[--dash-teal-strong:#5eead4]">
-      {/* ── Welcome header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <p
@@ -1048,7 +1044,6 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* ── Overview cards ── */}
       <section>
         <div className="flex items-center gap-2 mb-4">
           <p
@@ -1145,7 +1140,6 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* Streak */}
       <section
         className="relative overflow-hidden rounded-2xl border border-teal-700/20 bg-[linear-gradient(135deg,rgba(240,253,250,0.98)_0%,rgba(204,251,241,0.78)_42%,rgba(255,255,255,0.94)_100%)] p-5 shadow-[0_18px_46px_rgba(15,118,110,0.14),inset_0_1px_0_rgba(255,255,255,0.78)] transition-colors duration-300 sm:p-6 dark:border-teal-200/20 dark:bg-[linear-gradient(135deg,rgba(15,23,42,0.98)_0%,rgba(17,24,39,0.96)_48%,rgba(20,83,78,0.42)_100%)] dark:shadow-[0_18px_46px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(94,234,212,0.10)]"
       >
@@ -1328,9 +1322,7 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* ── Two-col: Today's Focus + Right column ── */}
       <div className="grid lg:grid-cols-5 gap-5">
-        {/* Today's Focus */}
         <div
           className="lg:col-span-3 rounded-2xl p-5"
           style={{
@@ -1370,7 +1362,6 @@ export default function DashboardPage() {
             </span>
           </div>
 
-          {/* Progress bar */}
           <div
             className="w-full h-1.5 rounded-full mb-4"
             style={{ background: "var(--ui-surface-2)" }}
@@ -1386,7 +1377,6 @@ export default function DashboardPage() {
             />
           </div>
 
-          {/* Tasks list */}
           <div className="space-y-2">
             {loading ? (
               focusSkeletonRows.map((i) => (
@@ -1504,9 +1494,7 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        {/* Right col */}
         <div className="lg:col-span-2 flex flex-col gap-4">
-          {/* Quick Actions */}
           <div
             className="rounded-2xl p-5"
             style={{
@@ -1561,7 +1549,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Recent Activity */}
           <div
             className="rounded-2xl p-5 flex-1"
             style={{

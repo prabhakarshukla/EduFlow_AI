@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 
-/* ─── Chip data ────────────────────────────────────────────────── */
 const features = [
   { icon: '📚', label: 'Study Planner' },
   { icon: '🤖', label: 'AI Doubt Solver' },

@@ -4,7 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Brand tokens ─────────────────────────────────────────────── */
 :root {
   --ui-bg:           #fcfcf9;
   --ui-surface:      #ffffff;
@@ -51,7 +50,6 @@ html.dark {
   --ui-shadow-card:  0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
-/* ── Reset & base ─────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { scroll-behavior: smooth; font-size: 16px; }
@@ -72,7 +70,6 @@ select {
   color: var(--ui-text);
 }
 
-/* ── Typography ───────────────────────────────────────────────── */
 @layer base {
   h1 {
     font-family: 'Inter', sans-serif;
@@ -104,10 +101,8 @@ select {
   a   { text-decoration: none; color: inherit; }
 }
 
-/* ── Reusable components ──────────────────────────────────────── */
 @layer components {
 
-  /* ── Gradient button: mint → teal ── */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 font-semibold rounded-xl text-sm transition-all duration-200;
     background: linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%);
@@ -125,7 +120,6 @@ select {
     filter: brightness(0.96);
   }
 
-  /* ── Ghost / outline button ── */
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 font-semibold rounded-xl text-sm border transition-all duration-200;
     color: var(--primary);
@@ -140,7 +134,6 @@ select {
   }
   .btn-ghost:active { transform: translateY(0); }
 
-  /* ── Card surface ── */
   .card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -153,13 +146,11 @@ select {
     transform: translateY(-2px);
   }
 
-  /* ── Logo wrapper ── */
   .logo-wrap {
     @apply flex items-center gap-2.5 transition-transform duration-200;
   }
   .logo-wrap:hover { transform: scale(1.03); }
 
-  /* ── Gradient text ── */
   .gradient-text {
     background: linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%);
     -webkit-background-clip: text;
@@ -167,7 +158,6 @@ select {
     background-clip: text;
   }
 
-  /* ── Inputs ── */
   .input {
     @apply w-full px-4 py-3 rounded-xl text-sm font-medium outline-none transition-all duration-200;
     background: var(--bg-surface);
@@ -184,7 +174,6 @@ select {
     box-shadow: 0 0 0 3px rgba(110, 231, 216, 0.09), inset 0 1px 2px rgba(0,0,0,0.12);
   }
 
-  /* ── Section eyebrow pill ── */
   .eyebrow {
     @apply inline-flex items-center gap-2 text-xs font-semibold px-3.5 py-1.5 rounded-full;
     background: rgba(110, 231, 216, 0.07);
@@ -193,7 +182,6 @@ select {
     letter-spacing: 0.025em;
   }
 
-  /* ── Stat badge ── */
   .badge {
     @apply text-xs font-semibold px-2.5 py-1 rounded-full;
     background: rgba(110, 231, 216, 0.08);
@@ -202,7 +190,6 @@ select {
   }
 }
 
-/* ── Utilities ────────────────────────────────────────────────── */
 @layer utilities {
   .text-balance   { text-wrap: balance; }
   .glow           { box-shadow: var(--glow); }
@@ -218,20 +205,17 @@ select {
   }
 }
 
-/* ── Scrollbar ────────────────────────────────────────────────── */
 ::-webkit-scrollbar        { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track  { background: var(--bg); }
 ::-webkit-scrollbar-thumb  { background: rgba(110,231,216,0.20); border-radius: 6px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
 
-/* ── Focus ring ───────────────────────────────────────────────── */
 :focus-visible {
   outline: 2px solid rgba(110, 231, 216, 0.50);
   outline-offset: 2px;
   border-radius: 8px;
 }
 
-/* ── Text selection ───────────────────────────────────────────── */
 ::selection {
   background: rgba(110, 231, 216, 0.18);
   color: var(--text-body);

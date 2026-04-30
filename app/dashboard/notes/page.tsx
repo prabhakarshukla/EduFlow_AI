@@ -67,7 +67,6 @@ const exportNoteToPdf = (note: NoteRow) => {
     const contentWidth = pageWidth - 2 * margin;
     let yPosition = margin;
 
-    // Add branding header
     doc.setFillColor(110, 231, 216);
     doc.rect(margin, yPosition, contentWidth, 8, "F");
     doc.setTextColor(255, 255, 255);
@@ -76,7 +75,6 @@ const exportNoteToPdf = (note: NoteRow) => {
     doc.text("EduFlow AI", margin + 5, yPosition + 6);
     yPosition += 12;
 
-    // Add title
     doc.setTextColor(30, 30, 30);
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
@@ -87,7 +85,6 @@ const exportNoteToPdf = (note: NoteRow) => {
     doc.text(titleLines, margin, yPosition);
     yPosition += titleLines.length * 8 + 4;
 
-    // Add metadata
     doc.setFontSize(10);
     doc.setTextColor(100, 100, 100);
     doc.setFont("helvetica", "normal");
@@ -103,7 +100,6 @@ const exportNoteToPdf = (note: NoteRow) => {
     doc.text(metadataText, margin, yPosition);
     yPosition += 6;
 
-    // Add divider line
     doc.setDrawColor(200, 200, 200);
     doc.line(margin, yPosition, pageWidth - margin, yPosition);
     yPosition += 6;
@@ -174,7 +170,6 @@ const exportNoteToPdf = (note: NoteRow) => {
       yPosition += 2;
     });
 
-    // Save the PDF
     const fileName = `${note.title || "note"}`
       .replace(/[^\w\s-]/g, "")
       .substring(0, 50);
@@ -193,7 +188,6 @@ const copyShareLink = async (noteId: string, notificationFn: (msg: string) => vo
       await navigator.clipboard.writeText(shareUrl);
       notificationFn("Share link copied!");
     } else {
-      // Fallback for older browsers
       const textarea = document.createElement("textarea");
       textarea.value = shareUrl;
       document.body.appendChild(textarea);
@@ -218,7 +212,6 @@ export default function NotesPage() {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // Editor state
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
   const [content, setContent] = useState("");
@@ -243,7 +236,6 @@ export default function NotesPage() {
             (n.content || "").toLowerCase().includes(q),
         )
       : notes;
-    // pinned first, then updated_at desc
     return [...list].sort((a, b) => {
       if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
       return (
@@ -301,17 +293,15 @@ export default function NotesPage() {
     return () => {
       alive = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Sync editor when selecting a note
   useEffect(() => {
     if (!selected) return;
     setTitle(selected.title);
     setSubject(selected.subject ?? "");
     setContent(selected.content ?? "");
     setPinned(Boolean(selected.pinned));
-  }, [selected?.id]); // intentionally only on selection change
+  }, [selected?.id]);
 
   const flashSuccess = (msg: string) => {
     setSuccess(msg);
@@ -534,7 +524,6 @@ export default function NotesPage() {
 
   return (
     <div className="px-6 py-8 max-w-6xl mx-auto space-y-8">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <div
@@ -691,7 +680,6 @@ export default function NotesPage() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-5">
-        {/* List */}
         <Card className="lg:col-span-1">
           <div className="flex items-center justify-between mb-4">
             <SectionLabel>Your Notes</SectionLabel>
@@ -965,7 +953,6 @@ export default function NotesPage() {
           </div>
         </Card>
 
-        {/* Editor */}
         <Card className="lg:col-span-2 flex flex-col gap-4">
           <SectionLabel>Editor</SectionLabel>
 

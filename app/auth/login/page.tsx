@@ -89,7 +89,6 @@ function LoginPageContent() {
       className="min-h-screen flex items-center justify-center px-4 py-16 relative overflow-hidden"
       style={{ background: "#222022" }}
     >
-      {/* Ambient blobs */}
       <div
         className="pointer-events-none fixed inset-0 overflow-hidden"
         aria-hidden="true"
@@ -102,7 +101,6 @@ function LoginPageContent() {
           className="absolute -bottom-48 -left-48 w-[440px] h-[440px] rounded-full blur-3xl"
           style={{ background: "#14B8A6", opacity: 0.055 }}
         />
-        {/* Subtle dot grid */}
         <div
           className="absolute inset-0"
           style={{
@@ -115,7 +113,6 @@ function LoginPageContent() {
       </div>
 
       <div className="relative w-full max-w-[400px]">
-        {/* Logo */}
         <div className="flex justify-center mb-8">
           <Link
             href="/"
@@ -130,7 +127,6 @@ function LoginPageContent() {
               (e.currentTarget as HTMLElement).style.filter = "none";
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/logo.png"
               alt="EduFlow AI"
@@ -139,7 +135,6 @@ function LoginPageContent() {
           </Link>
         </div>
 
-        {/* Card */}
         <div
           className="rounded-2xl overflow-hidden"
           style={{
@@ -149,7 +144,6 @@ function LoginPageContent() {
               "0 4px 24px rgba(0,0,0,0.40), 0 32px 64px rgba(0,0,0,0.28)",
           }}
         >
-          {/* Mint top accent line */}
           <div
             className="h-[2px] w-full"
             style={{
@@ -199,7 +193,6 @@ function LoginPageContent() {
                 </div>
               )}
 
-              {/* Email */}
               <div className="space-y-1.5">
                 <label
                   className="block text-xs font-semibold"
@@ -218,7 +211,6 @@ function LoginPageContent() {
                 />
               </div>
 
-              {/* Password */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label
@@ -253,7 +245,6 @@ function LoginPageContent() {
                 />
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
@@ -312,7 +303,6 @@ function LoginPageContent() {
               </button>
             </form>
 
-            {/* Divider */}
             <div className="flex items-center gap-3 my-6">
               <div
                 className="flex-1 h-px"

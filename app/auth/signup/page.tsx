@@ -87,7 +87,6 @@ export default function SignupPage() {
       className="min-h-screen flex items-center justify-center px-4 py-16 relative overflow-hidden"
       style={{ background: '#222022' }}
     >
-      {/* Ambient blobs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
         <div
           className="absolute -top-48 -right-48 w-[520px] h-[520px] rounded-full blur-3xl"
@@ -97,7 +96,6 @@ export default function SignupPage() {
           className="absolute -bottom-48 -left-48 w-[440px] h-[440px] rounded-full blur-3xl"
           style={{ background: '#14B8A6', opacity: 0.055 }}
         />
-        {/* Subtle dot grid */}
         <div
           className="absolute inset-0"
           style={{
@@ -110,7 +108,6 @@ export default function SignupPage() {
 
       <div className="relative w-full max-w-[400px]">
 
-        {/* Logo */}
         <div className="flex justify-center mb-7">
           <Link
             href="/"
@@ -124,12 +121,10 @@ export default function SignupPage() {
               (e.currentTarget as HTMLElement).style.filter = 'none';
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/logo.png" alt="EduFlow AI" style={{ height: '64px', width: 'auto', display: 'block' }} />
           </Link>
         </div>
 
-        {/* Feature pills */}
         <div className="flex justify-center gap-2 flex-wrap mb-6">
           {['Study Planner', 'AI Solver', 'Smart Notes', 'Mood Tracker'].map((f) => (
             <span
@@ -146,7 +141,6 @@ export default function SignupPage() {
           ))}
         </div>
 
-        {/* Card */}
         <div
           className="rounded-2xl overflow-hidden"
           style={{
@@ -155,7 +149,6 @@ export default function SignupPage() {
             boxShadow: '0 4px 24px rgba(0,0,0,0.40), 0 32px 64px rgba(0,0,0,0.28)',
           }}
         >
-          {/* Mint accent top line */}
           <div
             className="h-[2px] w-full"
             style={{ background: 'linear-gradient(90deg, #6EE7D8, #14B8A6, transparent)' }}
@@ -206,7 +199,6 @@ export default function SignupPage() {
                 </div>
               )}
 
-              {/* Full name */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold" style={{ color: 'rgba(209,250,245,0.75)' }}>
                   Full name
@@ -222,7 +214,6 @@ export default function SignupPage() {
                 />
               </div>
 
-              {/* Email */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold" style={{ color: 'rgba(209,250,245,0.75)' }}>
                   Email address
@@ -238,7 +229,6 @@ export default function SignupPage() {
                 />
               </div>
 
-              {/* Password */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold" style={{ color: 'rgba(209,250,245,0.75)' }}>
                   Password
@@ -257,7 +247,6 @@ export default function SignupPage() {
                 </p>
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
@@ -300,7 +289,6 @@ export default function SignupPage() {
               </button>
             </form>
 
-            {/* Divider */}
             <div className="flex items-center gap-3 my-5">
               <div className="flex-1 h-px" style={{ background: 'rgba(110,231,216,0.09)' }} />
               <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.22)' }}>or</span>
@@ -322,7 +310,6 @@ export default function SignupPage() {
           </div>
         </div>
 
-        {/* Legal */}
         <p className="text-center text-[11px] mt-5" style={{ color: 'rgba(255,255,255,0.20)' }}>
           By signing up, you agree to our{' '}
           <Link

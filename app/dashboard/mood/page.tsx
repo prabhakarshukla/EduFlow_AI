@@ -5,7 +5,7 @@ import { supabase } from "../../../lib/supabase";
 
 type MoodEntry = {
   id: string;
-  mood: number; // 1..5
+  mood: number;
   note: string | null;
   occurred_at: string;
 };
@@ -82,7 +82,7 @@ export default function MoodTrackerPage() {
 
   const [mood, setMood] = useState<number>(4);
   const [note, setNote] = useState("");
-  const [occurredAt, setOccurredAt] = useState<string>(""); // optional datetime-local
+  const [occurredAt, setOccurredAt] = useState<string>("");
 
   const [suggestionMood, setSuggestionMood] = useState<
     "tired" | "neutral" | "motivated"
@@ -161,7 +161,6 @@ export default function MoodTrackerPage() {
     return () => {
       alive = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const addEntry = async () => {
@@ -200,7 +199,6 @@ export default function MoodTrackerPage() {
       setError(e instanceof Error ? e.message : "Failed to save mood entry.");
     } finally {
       setSaving(false);
-      // fade success after a moment
       window.setTimeout(() => setSuccess(null), 1400);
     }
   };
@@ -320,7 +318,6 @@ export default function MoodTrackerPage() {
 
   return (
     <div className="px-6 py-8 max-w-6xl mx-auto space-y-8">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <div
@@ -444,7 +441,6 @@ export default function MoodTrackerPage() {
       </Card>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Quick check-in */}
         <Card className="lg:col-span-1 flex flex-col gap-5">
           <SectionLabel>Quick Check-in</SectionLabel>
 
@@ -697,7 +693,6 @@ export default function MoodTrackerPage() {
           </button>
         </Card>
 
-        {/* AI Mood-Based Suggestions */}
         <Card className="lg:col-span-1">
           <SectionLabel>AI Mood-Based Suggestions</SectionLabel>
 
@@ -900,7 +895,6 @@ export default function MoodTrackerPage() {
           </div>
         </Card>
 
-        {/* History */}
         <Card className="lg:col-span-2">
           <div className="flex items-center justify-between mb-5">
             <div>

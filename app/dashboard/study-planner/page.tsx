@@ -9,7 +9,6 @@ import {
   updateStreakOnTaskComplete,
 } from "../../../lib/streaks";
 
-/* ── Types ─────────────────────────────────────────────────────── */
 type Priority = "high" | "medium" | "low";
 type Task = {
   id: string;
@@ -32,7 +31,6 @@ type Deadline = {
   urgent: boolean;
 };
 
-/* ── Seed data ──────────────────────────────────────────────────── */
 const initialTasks: Task[] = [];
 
 const week: WeekDay[] = [
@@ -84,7 +82,6 @@ const NOTIFICATIONS_KEY = "notificationsEnabled";
 const REMINDERS_KEY = "remindersEnabled";
 const SENT_REMINDERS_KEY = "eduflow_sent_reminders";
 
-/* ── Priority helpers ───────────────────────────────────────────── */
 const pColor = (p: Priority) =>
   p === "high" ? "#f87171" : p === "medium" ? "#fbbf24" : "var(--ui-muted)";
 const pBg = (p: Priority) =>
@@ -167,7 +164,6 @@ const shouldSendReminder = (
   return null;
 };
 
-/* ── Shared card shell ──────────────────────────────────────────── */
 function Card({
   children,
   className = "",
@@ -188,7 +184,6 @@ function Card({
   );
 }
 
-/* ── Section label ──────────────────────────────────────────────── */
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <p
@@ -200,7 +195,6 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* ── Page ───────────────────────────────────────────────────────── */
 export default function StudyPlannerPage() {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [streak, setStreak] = useState<Streak | null>(null);
@@ -216,7 +210,7 @@ export default function StudyPlannerPage() {
   const [newLabel, setNewLabel] = useState("");
   const [newSubject, setNewSubject] = useState("");
   const [newDescription, setNewDescription] = useState("");
-  const [newDueDate, setNewDueDate] = useState(""); // YYYY-MM-DD
+  const [newDueDate, setNewDueDate] = useState("");
   const [newPriority, setNewPriority] = useState<Priority>("medium");
   const [focused, setFocused] = useState<string | null>(null);
 
@@ -309,7 +303,6 @@ export default function StudyPlannerPage() {
     return () => {
       alive = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -379,7 +372,6 @@ export default function StudyPlannerPage() {
         );
         setError(upErr.message);
       } else if (nextStatus === "done") {
-        // Update streak when task is marked as done
         const { data: userData } = await supabase.auth.getUser();
         if (userData.user?.id) {
           const updatedStreak = await updateStreakOnTaskComplete(
@@ -398,7 +390,6 @@ export default function StudyPlannerPage() {
   };
 
   const insertWithFallback = async (payload: Record<string, unknown>) => {
-    // Return inserted row when possible.
     const { data, error: firstErr } = await supabase
       .from("study_tasks")
       .insert(payload)
@@ -407,7 +398,6 @@ export default function StudyPlannerPage() {
 
     if (!firstErr) return { data, error: null as any };
 
-    // Fallback to a conservative schema (title/details/due_at/priority/status/user_id).
     const minimal: Record<string, unknown> = {
       title: payload.title,
       details: payload.description,
@@ -458,7 +448,6 @@ export default function StudyPlannerPage() {
         return;
       }
 
-      // Always refresh from DB so the user sees the source of truth.
       await loadTasks();
 
       setNewLabel("");
@@ -565,7 +554,6 @@ export default function StudyPlannerPage() {
     }
   };
 
-  /* Input focus ring helper */
   const inputStyle = (field: string): React.CSSProperties => ({
     background: "var(--ui-surface)",
     border: `1px solid ${focused === field ? "rgba(110,231,216,0.45)" : "rgba(110,231,216,0.15)"}`,
@@ -581,7 +569,6 @@ export default function StudyPlannerPage() {
 
   return (
     <div className="px-6 py-8 max-w-6xl mx-auto space-y-8">
-      {/* ── Page header ── */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <div
@@ -619,7 +606,6 @@ export default function StudyPlannerPage() {
           </p>
         </div>
 
-        {/* Progress pill */}
         <div
           className="flex items-center gap-3 px-4 py-2.5 rounded-xl flex-shrink-0"
           style={{
@@ -766,13 +752,10 @@ export default function StudyPlannerPage() {
         </div>
       </Card>
 
-      {/* ── Row 1: Progress summary + Weekly plan ── */}
       <div className="grid lg:grid-cols-3 gap-5">
-        {/* Progress summary */}
         <Card className="flex flex-col gap-5">
           <SectionLabel>Progress Summary</SectionLabel>
 
-          {/* Ring-style progress */}
           <div className="flex items-center gap-5">
             <div className="relative w-20 h-20 flex-shrink-0">
               <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
@@ -840,7 +823,6 @@ export default function StudyPlannerPage() {
             </div>
           </div>
 
-          {/* Streak */}
           <div
             className="flex items-center gap-3 rounded-xl px-4 py-3"
             style={{
@@ -889,7 +871,6 @@ export default function StudyPlannerPage() {
           </div>
         </Card>
 
-        {/* Weekly plan */}
         <Card className="lg:col-span-2">
           <SectionLabel>Weekly Study Plan</SectionLabel>
           <div className="grid grid-cols-7 gap-2">
@@ -952,7 +933,6 @@ export default function StudyPlannerPage() {
             ))}
           </div>
 
-          {/* Horizontal task load bar */}
           <div className="mt-5">
             <p
               className="text-[10px] mb-2"
@@ -979,9 +959,7 @@ export default function StudyPlannerPage() {
         </Card>
       </div>
 
-      {/* ── Row 2: Today's tasks + Quick add ── */}
       <div className="grid lg:grid-cols-3 gap-5">
-        {/* Today's tasks */}
         <Card className="lg:col-span-2">
           <div className="flex items-center justify-between mb-5">
             <div>
@@ -993,7 +971,6 @@ export default function StudyPlannerPage() {
                 {done} of {tasks.length} completed
               </p>
             </div>
-            {/* Progress bar */}
             <div className="w-24">
               <div
                 className="w-full h-1.5 rounded-full"
@@ -1111,7 +1088,6 @@ export default function StudyPlannerPage() {
                         : "rgba(255,255,255,0.03)";
                   }}
                 >
-                  {/* Checkbox */}
                   <button
                     onClick={() => toggleStatus(task.id)}
                     className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-150"
@@ -1141,7 +1117,6 @@ export default function StudyPlannerPage() {
                     )}
                   </button>
 
-                  {/* Label */}
                   <div className="flex-1 min-w-0">
                     <p
                       className={`text-sm truncate ${task.status === "done" ? "line-through" : ""}`}
@@ -1167,7 +1142,6 @@ export default function StudyPlannerPage() {
                     </p>
                   </div>
 
-                  {/* Priority */}
                   <span
                     className="text-[10px] font-medium px-2 py-0.5 rounded-full flex-shrink-0"
                     style={{
@@ -1178,7 +1152,6 @@ export default function StudyPlannerPage() {
                     {task.priority}
                   </span>
 
-                  {/* Delete */}
                   <button
                     type="button"
                     onClick={() => deleteTask(task.id)}
@@ -1212,7 +1185,6 @@ export default function StudyPlannerPage() {
           </div>
         </Card>
 
-        {/* Quick add */}
         <Card className="flex flex-col gap-4">
           <SectionLabel>Quick Add Task</SectionLabel>
 
@@ -1405,7 +1377,6 @@ export default function StudyPlannerPage() {
             </button>
           </div>
 
-          {/* Tip */}
           <div
             className="flex items-start gap-2.5 rounded-xl p-3 mt-auto"
             style={{
@@ -1447,9 +1418,7 @@ export default function StudyPlannerPage() {
         </Card>
       </div>
 
-      {/* ── Row 3: Priority subjects + Upcoming deadlines ── */}
       <div className="grid lg:grid-cols-2 gap-5">
-        {/* Priority subjects */}
         <Card>
           <SectionLabel>Priority Subjects</SectionLabel>
           <div className="space-y-4">
@@ -1488,7 +1457,6 @@ export default function StudyPlannerPage() {
           </div>
         </Card>
 
-        {/* Upcoming deadlines */}
         <Card>
           <SectionLabel>Upcoming Deadlines</SectionLabel>
           <div className="space-y-3">
@@ -1517,7 +1485,6 @@ export default function StudyPlannerPage() {
                     "translateY(0)";
                 }}
               >
-                {/* Calendar icon */}
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                   style={{

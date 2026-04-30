@@ -38,7 +38,6 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-5 sm:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-10 mb-12">
 
-          {/* Brand col */}
           <div className="md:col-span-2 flex flex-col gap-5">
             <Link
               href="/"
@@ -57,7 +56,6 @@ export default function Footer() {
                 (e.currentTarget as HTMLElement).style.filter = 'none';
               }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/logo.png"
                 alt="EduFlow AI"
@@ -73,7 +71,6 @@ export default function Footer() {
               instant doubt solving, and peak productivity.
             </p>
 
-            {/* Social icons */}
             <div className="flex gap-3">
               {[
                 {
@@ -119,7 +116,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Link cols */}
           {cols.map(col => (
             <div key={col.title}>
               <h4
@@ -151,7 +147,6 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* Bottom bar */}
         <div
           className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-8 text-xs"
           style={{

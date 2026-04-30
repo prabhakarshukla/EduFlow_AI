@@ -59,7 +59,6 @@ const sidebarLinks = [
   },
 ];
 
-// Flat list for current page lookup
 const allLinks = sidebarLinks.flatMap((g) => g.items);
 
 const resolveDisplayName = (
@@ -162,7 +161,6 @@ export default function DashboardLayout({
           .from("profiles")
           .upsert(basePayload, { onConflict: "id" });
       } catch {
-        // Intentionally silent: profile sync should never block dashboard access.
       }
     })();
   }, [authReady, user]);
@@ -187,7 +185,6 @@ export default function DashboardLayout({
       className="flex min-h-screen"
       style={{ background: "var(--ui-bg)", paddingTop: "64px" }}
     >
-      {/* ── Mobile overlay ── */}
       {mobileOpen && (
         <div
           className="fixed inset-0 z-20 bg-black/60 backdrop-blur-sm md:hidden"
@@ -195,7 +192,6 @@ export default function DashboardLayout({
         />
       )}
 
-      {/* ─────────────────────── SIDEBAR ─────────────────────────── */}
       <aside
         className={`
           fixed md:relative z-30 flex flex-col min-h-screen flex-shrink-0
@@ -210,7 +206,6 @@ export default function DashboardLayout({
           borderRight: "1px solid var(--ui-border)",
         }}
       >
-        {/* Collapse toggle row */}
         <div
           className="flex items-center justify-end px-3 py-3 flex-shrink-0"
           style={{ borderBottom: "1px solid var(--ui-border)", minHeight: "52px" }}
@@ -273,11 +268,9 @@ export default function DashboardLayout({
           )}
         </div>
 
-        {/* Nav groups */}
         <nav className="flex flex-col flex-1 px-2 py-4 gap-5 overflow-y-auto overflow-x-hidden">
           {sidebarLinks.map(({ group, items }) => (
             <div key={group} className="flex flex-col gap-0.5">
-              {/* Group label */}
               {!collapsed && (
                 <p
                   className="px-3 pb-1.5 text-[9px] font-bold uppercase tracking-[0.12em]"
@@ -316,7 +309,6 @@ export default function DashboardLayout({
                       }
                     }}
                   >
-                    {/* Active indicator pip */}
                     {active && (
                       <span
                         className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-r-full"
@@ -349,7 +341,6 @@ export default function DashboardLayout({
           ))}
         </nav>
 
-        {/* User row */}
         <div
           className="flex-shrink-0 px-3 py-4"
           style={{ borderTop: "1px solid var(--ui-border)" }}
@@ -425,9 +416,7 @@ export default function DashboardLayout({
         </div>
       </aside>
 
-      {/* ─────────────────────── MAIN AREA ───────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* ── Top header ── */}
         <header
           className="flex-shrink-0 flex items-center gap-4 px-5 sm:px-7"
           style={{
@@ -438,7 +427,6 @@ export default function DashboardLayout({
             minHeight: "56px",
           }}
         >
-          {/* Mobile hamburger */}
           <button
             className="md:hidden p-1.5 rounded-lg transition-colors duration-150"
             style={{ color: "#14b8a6" }}
@@ -460,7 +448,6 @@ export default function DashboardLayout({
             </svg>
           </button>
 
-          {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-xs min-w-0">
             <span style={{ color: "var(--ui-muted)", fontWeight: 500 }}>EduFlow</span>
             <svg
@@ -485,9 +472,7 @@ export default function DashboardLayout({
             </span>
           </div>
 
-          {/* Right region */}
           <div className="ml-auto flex items-center gap-3">
-            {/* Search pill */}
             <div
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs cursor-text transition-colors duration-150"
               style={{
@@ -525,7 +510,6 @@ export default function DashboardLayout({
               </span>
             </div>
 
-            {/* Notification bell */}
             <button
               className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center transition-all duration-150"
               style={{
@@ -558,7 +542,6 @@ export default function DashboardLayout({
               </svg>
             </button>
 
-            {/* Avatar */}
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 cursor-pointer"
               style={{
@@ -572,7 +555,6 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        {/* ── Page content ── */}
         <main
           className="flex-1 overflow-auto"
           style={{ background: "var(--ui-bg)" }}

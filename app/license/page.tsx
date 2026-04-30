@@ -13,7 +13,6 @@ export default function LicensePage() {
       }}
     >
       <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-        {/* Back Link */}
         <Link
           href="/"
           style={{
@@ -27,7 +26,6 @@ export default function LicensePage() {
           ← Back to Home
         </Link>
 
-        {/* Header */}
         <h1
           style={{
             fontSize: "2.25rem",
@@ -43,11 +41,9 @@ export default function LicensePage() {
           Copyright (c) 2026 Prabhakar Shukla. All Rights Reserved.
         </p>
 
-        {/* Content Sections */}
         <div
           style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
         >
-          {/* Section 1: Ownership */}
           <section
             style={{
               backgroundColor: "white",
@@ -74,7 +70,6 @@ export default function LicensePage() {
             </p>
           </section>
 
-          {/* Section 2: Restrictions */}
           <section
             style={{
               backgroundColor: "white",
@@ -116,7 +111,6 @@ export default function LicensePage() {
             </ul>
           </section>
 
-          {/* Section 3: Limited Access */}
           <section
             style={{
               backgroundColor: "white",
@@ -142,7 +136,6 @@ export default function LicensePage() {
             </p>
           </section>
 
-          {/* Section 4: Permissions */}
           <section
             style={{
               backgroundColor: "white",
@@ -192,7 +185,6 @@ export default function LicensePage() {
             </a>
           </section>
 
-          {/* Section 5: Enforcement */}
           <section
             style={{
               backgroundColor: "white",
@@ -217,7 +209,6 @@ export default function LicensePage() {
             </p>
           </section>
 
-          {/* Section 6: Disclaimer */}
           <section
             style={{
               backgroundColor: "white",
@@ -243,7 +234,6 @@ export default function LicensePage() {
             </p>
           </section>
 
-          {/* Section 7: Updates */}
           <section
             style={{
               backgroundColor: "white",

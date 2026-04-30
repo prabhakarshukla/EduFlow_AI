@@ -111,7 +111,6 @@ export default function Features() {
 
       <div className="relative max-w-7xl mx-auto px-5 sm:px-8">
 
-        {/* Section header */}
         <div className="text-center mb-20">
           <div
             className="inline-flex items-center gap-2 text-xs font-semibold px-3.5 py-1.5 rounded-full mb-5"
@@ -158,7 +157,6 @@ export default function Features() {
           </p>
         </div>
 
-        {/* Card grid — 3 top, 2 bottom (spanning wider) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 mb-5">
           {features.slice(0, 3).map(f => <FeatureCard key={f.title} {...f} />)}
         </div>
@@ -168,7 +166,6 @@ export default function Features() {
 
       </div>
 
-      {/* Bottom divider */}
       <div
         className="absolute bottom-0 left-0 right-0 h-px"
         style={{ background: 'linear-gradient(90deg, transparent, rgba(20,184,166,0.15), transparent)' }}
@@ -218,7 +215,6 @@ function FeatureCard({ title, description, icon, accent, accentBg, tag, href }: 
           aria-hidden="true"
         />
 
-        {/* Icon + tag row */}
         <div className="flex items-start justify-between">
           <div
             className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
@@ -238,7 +234,6 @@ function FeatureCard({ title, description, icon, accent, accentBg, tag, href }: 
           </span>
         </div>
 
-        {/* Text */}
         <div className="flex-1 flex flex-col gap-2">
           <h3
             className="text-[15px] font-semibold leading-snug"
@@ -251,7 +246,6 @@ function FeatureCard({ title, description, icon, accent, accentBg, tag, href }: 
           </p>
         </div>
 
-        {/* Bottom CTA strip */}
         <div className="flex items-center gap-1.5 mt-auto">
           <div
             className="h-px flex-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-250"

@@ -1,4 +1,3 @@
-// app/dashboard/doubt-solver/page.tsx
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
@@ -90,7 +89,6 @@ export default function DoubtSolverPage() {
   return (
     <div className="px-6 sm:px-8 py-8 max-w-4xl mx-auto space-y-6">
 
-      {/* ── Page header ── */}
       <div>
         <div
           className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full mb-3"
@@ -110,7 +108,6 @@ export default function DoubtSolverPage() {
         </p>
       </div>
 
-      {/* ── Question form ── */}
       <form
         onSubmit={handleSubmit}
         className="rounded-2xl p-5 space-y-4"
@@ -191,7 +188,6 @@ export default function DoubtSolverPage() {
           </button>
         </div>
 
-        {/* Example questions */}
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-wider mb-2.5" style={{ color: 'var(--ui-muted)' }}>
             Try an example
@@ -214,7 +210,6 @@ export default function DoubtSolverPage() {
         </div>
       </form>
 
-      {/* ── Answer panel ── */}
       <div
         className="rounded-2xl p-5 min-h-[200px] transition-all duration-300"
         style={{
@@ -285,7 +280,6 @@ export default function DoubtSolverPage() {
 
         {status === 'success' && result && (
           <div className="space-y-4">
-            {/* Mint top accent line */}
             <div className="h-px w-full mb-4" style={{ background: 'linear-gradient(90deg, #6EE7D8, transparent)' }} />
             <div className="relative">
               <FormattedNote content={displayedAnswer} emptyText="" />

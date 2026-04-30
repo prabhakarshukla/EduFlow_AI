@@ -68,7 +68,6 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[60px] gap-6">
-          {/* ── Logo ── */}
           <Link
             href="/"
             className="flex items-center flex-shrink-0 transition-all duration-200"
@@ -79,7 +78,6 @@ export default function Navbar() {
               (e.currentTarget as HTMLElement).style.transform = "scale(1)";
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/logo.png"
               alt="EduFlow AI"
@@ -93,7 +91,6 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* ── Desktop Nav ── */}
           <nav className="hidden md:flex items-center gap-1 flex-1 justify-center px-4">
             {navLinks.map(({ label, href }) => (
               <Link
@@ -118,7 +115,6 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* ── Desktop Actions ── */}
           <div className="hidden md:flex items-center gap-2.5 flex-shrink-0">
             {authReady && user ? (
               <>
@@ -204,7 +200,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* ── Mobile Hamburger ── */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="md:hidden p-2 rounded-lg transition-colors duration-150"
@@ -236,7 +231,6 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* ── Mobile Menu ── */}
         {mobileOpen && (
           <div
             className="md:hidden pb-5 pt-3"
