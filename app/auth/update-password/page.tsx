@@ -62,6 +62,7 @@ function UpdatePasswordContent() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [sessionReady, setSessionReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const router = useRouter();
@@ -105,11 +106,13 @@ function UpdatePasswordContent() {
             await supabase.auth.exchangeCodeForSession(code);
 
           if (exchangeError && mounted) {
+            setSessionReady(false);
             setError(
               exchangeError.message ||
                 "This password reset link is invalid or expired. Please request a new one.",
             );
           } else if (mounted) {
+            setSessionReady(true);
             setError(null);
           }
         } else if (
@@ -117,26 +120,40 @@ function UpdatePasswordContent() {
           refreshToken &&
           recoveryType === "recovery"
         ) {
+          const { data: hydratedData } = await supabase.auth.getSession();
+
+          if (hydratedData.session && mounted) {
+            setSessionReady(true);
+            setError(null);
+          }
+
           const { error: sessionError } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
           });
 
           if (sessionError && mounted) {
+            setSessionReady(false);
             setError(
               sessionError.message ||
                 "This password reset link is invalid or expired. Please request a new one.",
             );
           } else if (mounted) {
+            setSessionReady(true);
             setError(null);
           }
         }
       }
 
       const { data } = await supabase.auth.getSession();
+      if (mounted && data.session) {
+        setSessionReady(true);
+        setError(null);
+      }
       if (mounted && !data.session && !authMessage) {
+        setSessionReady(false);
         setError(
-          "Open this page from the password reset link in your email. You can still enter your new password once the recovery link is verified.",
+          "Open this page from the password reset link in your email, or request a new reset link if this one has expired.",
         );
       }
       if (mounted) setCheckingSession(false);
@@ -145,7 +162,8 @@ function UpdatePasswordContent() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
+        setSessionReady(true);
         setError(null);
         setCheckingSession(false);
       }
@@ -169,6 +187,13 @@ function UpdatePasswordContent() {
 
     if (newPassword !== confirmPassword) {
       setError("New password and confirmation do not match.");
+      return;
+    }
+
+    if (!sessionReady) {
+      setError(
+        "Your password reset session is not ready yet. Open the latest reset link from your email and try again.",
+      );
       return;
     }
 
@@ -290,66 +315,80 @@ function UpdatePasswordContent() {
               {error && <AuthNotice message={error} tone="error" />}
               {success && <AuthNotice message={success} tone="success" />}
 
-              <div className="space-y-1.5">
-                <label
-                  className="block text-xs font-semibold"
-                  style={{ color: "rgba(209,250,245,0.75)" }}
-                >
-                  New password
-                </label>
-                <input
-                  type="password"
-                  placeholder="Create a strong password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                  className="input"
-                  autoComplete="new-password"
+              {checkingSession && (
+                <AuthNotice
+                  message="Checking your reset link..."
+                  tone="success"
                 />
-              </div>
+              )}
 
-              <div className="space-y-1.5">
-                <label
-                  className="block text-xs font-semibold"
-                  style={{ color: "rgba(209,250,245,0.75)" }}
-                >
-                  Confirm password
-                </label>
-                <input
-                  type="password"
-                  placeholder="Repeat your new password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  className="input"
-                  autoComplete="new-password"
-                />
-                <p
-                  className="text-[10px]"
-                  style={{ color: "rgba(255,255,255,0.28)" }}
-                >
-                  Use at least 8 characters.
-                </p>
-              </div>
+              {sessionReady && (
+                <>
+                  <div className="space-y-1.5">
+                    <label
+                      className="block text-xs font-semibold"
+                      style={{ color: "rgba(209,250,245,0.75)" }}
+                    >
+                      New password
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Create a strong password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      className="input"
+                      autoComplete="new-password"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      className="block text-xs font-semibold"
+                      style={{ color: "rgba(209,250,245,0.75)" }}
+                    >
+                      Confirm password
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Repeat your new password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      className="input"
+                      autoComplete="new-password"
+                    />
+                    <p
+                      className="text-[10px]"
+                      style={{ color: "rgba(255,255,255,0.28)" }}
+                    >
+                      Use at least 8 characters.
+                    </p>
+                  </div>
+                </>
+              )}
 
               <button
                 type="submit"
-                disabled={loading || checkingSession}
+                disabled={loading || checkingSession || !sessionReady}
                 className="w-full flex items-center justify-center gap-2 mt-1 py-3 rounded-xl text-sm font-bold transition-all duration-200"
                 style={{
                   background:
-                    loading || checkingSession
+                    loading || checkingSession || !sessionReady
                       ? "rgba(110,231,216,0.35)"
                       : "linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)",
                   color: "#0d2420",
                   boxShadow:
-                    loading || checkingSession
+                    loading || checkingSession || !sessionReady
                       ? "none"
                       : "0 4px 16px rgba(110,231,216,0.30)",
-                  cursor: loading || checkingSession ? "not-allowed" : "pointer",
+                  cursor:
+                    loading || checkingSession || !sessionReady
+                      ? "not-allowed"
+                      : "pointer",
                 }}
                 onMouseEnter={(e) => {
-                  if (!loading && !checkingSession) {
+                  if (!loading && !checkingSession && sessionReady) {
                     e.currentTarget.style.boxShadow =
                       "0 6px 22px rgba(110,231,216,0.46)";
                     e.currentTarget.style.transform = "translateY(-1px)";

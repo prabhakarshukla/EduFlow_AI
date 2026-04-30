@@ -16,7 +16,7 @@ function redirectTo(request: NextRequest, pathname: string, searchParams?: Recor
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
-  const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig();
+  const searchParams = request.nextUrl.searchParams;
 
   // We only match the routes below via config.matcher, but keep logic explicit.
   const isDashboardRoute = pathname === '/dashboard' || pathname.startsWith('/dashboard/');
@@ -26,9 +26,12 @@ export async function proxy(request: NextRequest) {
     '/auth/forgot-password',
     '/auth/update-password',
   ];
-  const redirectAuthenticatedAuthRoutes = ['/auth/login', '/auth/signup'];
   const isPublicAuthRoute = publicAuthRoutes.includes(pathname);
-  const shouldRedirectAuthenticatedUser = redirectAuthenticatedAuthRoutes.includes(pathname);
+  const hasRecoveryParams =
+    searchParams.get('type') === 'recovery' ||
+    searchParams.has('code') ||
+    searchParams.has('access_token') ||
+    searchParams.has('refresh_token');
 
   let response = NextResponse.next({
     request: {
@@ -36,6 +39,12 @@ export async function proxy(request: NextRequest) {
     },
   });
 
+  // Supabase recovery URLs must never be routed away before the client restores a session.
+  if (isPublicAuthRoute || hasRecoveryParams) {
+    return response;
+  }
+
+  const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig();
   const supabase = createServerClient(
     supabaseUrl,
     supabaseAnonKey,
@@ -61,16 +70,6 @@ export async function proxy(request: NextRequest) {
   if (isDashboardRoute && !user) {
     const next = `${pathname}${search ?? ''}`;
     return redirectTo(request, '/auth/login', { next });
-  }
-
-  // 2) Prevent logged-in users from visiting /auth/login or /auth/signup
-  if (shouldRedirectAuthenticatedUser && user) {
-    return redirectTo(request, '/dashboard');
-  }
-
-  // 3) Keep reset-password routes publicly reachable, including Supabase recovery URLs.
-  if (isPublicAuthRoute) {
-    return response;
   }
 
   return response;
