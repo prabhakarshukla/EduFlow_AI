@@ -20,7 +20,15 @@ export async function proxy(request: NextRequest) {
 
   // We only match the routes below via config.matcher, but keep logic explicit.
   const isDashboardRoute = pathname === '/dashboard' || pathname.startsWith('/dashboard/');
-  const isAuthRoute = pathname === '/auth/login' || pathname === '/auth/signup';
+  const publicAuthRoutes = [
+    '/auth/login',
+    '/auth/signup',
+    '/auth/forgot-password',
+    '/auth/update-password',
+  ];
+  const redirectAuthenticatedAuthRoutes = ['/auth/login', '/auth/signup'];
+  const isPublicAuthRoute = publicAuthRoutes.includes(pathname);
+  const shouldRedirectAuthenticatedUser = redirectAuthenticatedAuthRoutes.includes(pathname);
 
   let response = NextResponse.next({
     request: {
@@ -56,13 +64,24 @@ export async function proxy(request: NextRequest) {
   }
 
   // 2) Prevent logged-in users from visiting /auth/login or /auth/signup
-  if (isAuthRoute && user) {
+  if (shouldRedirectAuthenticatedUser && user) {
     return redirectTo(request, '/dashboard');
+  }
+
+  // 3) Keep reset-password routes publicly reachable, including Supabase recovery URLs.
+  if (isPublicAuthRoute) {
+    return response;
   }
 
   return response;
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/auth/login', '/auth/signup'],
+  matcher: [
+    '/dashboard/:path*',
+    '/auth/login',
+    '/auth/signup',
+    '/auth/forgot-password',
+    '/auth/update-password',
+  ],
 };
