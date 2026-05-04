@@ -3,7 +3,7 @@
 import type { FormEvent } from "react";
 import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 
 function AuthNotice({
@@ -66,37 +66,41 @@ function UpdatePasswordContent() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const handledRecoveryUrl = useRef(false);
 
   useEffect(() => {
     let mounted = true;
 
-    (async () => {
+    const handleRecovery = async () => {
       setCheckingSession(true);
 
+      const { search, hash } = window.location;
+      const queryParams = new URLSearchParams(search);
       const hashParams = new URLSearchParams(
-        window.location.hash.startsWith("#")
-          ? window.location.hash.slice(1)
-          : window.location.hash,
+        hash.startsWith("#") ? hash.slice(1) : hash,
       );
       const authMessage =
-        searchParams.get("error_description") ||
+        queryParams.get("error_description") ||
         hashParams.get("error_description") ||
-        searchParams.get("error") ||
+        queryParams.get("error") ||
         hashParams.get("error") ||
-        searchParams.get("authError");
+        queryParams.get("authError");
 
       if (authMessage && mounted) {
         setError(authMessage);
       }
 
-      const code = searchParams.get("code");
+      const code = queryParams.get("code");
       const accessToken =
-        searchParams.get("access_token") || hashParams.get("access_token");
+        queryParams.get("access_token") || hashParams.get("access_token");
       const refreshToken =
-        searchParams.get("refresh_token") || hashParams.get("refresh_token");
-      const recoveryType = searchParams.get("type") || hashParams.get("type");
+        queryParams.get("refresh_token") || hashParams.get("refresh_token");
+      const recoveryType = queryParams.get("type") || hashParams.get("type");
+      const hasRecoveryParams = Boolean(
+        code || accessToken || refreshToken || recoveryType,
+      );
+      const hasHash = hash.length > 0;
+      let hadRecoveryError = false;
 
       if (!handledRecoveryUrl.current) {
         handledRecoveryUrl.current = true;
@@ -106,33 +110,31 @@ function UpdatePasswordContent() {
             await supabase.auth.exchangeCodeForSession(code);
 
           if (exchangeError && mounted) {
+            hadRecoveryError = true;
             setSessionReady(false);
             setError(
               exchangeError.message ||
                 "This password reset link is invalid or expired. Please request a new one.",
             );
-          } else if (mounted) {
+          }
+        }
+
+        if (hasHash) {
+          const { data: hashedSession } = await supabase.auth.getSession();
+          if (hashedSession.session && mounted) {
             setSessionReady(true);
             setError(null);
           }
-        } else if (
-          accessToken &&
-          refreshToken &&
-          recoveryType === "recovery"
-        ) {
-          const { data: hydratedData } = await supabase.auth.getSession();
+        }
 
-          if (hydratedData.session && mounted) {
-            setSessionReady(true);
-            setError(null);
-          }
-
+        if (accessToken && refreshToken && recoveryType === "recovery") {
           const { error: sessionError } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
           });
 
           if (sessionError && mounted) {
+            hadRecoveryError = true;
             setSessionReady(false);
             setError(
               sessionError.message ||
@@ -150,14 +152,18 @@ function UpdatePasswordContent() {
         setSessionReady(true);
         setError(null);
       }
-      if (mounted && !data.session && !authMessage) {
+      if (mounted && !data.session && !authMessage && !hadRecoveryError) {
         setSessionReady(false);
         setError(
-          "Open this page from the password reset link in your email, or request a new reset link if this one has expired.",
+          hasRecoveryParams
+            ? "This password reset link is invalid or expired. Please request a new one."
+            : "Open this page from the password reset link in your email, or request a new reset link if this one has expired.",
         );
       }
       if (mounted) setCheckingSession(false);
-    })();
+    };
+
+    handleRecovery();
 
     const {
       data: { subscription },
@@ -173,15 +179,15 @@ function UpdatePasswordContent() {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [searchParams]);
+  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
 
-    if (newPassword.length < 8) {
-      setError("Please choose a password with at least 8 characters.");
+    if (newPassword.length < 6) {
+      setError("Please choose a password with at least 6 characters.");
       return;
     }
 
@@ -361,7 +367,7 @@ function UpdatePasswordContent() {
                       className="text-[10px]"
                       style={{ color: "rgba(255,255,255,0.28)" }}
                     >
-                      Use at least 8 characters.
+                      Use at least 6 characters.
                     </p>
                   </div>
                 </>

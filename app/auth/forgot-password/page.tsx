@@ -69,10 +69,14 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
+      const redirectTo =
+        typeof window !== "undefined"
+          ? `${window.location.origin}/auth/update-password`
+          : "https://eduflow-ai-olive.vercel.app/auth/update-password";
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(
         email.trim(),
         {
-          redirectTo: `${window.location.origin}/auth/update-password`,
+          redirectTo,
         },
       );
 
