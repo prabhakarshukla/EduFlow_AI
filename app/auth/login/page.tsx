@@ -27,6 +27,7 @@ function getAuthErrorMessage(message: string) {
 function LoginPageContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -235,7 +236,7 @@ function LoginPageContent() {
                   </Link>
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -243,6 +244,23 @@ function LoginPageContent() {
                   className="input"
                   autoComplete="current-password"
                 />
+                <div className="flex items-center gap-2 pt-1">
+                  <input
+                    id="login-show-password"
+                    type="checkbox"
+                    checked={showPassword}
+                    onChange={(e) => setShowPassword(e.target.checked)}
+                    className="h-4 w-4 rounded border"
+                    style={{ accentColor: "#6EE7D8" }}
+                  />
+                  <label
+                    htmlFor="login-show-password"
+                    className="text-xs font-medium select-none"
+                    style={{ color: "rgba(209,250,245,0.7)" }}
+                  >
+                    Show password
+                  </label>
+                </div>
               </div>
 
               <button

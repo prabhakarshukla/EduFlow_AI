@@ -60,6 +60,7 @@ function AuthNotice({
 function UpdatePasswordContent() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
   const [sessionReady, setSessionReady] = useState(false);
@@ -337,7 +338,7 @@ function UpdatePasswordContent() {
                       New password
                     </label>
                     <input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="Create a strong password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
@@ -355,7 +356,7 @@ function UpdatePasswordContent() {
                       Confirm password
                     </label>
                     <input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="Repeat your new password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
@@ -369,6 +370,23 @@ function UpdatePasswordContent() {
                     >
                       Use at least 6 characters.
                     </p>
+                    <div className="flex items-center gap-2 pt-1">
+                      <input
+                        id="update-show-password"
+                        type="checkbox"
+                        checked={showPassword}
+                        onChange={(e) => setShowPassword(e.target.checked)}
+                        className="h-4 w-4 rounded border"
+                        style={{ accentColor: "#6EE7D8" }}
+                      />
+                      <label
+                        htmlFor="update-show-password"
+                        className="text-xs font-medium select-none"
+                        style={{ color: "rgba(209,250,245,0.7)" }}
+                      >
+                        Show password
+                      </label>
+                    </div>
                   </div>
                 </>
               )}
