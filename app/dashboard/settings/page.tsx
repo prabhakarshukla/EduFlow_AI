@@ -47,18 +47,37 @@ export default function SettingsPage() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [remindersEnabled, setRemindersEnabled] = useState(false);
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
-  const [notificationPermissionStatus, setNotificationPermissionStatus] = useState<
-    "enabled" | "disabled" | "denied" | "unsupported"
-  >("disabled");
-  const [notificationStatusMessage, setNotificationStatusMessage] = useState<string | null>(null);
+  const [notificationPermissionStatus, setNotificationPermissionStatus] =
+    useState<"enabled" | "disabled" | "denied" | "unsupported">("disabled");
+  const [notificationStatusMessage, setNotificationStatusMessage] = useState<
+    string | null
+  >(null);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
   const NOTIFICATIONS_KEY = "notificationsEnabled";
   const REMINDERS_KEY = "remindersEnabled";
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        const fullName =
+          typeof user?.user_metadata?.full_name === "string"
+            ? user.user_metadata.full_name.trim()
+            : "";
+        const displayName =
+          fullName ||
+          (typeof user?.user_metadata?.name === "string"
+            ? user.user_metadata.name.trim()
+            : "");
+
+        if (displayName) {
+          setName(displayName);
+        }
         if (user?.email) {
           setEmail(user.email);
         }
@@ -94,18 +113,24 @@ export default function SettingsPage() {
     if (!("Notification" in window)) {
       setNotificationsEnabled(false);
       setNotificationPermissionStatus("unsupported");
-      setNotificationStatusMessage("Browser notifications are not supported in this browser.");
+      setNotificationStatusMessage(
+        "Browser notifications are not supported in this browser.",
+      );
       return;
     }
 
     if (Notification.permission === "denied") {
       setNotificationsEnabled(false);
       setNotificationPermissionStatus("denied");
-      setNotificationStatusMessage("Notification permission is blocked in your browser settings.");
+      setNotificationStatusMessage(
+        "Notification permission is blocked in your browser settings.",
+      );
       return;
     }
 
-    setNotificationPermissionStatus(notificationsEnabled ? "enabled" : "disabled");
+    setNotificationPermissionStatus(
+      notificationsEnabled ? "enabled" : "disabled",
+    );
     setNotificationStatusMessage(null);
   }, [notificationsEnabled, preferencesHydrated]);
 
@@ -124,9 +149,11 @@ export default function SettingsPage() {
     if (notificationsEnabled) {
       setNotificationsEnabled(false);
       setNotificationPermissionStatus(
-        typeof window !== "undefined" && "Notification" in window && Notification.permission === "denied"
+        typeof window !== "undefined" &&
+          "Notification" in window &&
+          Notification.permission === "denied"
           ? "denied"
-          : "disabled"
+          : "disabled",
       );
       setNotificationStatusMessage(null);
       return;
@@ -135,14 +162,17 @@ export default function SettingsPage() {
     if (typeof window === "undefined" || !("Notification" in window)) {
       setNotificationsEnabled(false);
       setNotificationPermissionStatus("unsupported");
-      setNotificationStatusMessage("Browser notifications are not supported in this browser.");
+      setNotificationStatusMessage(
+        "Browser notifications are not supported in this browser.",
+      );
       return;
     }
 
     try {
-      const permission = Notification.permission === "granted"
-        ? "granted"
-        : await Notification.requestPermission();
+      const permission =
+        Notification.permission === "granted"
+          ? "granted"
+          : await Notification.requestPermission();
 
       if (permission === "granted") {
         setNotificationsEnabled(true);
@@ -152,21 +182,26 @@ export default function SettingsPage() {
       }
 
       setNotificationsEnabled(false);
-      setNotificationPermissionStatus(permission === "denied" ? "denied" : "disabled");
+      setNotificationPermissionStatus(
+        permission === "denied" ? "denied" : "disabled",
+      );
       setNotificationStatusMessage(
         permission === "denied"
           ? "Notification permission is blocked in your browser settings."
-          : "Notification permission was not granted."
+          : "Notification permission was not granted.",
       );
     } catch (error) {
       setNotificationsEnabled(false);
       setNotificationPermissionStatus("disabled");
-      setNotificationStatusMessage("Unable to request notification permission right now.");
+      setNotificationStatusMessage(
+        "Unable to request notification permission right now.",
+      );
     }
   };
 
   const handleSave = async () => {
-    if (!name.trim()) {
+    const trimmedName = name.trim();
+    if (!trimmedName) {
       setMessage({ type: "error", text: "Name cannot be empty" });
       setTimeout(() => setMessage(null), 3000);
       return;
@@ -174,12 +209,20 @@ export default function SettingsPage() {
 
     setSaving(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      const { error } = await supabase.auth.updateUser({
+        data: { full_name: trimmedName },
+      });
+      if (error) {
+        throw error;
+      }
+
+      setName(trimmedName);
       setMessage({ type: "success", text: "Settings saved successfully" });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
-      setMessage({ type: "error", text: "Failed to save settings" });
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to save settings";
+      setMessage({ type: "error", text: errorMessage });
       setTimeout(() => setMessage(null), 3000);
     } finally {
       setSaving(false);
@@ -203,18 +246,20 @@ export default function SettingsPage() {
         <div
           className="px-4 py-3 rounded-lg text-sm font-medium"
           style={{
-            background: message.type === "success" 
-              ? "rgba(16, 185, 129, 0.1)" 
-              : "rgba(239, 68, 68, 0.1)",
-            color: message.type === "success" 
-              ? "#10b981" 
-              : "#ef4444",
-            border: `1px solid ${message.type === "success" 
-              ? "rgba(16, 185, 129, 0.3)" 
-              : "rgba(239, 68, 68, 0.3)"}`,
+            background:
+              message.type === "success"
+                ? "rgba(16, 185, 129, 0.1)"
+                : "rgba(239, 68, 68, 0.1)",
+            color: message.type === "success" ? "#10b981" : "#ef4444",
+            border: `1px solid ${
+              message.type === "success"
+                ? "rgba(16, 185, 129, 0.3)"
+                : "rgba(239, 68, 68, 0.3)"
+            }`,
           }}
         >
-          {message.type === "success" ? "✓ " : "✕ "}{message.text}
+          {message.type === "success" ? "✓ " : "✕ "}
+          {message.text}
         </div>
       )}
 
@@ -225,7 +270,7 @@ export default function SettingsPage() {
               <SectionLabel>Account</SectionLabel>
               <h2
                 className="text-lg font-semibold mb-4"
-                  style={{ color: "var(--ui-text)" }}
+                style={{ color: "var(--ui-text)" }}
               >
                 Profile & Email
               </h2>
@@ -251,7 +296,10 @@ export default function SettingsPage() {
                     border: "1px solid var(--ui-border)",
                   }}
                 />
-                <p className="text-xs mt-1" style={{ color: "var(--ui-subtle)" }}>
+                <p
+                  className="text-xs mt-1"
+                  style={{ color: "var(--ui-subtle)" }}
+                >
                   Managed through authentication
                 </p>
               </div>
@@ -277,7 +325,8 @@ export default function SettingsPage() {
                   }}
                   onFocus={(e) => {
                     e.currentTarget.style.borderColor = "#14b8a6";
-                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(20, 184, 166, 0.1)";
+                    e.currentTarget.style.boxShadow =
+                      "0 0 0 3px rgba(20, 184, 166, 0.1)";
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = "var(--ui-border)";
@@ -291,21 +340,26 @@ export default function SettingsPage() {
                 disabled={saving}
                 className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200"
                 style={{
-                  background: saving ? "var(--ui-border)" : "linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)",
+                  background: saving
+                    ? "var(--ui-border)"
+                    : "linear-gradient(135deg, #6EE7D8 0%, #14B8A6 100%)",
                   color: saving ? "var(--ui-muted)" : "#0d2420",
                   border: "none",
                   cursor: saving ? "not-allowed" : "pointer",
                 }}
                 onMouseEnter={(e) => {
                   if (!saving) {
-                    (e.currentTarget as HTMLElement).style.boxShadow = "0 6px 22px rgba(110,231,216,0.44)";
-                    (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+                    (e.currentTarget as HTMLElement).style.boxShadow =
+                      "0 6px 22px rgba(110,231,216,0.44)";
+                    (e.currentTarget as HTMLElement).style.transform =
+                      "translateY(-2px)";
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!saving) {
                     (e.currentTarget as HTMLElement).style.boxShadow = "none";
-                    (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+                    (e.currentTarget as HTMLElement).style.transform =
+                      "translateY(0)";
                   }
                 }}
               >
@@ -321,7 +375,7 @@ export default function SettingsPage() {
               <SectionLabel>Preferences</SectionLabel>
               <h2
                 className="text-lg font-semibold mb-4"
-                  style={{ color: "var(--ui-text)" }}
+                style={{ color: "var(--ui-text)" }}
               >
                 Customization
               </h2>
@@ -336,7 +390,10 @@ export default function SettingsPage() {
                   >
                     Theme
                   </p>
-                  <p className="text-xs mt-1" style={{ color: "var(--ui-muted)" }}>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: "var(--ui-muted)" }}
+                  >
                     {isDark ? "Dark mode" : "Light mode"}
                   </p>
                 </div>
@@ -358,7 +415,10 @@ export default function SettingsPage() {
                 </button>
               </div>
 
-              <div className="flex items-center justify-between pt-2" style={{ borderTop: "1px solid var(--ui-border)" }}>
+              <div
+                className="flex items-center justify-between pt-2"
+                style={{ borderTop: "1px solid var(--ui-border)" }}
+              >
                 <div>
                   <p
                     className="text-sm font-medium"
@@ -366,10 +426,16 @@ export default function SettingsPage() {
                   >
                     Notifications
                   </p>
-                  <p className="text-xs mt-1" style={{ color: "var(--ui-muted)" }}>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: "var(--ui-muted)" }}
+                  >
                     Alert settings
                   </p>
-                  <p className="text-xs mt-1" style={{ color: "var(--ui-subtle)" }}>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: "var(--ui-subtle)" }}
+                  >
                     {notificationPermissionStatus === "denied"
                       ? "Permission denied"
                       : notificationsEnabled
@@ -380,9 +446,11 @@ export default function SettingsPage() {
                     <p
                       className="text-[11px] mt-1 leading-relaxed"
                       style={{
-                        color: notificationPermissionStatus === "denied" || notificationPermissionStatus === "unsupported"
-                          ? "#f87171"
-                          : "var(--ui-muted)",
+                        color:
+                          notificationPermissionStatus === "denied" ||
+                          notificationPermissionStatus === "unsupported"
+                            ? "#f87171"
+                            : "var(--ui-muted)",
                       }}
                     >
                       {notificationStatusMessage}
@@ -394,7 +462,9 @@ export default function SettingsPage() {
                   onClick={handleNotificationsToggle}
                   className="relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-200"
                   style={{
-                    background: notificationsEnabled ? "#14b8a6" : "var(--ui-border)",
+                    background: notificationsEnabled
+                      ? "#14b8a6"
+                      : "var(--ui-border)",
                   }}
                 >
                   <span
@@ -407,7 +477,10 @@ export default function SettingsPage() {
                 </button>
               </div>
 
-              <div className="flex items-center justify-between pt-2" style={{ borderTop: "1px solid var(--ui-border)" }}>
+              <div
+                className="flex items-center justify-between pt-2"
+                style={{ borderTop: "1px solid var(--ui-border)" }}
+              >
                 <div>
                   <p
                     className="text-sm font-medium"
@@ -415,10 +488,16 @@ export default function SettingsPage() {
                   >
                     Reminders
                   </p>
-                  <p className="text-xs mt-1" style={{ color: "var(--ui-muted)" }}>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: "var(--ui-muted)" }}
+                  >
                     Study reminders
                   </p>
-                  <p className="text-xs mt-1" style={{ color: "var(--ui-subtle)" }}>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: "var(--ui-subtle)" }}
+                  >
                     {remindersEnabled ? "Enabled" : "Disabled"}
                   </p>
                 </div>
@@ -427,7 +506,9 @@ export default function SettingsPage() {
                   onClick={() => setRemindersEnabled(!remindersEnabled)}
                   className="relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-200"
                   style={{
-                    background: remindersEnabled ? "#14b8a6" : "var(--ui-border)",
+                    background: remindersEnabled
+                      ? "#14b8a6"
+                      : "var(--ui-border)",
                   }}
                 >
                   <span
@@ -449,7 +530,7 @@ export default function SettingsPage() {
               <SectionLabel>Data & Privacy</SectionLabel>
               <h2
                 className="text-lg font-semibold mb-4"
-                  style={{ color: "var(--ui-text)" }}
+                style={{ color: "var(--ui-text)" }}
               >
                 Legal & Policy
               </h2>
